@@ -62,7 +62,7 @@ const initialData = {
                     "total_wrong": 2,
                     "available_questions": [
                         4, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 21, 22, 23, 25, 26, 27,
-                        28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43, 44, 47, 48, 49, 50,
+                        28, 29, 30, 31, 32, 33, 34, /IR37, 38, 39, 40, 41, 42, 43, 44, 47, 48, 49, 50,
                         51, 52, 53, 54, 55, 56, 57, 59, 60, 61, 62, 63, 64, 65, 66
                     ],
                     "mistake_history": [],
@@ -460,7 +460,7 @@ function deleteExam(index) {
                 inputs.push(chap_num);
             }
         }
-        output += `<button onclick="submitDelete(${index}, ${JSON.stringify microbial) class="mt-2 bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">Submit</button>`;
+        output += `<button onclick="submitDelete(${index}, ${JSON.stringify(inputs)})" class="mt-2 bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">Submit</button>`;
         document.getElementById('content').innerHTML = output;
     } else {
         currentSubject.pending_exams.splice(index, 1);
@@ -579,6 +579,53 @@ function setSubject(sid) {
 function exit() {
     document.getElementById('content').innerHTML = '<p class="text-green-500">Goodbye!</p>';
     setTimeout(() => window.close(), 1000);
+}
+
+function exportData() {
+    const data = JSON.parse(localStorage.getItem(DATA_KEY));
+    if (!data) {
+        document.getElementById('content').innerHTML = '<p class="text-red-500">No data to export.</p>';
+        return;
+    }
+    const jsonString = JSON.stringify(data, null, 2);
+    const blob = new Blob([jsonString], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `test_generator_data_${new Date().toISOString().slice(0,10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    document.getElementById('content').innerHTML = '<p class="text-green-500">Data exported successfully.</p>';
+}
+
+function importData() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = function(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const importedData = JSON.parse(e.target.result);
+                if (!importedData.subjects) {
+                    document.getElementById('content').innerHTML = '<p class="text-red-500">Invalid data format. Must contain "subjects".</p>';
+                    return;
+                }
+                if (confirm("Are you sure you want to import this data? This will overwrite the existing data.")) {
+                    localStorage.setItem(DATA_KEY, JSON.stringify(importedData));
+                    location.reload(); // Reload to apply new data
+                }
+            } catch (error) {
+                document.getElementById('content').innerHTML = '<p class="text-red-500">Invalid JSON file.</p>';
+            }
+        };
+        reader.readAsText(file);
+    };
+    input.click();
 }
 
 updateSubjectInfo();
