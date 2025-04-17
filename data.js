@@ -304,7 +304,27 @@ export function selectNewQuestions(chap, n) {
  * @param {Object} data - Data to save.
  */
 export function saveData(data) {
-    localStorage.setItem(DATA_KEY, JSON.stringify(data));
+    try {
+        localStorage.setItem(DATA_KEY, JSON.stringify(data));
+    } catch (e) {
+        console.error('Failed to save data:', e);
+    }
+}
+
+export function loadData() {
+    try {
+        let data = JSON.parse(localStorage.getItem(DATA_KEY));
+        if (!data || !data.subjects) {
+            data = JSON.parse(JSON.stringify(initialData));
+            saveData(data);
+        }
+        return data;
+    } catch (e) {
+        console.error('Failed to load data:', e);
+        const data = JSON.parse(JSON.stringify(initialData));
+        saveData(data);
+        return data;
+    }
 }
 
 /**

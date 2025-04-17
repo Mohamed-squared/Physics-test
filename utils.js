@@ -47,14 +47,17 @@ export function importData() {
         reader.onload = function(e) {
             try {
                 const importedData = JSON.parse(e.target.result);
-                if (!importedData.subjects || typeof importedData.subjects !== 'object') {
-                    throw new Error('Invalid data format');
+                if (!importedData.subjects || typeof importedData.subjects !== 'object' || Object.keys(importedData.subjects).length === 0) {
+                    throw new Error('Invalid data format: subjects missing or empty');
                 }
                 saveData(importedData);
-
-                showSubject();
+                showSubject(); // Ensure this updates the UI
             } catch (e) {
-                document.getElementById('content').innerHTML = `<p class="text-red-500">Error importing data: ${e.message}</p>`;
+                console.error('Import error:', e);
+                const content = document.getElementById('content');
+                if (content) {
+                    content.innerHTML = `<p class="text-red-500">Failed to import data. Please ensure the file is a valid JSON with subjects.</p>`;
+                }
             }
         };
         reader.readAsText(file);
