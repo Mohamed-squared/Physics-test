@@ -11,17 +11,11 @@ export function toggleTheme() {
     document.documentElement.classList.toggle('dark');
     const isDark = document.documentElement.classList.contains('dark');
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    const themeToggle = document.getElementById('theme-toggle');
-    if (themeToggle) {
-        const sunIcon = themeToggle.querySelector('.dark\\:block');
-        const moonIcon = themeToggle.querySelector('.block:not(.dark\\:block)');
-        if (isDark) {
-            sunIcon.classList.remove('hidden');
-            moonIcon.classList.add('hidden');
-        } else {
-            sunIcon.classList.add('hidden');
-            moonIcon.classList.remove('hidden');
-        }
+    const sunIcon = document.getElementById('sun-icon');
+    const moonIcon = document.getElementById('moon-icon');
+    if (sunIcon && moonIcon) {
+        sunIcon.classList.toggle('hidden', !isDark);
+        moonIcon.classList.toggle('hidden', isDark);
     }
 }
 
