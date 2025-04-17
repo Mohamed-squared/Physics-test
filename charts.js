@@ -11,123 +11,169 @@ const charts = {};
  * Shows the progress dashboard with charts for the current subject.
  */
 export async function showProgressDashboard() {
-    document.getElementById('menu').classList.add('hidden');
-    document.getElementById('dashboard').classList.remove('hidden');
-    
-    if (Object.keys(currentSubject.chapters).length === 0) {
-        document.getElementById('dashboard').innerHTML = '<p class="text-red-500">No chapters available to display in dashboard.</p>';
+    const menu = document.getElementById('menu');
+    const dashboard = document.getElementById('dashboard');
+
+    if (!menu || !dashboard) {
+        console.error("Required DOM elements 'menu' or 'dashboard' not found.");
         return;
     }
 
-    // Load Chart.js dynamically to reduce initial load time
-    const { Chart } = await import('https://cdn.jsdelivr.net/npm/chart.js@4.4.4/+esm');
-    
-    // Clear existing charts
-    Object.values(charts).forEach(chart => chart.destroy());
-    
-    // Render dashboard
-    document.getElementById('dashboard').innerHTML = `
-        <div class="p-4">
-            <h2 class="text-2xl font-bold mb-4 dark:text-white">Progress Dashboard: ${currentSubject.name}</h2>
-            <div class="mb-8">
-                <h3 class="text-lg font-semibold mb-2 dark:text-white">Wrong Answers per Chapter</h3>
-                <canvas id="wrongAnswersChart" class="chart-container"></canvas>
+    menu.classList.add('hidden');
+    dashboard.classList.remove('hidden');
+
+    if (!currentSubject || !currentSubject.chapters || Object.keys(currentSubject.chapters).length === 0) {
+        dashboard.innerHTML = '<p class="text-red-500 p-4">No chapters available to display in dashboard. Please add chapters first.</p>';
+        return;
+    }
+
+    try {
+        // Load Chart.js dynamically
+        const { Chart } = await import('https://cdn.jsdelivr.net/npm/chart.js@4.4.4/+esm');
+
+        // Clear existing charts
+        Object.values(charts).forEach(chart => chart.destroy());
+        charts.attemptedChart = null;
+        charts.wrongChart = null;
+        charts.masteryChart = null;
+        charts.difficultyChart = null;
+
+        // Render dashboard with correct canvas IDs
+        dashboard.innerHTML = `
+            <div class="p-4">
+                <h2 class="text-2xl font-bold mb-4 dark:text-white">Progress Dashboard: ${currentSubject.name}</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2 dark:text-white">Questions Attempted</h3>
+                        <canvas id="attemptedChart" class="chart-container"></canvas>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2 dark:text-white">Wrong Answers</h3>
+                        <canvas id="wrongChart" class="chart-container"></canvas>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2 dark:text-white">Consecutive Mastery</h3>
+                        <canvas id="masteryChart" class="chart-container"></canvas>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2 dark:text-white">Chapter Difficulty</h3>
+                        <canvas id="difficultyChart" class="chart-container"></canvas>
+                    </div>
+                </div>
+                <button id="back-to-subject" class="btn-primary mt-4">Back to Subject</button>
             </div>
-            <div>
-                <h3 class="text-lg font-semibold mb-2 dark:text-white">Mistake History Trends</h3>
-                <canvas id="mistakeHistoryChart" class="chart-container"></canvas>
-            </div>
-            <button onclick="showSubject()" class="btn-primary mt-4">Back to Subject</button>
-        </div>
-    `;
-    
-    renderCharts(Chart);
+        `;
+
+        // Verify canvas elements exist
+        const canvases = ['attemptedChart', 'wrongChart', 'masteryChart', 'difficultyChart'];
+        for (const id of canvases) {
+            if (!document.getElementById(id)) {
+                throw new Error(`Canvas element with ID '${id}' not found.`);
+            }
+        }
+
+        // Render charts
+        renderCharts(Chart);
+
+        // Attach event listener for back button
+        document.getElementById('back-to-subject').addEventListener('click', () => {
+            import('./ui.js').then(module => module.showSubject());
+        });
+    } catch (error) {
+        console.error("Error rendering dashboard:", error);
+        dashboard.innerHTML = `<p class="text-red-500 p-4">Failed to load dashboard: ${error.message}</p>`;
+    }
 }
 
 /**
- * Renders the wrong answers and mistake history charts.
+ * Renders the charts for the dashboard.
  * @param {Object} Chart - Chart.js constructor.
  */
 function renderCharts(Chart) {
-    const wrongCtx = document.getElementById('wrongAnswersChart').getContext('2d');
-    const historyCtx = document.getElementById('mistakeHistoryChart').getContext('2d');
-    
-    // Wrong Answers Bar Chart
-    const labels = Object.keys(currentSubject.chapters).map(chapNum => `Ch. ${chapNum}`);
-    const wrongData = Object.values(currentSubject.chapters).map(chap => chap.total_wrong);
-    const difficultyData = Object.values(currentSubject.chapters).map(chap => calculateDifficulty(chap));
-    
-    charts.wrongAnswersChart = new Chart(wrongCtx, {
+    const chapters = currentSubject.chapters;
+    const chapterNumbers = Object.keys(chapters).sort((a, b) => parseInt(a) - parseInt(b));
+
+    // Total Questions Attempted
+    const attemptedCtx = document.getElementById('attemptedChart').getContext('2d');
+    charts.attemptedChart = new Chart(attemptedCtx, {
         type: 'bar',
         data: {
-            labels,
-            datasets: [
-                {
-                    label: 'Wrong Answers',
-                    data: wrongData,
-                    backgroundColor: 'rgba(239, 68, 68, 0.6)', // Tailwind red-500
-                    borderColor: '#EF4444',
-                    borderWidth: 1
-                },
-                {
-                    label: 'Difficulty Score',
-                    data: difficultyData,
-                    type: 'line',
-                    borderColor: '#3B82F6', // Tailwind primary-500
-                    backgroundColor: 'rgba(59, 130, 246, 0.2)',
-                    fill: true,
-                    yAxisID: 'y1'
-                }
-            ]
+            labels: chapterNumbers.map(num => `Ch. ${num}`),
+            datasets: [{
+                label: 'Questions Attempted',
+                data: chapterNumbers.map(num => chapters[num].total_attempted || 0),
+                backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                borderColor: 'rgb(59, 130, 246)',
+                borderWidth: 1
+            }]
         },
         options: {
             responsive: true,
-            plugins: {
-                legend: { position: 'top' }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    title: { display: true, text: 'Wrong Answers' }
-                },
-                y1: {
-                    position: 'right',
-                    beginAtZero: true,
-                    title: { display: true, text: 'Difficulty Score' },
-                    grid: { drawOnChartArea: false }
-                }
-            }
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
         }
     });
-    
-    // Mistake History Line Chart
-    const maxHistoryLength = Math.max(...Object.values(currentSubject.chapters).map(chap => chap.mistake_history.length));
-    const timestamps = Array.from({length: maxHistoryLength}, (_, i) => `Test ${i + 1}`);
-    
-    charts.mistakeHistoryChart = new Chart(historyCtx, {
-        type: 'line',
+
+    // Total Wrong Answers
+    const wrongCtx = document.getElementById('wrongChart').getContext('2d');
+    charts.wrongChart = new Chart(wrongCtx, {
+        type: 'bar',
         data: {
-            labels: timestamps,
-            datasets: Object.entries(currentSubject.chapters).map(([chapNum, chap], i) => ({
-                label: `Ch. ${chapNum} Wrong`,
-                data: chap.mistake_history,
-                borderColor: `hsl(${i * 30}, 70%, 50%)`,
-                backgroundColor: `hsla(${i * 30}, 70%, 50%, 0.2)`,
-                fill: false
-            }))
+            labels: chapterNumbers.map(num => `Ch. ${num}`),
+            datasets: [{
+                label: 'Wrong Answers',
+                data: chapterNumbers.map(num => chapters[num].total_wrong || 0),
+                backgroundColor: 'rgba(239, 68, 68, 0.7)',
+                borderColor: 'rgb(239, 68, 68)',
+                borderWidth: 1
+            }]
         },
         options: {
             responsive: true,
-            plugins: {
-                legend: { position: 'top' }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    title: { display: true, text: 'Wrong Answers' },
-                    ticks: { precision: 0 }
-                }
-            }
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+        }
+    });
+
+    // Consecutive Mastery
+    const masteryCtx = document.getElementById('masteryChart').getContext('2d');
+    charts.masteryChart = new Chart(masteryCtx, {
+        type: 'bar',
+        data: {
+            labels: chapterNumbers.map(num => `Ch. ${num}`),
+            datasets: [{
+                label: 'Consecutive Mastery',
+                data: chapterNumbers.map(num => chapters[num].consecutive_mastery || 0),
+                backgroundColor: 'rgba(34, 197, 94, 0.7)',
+                borderColor: 'rgb(34, 197, 94)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+        }
+    });
+
+    // Chapter Difficulty
+    const difficultyCtx = document.getElementById('difficultyChart').getContext('2d');
+    charts.difficultyChart = new Chart(difficultyCtx, {
+        type: 'bar',
+        data: {
+            labels: chapterNumbers.map(num => `Ch. ${num}`),
+            datasets: [{
+                label: 'Difficulty Score',
+                data: chapterNumbers.map(num => calculateDifficulty(chapters[num]) || 0),
+                backgroundColor: 'rgba(255, 159, 64, 0.7)',
+                borderColor: 'rgb(255, 159, 64)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, max: 100 } }
         }
     });
 }

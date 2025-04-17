@@ -305,10 +305,11 @@ export function deleteExam() {
 export function showManageSubjects() {
     document.getElementById('menu').classList.add('hidden');
     document.getElementById('content').innerHTML = `
-        <div class="max-w-md mx-auto">
+        <div class="max-w-md mx-auto p-4">
             <h2 class="text-2xl font-bold mb-4 dark:text-white">Manage Subjects</h2>
-            <p class="dark:text-gray-300">Currently, only one subject (${currentSubject.name}) is supported.</p>
-            <button class="btn-primary mt-4" onclick="showSubject()">Back to Subject</button>
+            <p class="dark:text-gray-300 mb-4">Current Subject: ${currentSubject.name}</p>
+            <button id="back-to-subject-btn" class="btn-primary">Back to Subject</button>
         </div>
     `;
+    document.getElementById('back-to-subject-btn').addEventListener('click', showSubject);
 }
