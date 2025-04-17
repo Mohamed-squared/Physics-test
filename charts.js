@@ -1,15 +1,9 @@
-/**
- * Chart rendering for the test generator's progress dashboard using Chart.js.
- */
+// charts.js
 import { currentSubject } from './ui.js';
 import { calculateDifficulty } from './data.js';
 
-// Global charts object to manage Chart.js instances
 const charts = {};
 
-/**
- * Shows the progress dashboard with charts for the current subject.
- */
 export async function showProgressDashboard() {
     const menu = document.getElementById('menu');
     const dashboard = document.getElementById('dashboard');
@@ -28,17 +22,14 @@ export async function showProgressDashboard() {
     }
 
     try {
-        // Load Chart.js dynamically
         const { Chart } = await import('https://cdn.jsdelivr.net/npm/chart.js@4.4.4/+esm');
 
-        // Clear existing charts
         Object.values(charts).forEach(chart => chart.destroy());
         charts.attemptedChart = null;
         charts.wrongChart = null;
         charts.masteryChart = null;
         charts.difficultyChart = null;
 
-        // Render dashboard with correct canvas IDs
         dashboard.innerHTML = `
             <div class="p-4">
                 <h2 class="text-2xl font-bold mb-4 dark:text-white">Progress Dashboard: ${currentSubject.name}</h2>
@@ -64,18 +55,8 @@ export async function showProgressDashboard() {
             </div>
         `;
 
-        // Verify canvas elements exist
-        const canvases = ['attemptedChart', 'wrongChart', 'masteryChart', 'difficultyChart'];
-        for (const id of canvases) {
-            if (!document.getElementById(id)) {
-                throw new Error(`Canvas element with ID '${id}' not found.`);
-            }
-        }
-
-        // Render charts
         renderCharts(Chart);
 
-        // Attach event listener for back button
         document.getElementById('back-to-subject').addEventListener('click', () => {
             import('./ui.js').then(module => module.showSubject());
         });
@@ -85,15 +66,10 @@ export async function showProgressDashboard() {
     }
 }
 
-/**
- * Renders the charts for the dashboard.
- * @param {Object} Chart - Chart.js constructor.
- */
 function renderCharts(Chart) {
     const chapters = currentSubject.chapters;
     const chapterNumbers = Object.keys(chapters).sort((a, b) => parseInt(a) - parseInt(b));
 
-    // Total Questions Attempted
     const attemptedCtx = document.getElementById('attemptedChart').getContext('2d');
     charts.attemptedChart = new Chart(attemptedCtx, {
         type: 'bar',
@@ -114,7 +90,6 @@ function renderCharts(Chart) {
         }
     });
 
-    // Total Wrong Answers
     const wrongCtx = document.getElementById('wrongChart').getContext('2d');
     charts.wrongChart = new Chart(wrongCtx, {
         type: 'bar',
@@ -122,7 +97,7 @@ function renderCharts(Chart) {
             labels: chapterNumbers.map(num => `Ch. ${num}`),
             datasets: [{
                 label: 'Wrong Answers',
-                data: chapterNumbers.map(num => chapters[num].total_wrong || 0),
+                data: chapterNumbers.map(num => chapters[num].wrong_answers || 0),
                 backgroundColor: 'rgba(239, 68, 68, 0.7)',
                 borderColor: 'rgb(239, 68, 68)',
                 borderWidth: 1
@@ -135,7 +110,6 @@ function renderCharts(Chart) {
         }
     });
 
-    // Consecutive Mastery
     const masteryCtx = document.getElementById('masteryChart').getContext('2d');
     charts.masteryChart = new Chart(masteryCtx, {
         type: 'bar',
@@ -143,9 +117,9 @@ function renderCharts(Chart) {
             labels: chapterNumbers.map(num => `Ch. ${num}`),
             datasets: [{
                 label: 'Consecutive Mastery',
-                data: chapterNumbers.map(num => chapters[num].consecutive_mastery || 0),
-                backgroundColor: 'rgba(34, 197, 94, 0.7)',
-                borderColor: 'rgb(34, 197, 94)',
+                data: chapterNumbers.map(num => chapters[num].correct_streak || 0),
+                backgroundColor: 'rgba(16, 185, 129, 0.7)',
+                borderColor: 'rgb(16, 185, 129)',
                 borderWidth: 1
             }]
         },
@@ -156,24 +130,23 @@ function renderCharts(Chart) {
         }
     });
 
-    // Chapter Difficulty
     const difficultyCtx = document.getElementById('difficultyChart').getContext('2d');
     charts.difficultyChart = new Chart(difficultyCtx, {
         type: 'bar',
         data: {
             labels: chapterNumbers.map(num => `Ch. ${num}`),
             datasets: [{
-                label: 'Difficulty Score',
-                data: chapterNumbers.map(num => calculateDifficulty(chapters[num]) || 0),
-                backgroundColor: 'rgba(255, 159, 64, 0.7)',
-                borderColor: 'rgb(255, 159, 64)',
+                label: 'Chapter Difficulty',
+                data: chapterNumbers.map(num => calculateDifficulty(chapters[num])),
+                backgroundColor: 'rgba(245, 158, 11, 0.7)',
+                borderColor: 'rgb(245, 158, 11)',
                 borderWidth: 1
             }]
         },
         options: {
             responsive: true,
             plugins: { legend: { display: false } },
-            scales: { y: { beginAtZero: true, max: 100 } }
+            scales: { y: { beginAtZero: true, max: 1 } }
         }
     });
 }

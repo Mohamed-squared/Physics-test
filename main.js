@@ -1,6 +1,4 @@
-/**
- * Entry point for the test generator website, initializing UI and utility functions.
- */
+// main.js
 import { initUI, generateTest, showAddChapters, showEnterResults, showDeleteExam, showManageSubjects, showSubject } from './ui.js';
 import { toggleTheme, exportData, importData, exit } from './utils.js';
 
@@ -14,7 +12,7 @@ if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-s
     toggleTheme(); // Update icon
 }
 
-// Add event listeners for all buttons
+// Add event listeners for all main menu buttons
 document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
 document.getElementById('generate-test').addEventListener('click', generateTest);
 document.getElementById('show-enter-results').addEventListener('click', showEnterResults);
@@ -27,7 +25,6 @@ document.getElementById('show-progress-dashboard').addEventListener('click', () 
 document.getElementById('export-data').addEventListener('click', exportData);
 document.getElementById('import-data').addEventListener('click', importData);
 document.getElementById('exit').addEventListener('click', exit);
-document.getElementById('close-dashboard').addEventListener('click', showSubject);
 
 // Show initial subject view
 showSubject();
