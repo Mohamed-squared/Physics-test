@@ -400,4 +400,185 @@ function addChaptersForm() {
     for (let i = 0; i < num_chapters; i++) {
         output += `
             <p>Chapter number: <input id="chap-num-${i}" type="text" class="border rounded px-2 py-1"></p>
-            <p>Total questions: <input id="chap-questions-${i}" type="number" min="1" class="border rounded px-2
+            <p>Total questions: <input id="chap-questions-${i}" type="number" min="1" class="border rounded px-2 py-1"></p>
+        `;
+        inputs.push(i);
+    }
+    output += `<button onclick="submitChapters(${JSON.stringify(inputs)})" class="mt-2 bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">Submit</button>`;
+    document.getElementById('content').innerHTML = output;
+}
+
+function submitChapters(indices) {
+    let chapters = currentSubject.chapters;
+    for (let i of indices) {
+        let chap_num = document.getElementById(`chap-num-${i}`).value;
+        let total_questions = parseInt(document.getElementById(`chap-questions-${i}`).value);
+        if (chap_num in chapters) {
+            alert(`Chapter ${chap_num} already exists.`);
+            return;
+        }
+        if (!chap_num || isNaN(total_questions) || total_questions < 1) {
+            alert("Please enter valid chapter number and questions.");
+            return;
+        }
+        chapters[chap_num] = {
+            total_questions,
+            total_attempted: 0,
+            total_wrong: 0,
+            available_questions: Array.from({length: total_questions}, (_, j) => j + 1),
+            mistake_history: [],
+            consecutive_mastery: 0
+        };
+    }
+    saveData(data);
+    document.getElementById('content').innerHTML = '<p class="text-green-500">New chapters added!</p>';
+}
+
+function showDeleteExam() {
+    let pending_exams = currentSubject.pending_exams;
+    if (pending_exams.length === 0) {
+        document.getElementById('content').innerHTML = '<p class="text-red-500">No pending exams to delete.</p>';
+        return;
+    }
+    let output = '<p class="font-bold">Select an exam to delete:</p>';
+    pending_exams.forEach((exam, i) => {
+        output += `<p><button onclick="deleteExam(${i})" class="text-blue-500 underline">${i + 1}. ${exam.id}</button></p>`;
+    });
+    document.getElementById('content').innerHTML = output;
+}
+
+function deleteExam(index) {
+    let exam = currentSubject.pending_exams[index];
+    let chapters = currentSubject.chapters;
+    if (exam.results_entered) {
+        let output = `<p class="font-bold">Exam ${exam.id} has results entered. Enter original wrong answers:</p>`;
+        let inputs = [];
+        for (let chap_num in exam.allocation) {
+            let n = exam.allocation[chap_num];
+            if (n > 0) {
+                output += `<p>Chapter ${chap_num}: original wrong answers (0 to ${n}): <input id="wrong-${chap_num}" type="number" min="0" max="${n}" class="border rounded px-2 py-1"></p>`;
+                inputs.push(chap_num);
+            }
+        }
+        output += `<button onclick="submitDelete(${index}, ${JSON.stringify microbial) class="mt-2 bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">Submit</button>`;
+        document.getElementById('content').innerHTML = output;
+    } else {
+        currentSubject.pending_exams.splice(index, 1);
+        saveData(data);
+        document.getElementById('content').innerHTML = `<p class="text-green-500">Exam ${exam.id} deleted successfully.</p>`;
+    }
+}
+
+function submitDelete(index, chap_nums) {
+    let exam = currentSubject.pending_exams[index];
+    let chapters = currentSubject.chapters;
+    for (let chap_num of chap_nums) {
+        let n = exam.allocation[chap_num];
+        let wrong = parseInt(document.getElementById(`wrong-${chap_num}`).value);
+        if (isNaN(wrong) || wrong < 0 || wrong > n) {
+            alert(`Invalid input for Chapter ${chap_num}. Must be between 0 and ${n}.`);
+            return;
+        }
+        chapters[chap_num].total_attempted -= n;
+        chapters[chap_num].total_wrong -= wrong;
+        if (chapters[chap_num].mistake_history.length > 0) {
+            chapters[chap_num].mistake_history.pop();
+        }
+    }
+    currentSubject.pending_exams.splice(index, 1);
+    saveData(data);
+    document.getElementById('content').innerHTML = `<p class="text-green-500">Exam ${exam.id} deleted successfully.</p>`;
+}
+
+function showManageSubjects() {
+    let output = `
+        <p class="font-bold">Subject Management</p>
+        <p><button onclick="addSubject()" class="text-blue-500 underline">1. Add new subject</button></p>
+        <p><button onclick="editSubject()" class="text-blue-500 underline">2. Edit existing subject</button></p>
+        <p><button onclick="selectSubject()" class="text-blue-500 underline">3. Select subject</button></p>
+        <p><button onclick="updateSubjectInfo(); document.getElementById('content').innerHTML = '';" class="text-blue-500 underline">4. Back to main menu</button></p>
+    `;
+    document.getElementById('content').innerHTML = output;
+}
+
+function addSubject() {
+    let output = `
+        <p class="font-bold">Add New Subject</p>
+        <p>Name: <input id="subject-name" type="text" class="border rounded px-2 py-1"></p>
+        <p>Max questions for tests: <input id="max-questions" type="number" min="1" class="border rounded px-2 py-1"></p>
+        <button onclick="submitSubject()" class="mt-2 bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">Submit</button>
+    `;
+    document.getElementById('content').innerHTML = output;
+}
+
+function submitSubject() {
+    let name = document.getElementById('subject-name').value;
+    let max_questions = parseInt(document.getElementById('max-questions').value);
+    if (!name || isNaN(max_questions) || max_questions < 1) {
+        alert("Please enter a valid name and positive number of questions.");
+        return;
+    }
+    let subject_id = (Math.max(...Object.keys(data.subjects).map(Number), 0) + 1).toString();
+    data.subjects[subject_id] = {name, max_questions, chapters: {}, pending_exams: []};
+    saveData(data);
+    document.getElementById('content').innerHTML = `<p class="text-green-500">Subject ${name} (ID: ${subject_id}) added!</p>`;
+}
+
+function editSubject() {
+    let subjects = data.subjects;
+    let output = '<p class="font-bold">Edit Subject</p>';
+    for (let sid in subjects) {
+        output += `<p><button onclick="editSubjectForm('${sid}')" class="text-blue-500 underline">${sid}. ${subjects[sid].name} (Max Questions: ${subjects[sid].max_questions})</button></p>`;
+    }
+    document.getElementById('content').innerHTML = output;
+}
+
+function editSubjectForm(sid) {
+    let subject = data.subjects[sid];
+    let output = `
+        <p class="font-bold">Edit Subject ${subject.name}</p>
+        <p>New name: <input id="subject-name" type="text" value="${subject.name}" class="border rounded px-2 py-1"></p>
+        <p>New max questions: <input id="max-questions" type="number" min="1" value="${subject.max_questions}" class="border rounded px-2 py-1"></p>
+        <button onclick="submitEditSubject('${sid}')" class="mt-2 bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">Submit</button>
+    `;
+    document.getElementById('content').innerHTML = output;
+}
+
+function submitEditSubject(sid) {
+    let name = document.getElementById('subject-name').value;
+    let max_questions = parseInt(document.getElementById('max-questions').value);
+    if (!name || isNaN(max_questions) || max_questions < 1) {
+        alert("Please enter a valid name and positive number of questions.");
+        return;
+    }
+    data.subjects[sid].name = name;
+    data.subjects[sid].max_questions = max_questions;
+    saveData(data);
+    if (currentSubject === data.subjects[sid]) {
+        currentSubject = data.subjects[sid];
+        updateSubjectInfo();
+    }
+    document.getElementById('content').innerHTML = '<p class="text-green-500">Subject updated!</p>';
+}
+
+function selectSubject() {
+    let subjects = data.subjects;
+    let output = '<p class="font-bold">Select a Subject</p>';
+    for (let sid in subjects) {
+        output += `<p><button onclick="setSubject('${sid}')" class="text-blue-500 underline">${sid}. ${subjects[sid].name}</button></p>`;
+    }
+    document.getElementById('content').innerHTML = output;
+}
+
+function setSubject(sid) {
+    currentSubject = data.subjects[sid];
+    updateSubjectInfo();
+    document.getElementById('content').innerHTML = '<p class="text-green-500">Subject selected!</p>';
+}
+
+function exit() {
+    document.getElementById('content').innerHTML = '<p class="text-green-500">Goodbye!</p>';
+    setTimeout(() => window.close(), 1000);
+}
+
+updateSubjectInfo();
