@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center p-4">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl">
+        <h1 class="text-2xl font-bold mb-4 text-center">Test Generator</h1>
+        <div id="subject-info" class="mb-4"></div>
+        <div id="menu" class="space-y-2">
+            <button onclick="generateTest()" class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">Generate Today's Test</button>
+            <button onclick="showEnterResults()" class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">Enter Results</button>
+            <button onclick="showAddChapters()" class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">Add New Chapters</button>
+            <button onclick="showDeleteExam()" class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">Delete an Exam</button>
+            <button onclick="showManageSubjects()" class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">Manage Subjects</button>
+            <button onclick="exit()" class="w-full bg-red-500 text-white py-2 rounded hover:bg-red-600">Exit</button>
+        </div>
+        <div id="content" class="mt-4"></div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
