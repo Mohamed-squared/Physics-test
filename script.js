@@ -342,44 +342,6 @@ function renderLatex() {
 
 // --- Markdown Parsing ---
 
-function parseChaptersFromMarkdown(mdContent) {
-    const chapters = {};
-    if (!mdContent) return chapters;
-
-    const lines = mdContent.split('\n');
-    let currentChapter = null;
-    let questionCount = 0;
-
-    const chapterRegex = /^###\s+Chapter\s+(\d+):?.*?$/;
-    // Simple question regex: assumes questions start with number.dot or number)
-    const questionRegex = /^\s*(\d+[\.\)])\s+.*$/;
-
-    for (const line of lines) {
-        const chapterMatch = line.match(chapterRegex);
-        if (chapterMatch) {
-            // Finalize previous chapter's count if exists
-            if (currentChapter !== null) {
-                chapters[currentChapter].total_questions = questionCount;
-            }
-            // Start new chapter
-            currentChapter = chapterMatch[1];
-            questionCount = 0;
-            chapters[currentChapter] = { number: currentChapter, total_questions: 0 }; // Initialize
-            console.log(`Found Chapter ${currentChapter}`);
-        } else if (currentChapter !== null && questionRegex.test(line.trim())) {
-            questionCount++;
-        }
-    }
-
-    // Finalize the last chapter's count
-    if (currentChapter !== null) {
-        chapters[currentChapter].total_questions = questionCount;
-    }
-
-     console.log("Parsed Chapters:", chapters);
-    return chapters;
-}
-
 function updateChaptersFromMarkdown(subject, mdContent) {
     const parsedChapters = parseChaptersFromMarkdown(mdContent);
     const existingChapters = subject.chapters || {};
@@ -435,97 +397,204 @@ function updateChaptersFromMarkdown(subject, mdContent) {
     subject.chapters = updatedChapters;
 }
 
+// --- Markdown Parsing (REVISED) ---
 
-function extractQuestionsFromMarkdown(mdContent, selectedQuestionsMap) {
-    // selectedQuestionsMap = { chapterNum: [qNum1, qNum2], ... }
-    const extracted = {
-        questions: [], // { chapter: num, number: num, text: "", image: url | null }
-        answers: {} // { "c<chapter>q<question>": "A", ... }
-    };
-    if (!mdContent || !selectedQuestionsMap) return extracted;
+function parseChaptersFromMarkdown(mdContent) {
+    const chapters = {};
+    if (!mdContent) return chapters;
 
     const lines = mdContent.split('\n');
     let currentChapter = null;
+    let questionCount = 0;
+
+    // Regex to find chapter lines: Allow optional leading text/numbers before "Chapter"
+    // Matches "### Chapter X: TITLE", "XXX Chapter X: TITLE", etc. Case-insensitive for "Chapter".
+    const chapterRegex = /^(?:.*?\s+)?###\s+Chapter\s+(\d+):?.*?$/i;
+    // Question regex: starts with number(.) or number() followed by space. Allows leading whitespace.
+    const questionRegex = /^\s*\d+[\.\)]\s+.*/;
+
+    for (const line of lines) {
+        const trimmedLine = line.trim();
+        const chapterMatch = trimmedLine.match(chapterRegex);
+
+        if (chapterMatch) {
+            // Finalize previous chapter's count if one was active
+            if (currentChapter !== null && questionCount > 0) {
+                 // Ensure the chapter entry exists before assigning count
+                 if (!chapters[currentChapter]) {
+                     chapters[currentChapter] = { number: currentChapter, total_questions: 0 };
+                 }
+                 chapters[currentChapter].total_questions = questionCount;
+                 console.log(`---> Finalized Chapter ${currentChapter} with ${questionCount} questions.`);
+            }
+            // Start new chapter
+            currentChapter = chapterMatch[1]; // Chapter number is group 1
+            questionCount = 0; // Reset question count
+            // Initialize chapter entry if it doesn't exist
+            if (!chapters[currentChapter]) {
+                 chapters[currentChapter] = { number: currentChapter, total_questions: 0 };
+            }
+            console.log(`---> Found Chapter ${currentChapter}`);
+        } else if (currentChapter !== null && questionRegex.test(line)) {
+             // Count line as a question only if we are inside a chapter
+             // and the line matches the question format.
+            questionCount++;
+             // console.log(`    Q${questionCount} in Ch ${currentChapter}: ${line.substring(0, 30)}...`);
+        }
+    }
+
+    // Finalize the last chapter's count
+    if (currentChapter !== null && questionCount > 0) {
+         if (!chapters[currentChapter]) { // Ensure entry exists
+             chapters[currentChapter] = { number: currentChapter, total_questions: 0 };
+         }
+         chapters[currentChapter].total_questions = questionCount;
+         console.log(`---> Finalized LAST Chapter ${currentChapter} with ${questionCount} questions.`);
+    }
+
+     console.log("Final Parsed Chapters Object:", JSON.stringify(chapters, null, 2));
+    if (Object.keys(chapters).length === 0) {
+        console.error("ERROR: No chapters were parsed. Check chapterRegex and MD format.");
+    }
+    return chapters;
+}
+
+// --- (updateChaptersFromMarkdown remains the same as before) ---
+
+function extractQuestionsFromMarkdown(mdContent, selectedQuestionsMap) {
+    // selectedQuestionsMap = { "chapterNumString": [qNumInt1, qNumInt2], ... }
+    const extracted = {
+        questions: [], // { id, chapter, number, text, image, answer } <- Storing answer here temporarily
+        answers: {}    // { "c<chapter>q<question>": "A", ... }
+    };
+    if (!markdownContentCache) { // Use the global cache
+        console.error("Markdown content cache is empty in extractQuestionsFromMarkdown");
+        return extracted;
+    }
+    if (!selectedQuestionsMap || Object.keys(selectedQuestionsMap).length === 0) {
+         console.error("selectedQuestionsMap is empty or invalid");
+        return extracted;
+    }
+
+    console.log("Extracting questions for map:", JSON.stringify(selectedQuestionsMap));
+
+    const lines = markdownContentCache.split('\n');
+    let currentChapter = null;
     let currentQuestionNumber = null;
-    let currentQuestionText = "";
+    let currentQuestionLines = [];
     let inQuestion = false;
 
-    const chapterRegex = /^###\s+Chapter\s+(\d+):?.*?$/;
-    const questionStartRegex = /^\s*(\d+[\.\)])\s+(.*)/; // Capture number and first line
-    const answerRegex = /^\s*(?:ans|answer)[:\s]+([a-zA-Z\d]+)\s*$/i; // Flexible answer capture
-    const imageRegex = /!\[(.*?)\]\((.*?)\)/; // Basic Markdown image
+    // Regex needs to match the actual chapter headings in *this* file
+    const chapterRegex = /^###\s+Chapter\s+(\d+):?.*?$/i;
+     // Regex to find the start of a question (number. or number) )
+     const questionStartRegex = /^\s*(\d+)\s*[\.\)]\s*(.*)/;
+     // Regex to find the answer line - more robust to capture only the letter/number
+     // Allows optional leading/trailing text as long as "ans:" or "answer:" is present
+     const answerRegex = /^(.*?)(?:ans|answer)\s*:\s*([a-zA-Z\d])(?:\s+.*)?$/i;
+     const imageRegex = /!\[(.*?)\]\((.*?)\)/; // Basic Markdown image
 
     function finalizeQuestion() {
         if (inQuestion && currentChapter && currentQuestionNumber) {
-             const questionId = `c${currentChapter}q${currentQuestionNumber}`;
-             let answer = null;
+            let combinedText = currentQuestionLines.join('\n').trim();
+            let answer = null;
+            let cleanText = combinedText; // Start with full text
 
-             // Find and remove answer line
-             const textLines = currentQuestionText.split('\n');
-             const filteredLines = [];
-             for (const line of textLines) {
-                 const answerMatch = line.match(answerRegex);
-                 if (answerMatch) {
-                     answer = answerMatch[1].toUpperCase();
-                 } else {
-                     filteredLines.push(line);
-                 }
-             }
-             const cleanText = filteredLines.join('\n').trim();
+            // Check if the *last line* contains the answer pattern
+            if (currentQuestionLines.length > 0) {
+                const lastLine = currentQuestionLines[currentQuestionLines.length - 1].trim();
+                const answerMatch = lastLine.match(answerRegex);
+                if (answerMatch) {
+                    // Extract the answer letter/digit
+                    answer = answerMatch[2].toUpperCase();
+                    // Remove the matched answer part (and potentially preceding text on the same line)
+                    // from the *last line* before rejoining.
+                    // This is safer than removing the whole last line.
+                    currentQuestionLines[currentQuestionLines.length - 1] = answerMatch[1].trim(); // Keep text before "ans:"
+                    cleanText = currentQuestionLines.join('\n').trim();
+                }
+            }
 
-              // Extract first image URL if present
-             const imageMatch = cleanText.match(imageRegex);
-             const imageUrl = imageMatch ? imageMatch[2] : null;
-
+            const questionId = `c${currentChapter}q${currentQuestionNumber}`;
+            const imageMatch = cleanText.match(imageRegex);
+            const imageUrl = imageMatch ? imageMatch[2] : null;
 
             extracted.questions.push({
                 id: questionId,
-                chapter: currentChapter,
-                number: currentQuestionNumber,
+                chapter: currentChapter, // string
+                number: currentQuestionNumber, // number
                 text: cleanText,
-                 image: imageUrl // Store image URL
+                image: imageUrl,
+                answer: answer // Temporarily store answer with question data
             });
-            if (answer) {
-                extracted.answers[questionId] = answer;
-            }
-            // console.log(`Extracted Q: ${questionId}, Answer: ${answer}`); // Debug
+            // console.log(`Extracted Q: ${questionId} (Ch: ${currentChapter}, Num: ${currentQuestionNumber}), Answer: ${answer}`);
         }
-        // Reset for next question
+        // Reset for next potential question
         inQuestion = false;
-        currentQuestionText = "";
+        currentQuestionLines = [];
+        // Keep currentChapter, reset currentQuestionNumber
         currentQuestionNumber = null;
     }
 
-    for (const line of lines) {
-        const chapterMatch = line.match(chapterRegex);
+
+    for (let i = 0; i < lines.length; i++) {
+         const line = lines[i];
+         const trimmedLine = line.trim();
+
+        const chapterMatch = trimmedLine.match(chapterRegex);
         if (chapterMatch) {
             finalizeQuestion(); // Finalize any question from the previous chapter
-            currentChapter = chapterMatch[1];
-            // console.log(`Processing Chapter ${currentChapter}`); // Debug
-        } else if (currentChapter && selectedQuestionsMap[currentChapter]) {
-            const questionMatch = line.match(questionStartRegex);
-            if (questionMatch) {
-                finalizeQuestion(); // Finalize previous question within the same chapter
-                const qNum = parseInt(questionMatch[1].replace(/[\.\)]/, '')); // Get number part
-                if (selectedQuestionsMap[currentChapter].includes(qNum)) {
-                    inQuestion = true;
-                    currentQuestionNumber = qNum;
-                    currentQuestionText += questionMatch[2].trim() + "\n"; // Start with the first line text
-                    // console.log(`Starting Q ${currentChapter}-${currentQuestionNumber}`); // Debug
-                }
-            } else if (inQuestion) {
-                 // Only add line if it's not the answer line itself (already handled in finalize)
-                 if (!answerRegex.test(line.trim())) {
-                    currentQuestionText += line + "\n"; // Append subsequent lines
-                 }
+            currentChapter = chapterMatch[1]; // This is a string
+            // console.log(`--> Switched to Chapter ${currentChapter}`);
+            continue; // Move to next line, don't process chapter header as question content
+        }
+
+         if (currentChapter === null) continue; // Skip lines before the first chapter header
+
+        const questionMatch = line.match(questionStartRegex); // Match against original line to preserve indentation maybe?
+        if (questionMatch) {
+            // Found a potential start of a new question
+            finalizeQuestion(); // Finalize the previous question first
+
+            const qNum = parseInt(questionMatch[1], 10);
+            const firstLineText = questionMatch[2].trim();
+
+            // Check if this chapter and question number are needed
+            const chapterKey = String(currentChapter); // Ensure we use string key for lookup
+            if (selectedQuestionsMap[chapterKey] && selectedQuestionsMap[chapterKey].includes(qNum)) {
+                 // console.log(`--> Starting selected question: Ch ${chapterKey} Q ${qNum}`);
+                 inQuestion = true;
+                 currentQuestionNumber = qNum;
+                 currentQuestionLines.push(line.trim()); // Add the first line (already trimmed somewhat)
+            } else {
+                 // This line starts a question, but not one we selected
+                 inQuestion = false;
             }
+        } else if (inQuestion) {
+            // This line is part of the currently processed question
+            // Don't add blank lines unless intended (e.g., for code blocks)
+             if (trimmedLine.length > 0 || line.length > 0) { // Add line even if only whitespace, might be intended format
+               currentQuestionLines.push(line); // Preserve original spacing/indentation
+             }
         }
     }
-    finalizeQuestion(); // Finalize the very last question
+    finalizeQuestion(); // Finalize the very last question after the loop
 
+     // Separate answers into the answers map
+     extracted.questions.forEach(q => {
+         if (q.answer) {
+             extracted.answers[q.id] = q.answer;
+         }
+         // delete q.answer; // Remove temporary answer storage from question object
+     });
+
+    console.log(`Extraction finished. Found ${extracted.questions.length} questions.`);
+    if (extracted.questions.length === 0 && Object.keys(selectedQuestionsMap).length > 0) {
+         console.error("Extraction failed: No questions extracted despite selection map.");
+    }
     return extracted;
 }
 
+// --- (extractFullQuestionTextForPdf remains the same as before, but ensure it uses the correct chapterRegex) ---
 function extractFullQuestionTextForPdf(mdContent, chapterNumber, questionNumber) {
     // Extracts the full text including the answer line for a specific question
     if (!mdContent) return "";
@@ -533,35 +602,43 @@ function extractFullQuestionTextForPdf(mdContent, chapterNumber, questionNumber)
     const lines = mdContent.split('\n');
     let inTargetChapter = false;
     let inTargetQuestion = false;
-    let questionText = "";
+    let questionLines = [];
     let foundQuestion = false;
 
-    const chapterRegex = /^###\s+Chapter\s+(\d+):?.*?$/;
-    const questionStartRegex = /^\s*(\d+[\.\)])\s+.*/; // Match start, don't capture text here
+    // Use the same regex as the main extractors
+    const chapterRegex = /^###\s+Chapter\s+(\d+):?.*?$/i;
+    const questionStartRegex = /^\s*(\d+)\s*[\.\)]\s+.*/; // Match start, don't capture text here
 
     for (const line of lines) {
-        const chapterMatch = line.match(chapterRegex);
+        const trimmedLine = line.trim();
+        const chapterMatch = trimmedLine.match(chapterRegex);
+
         if (chapterMatch) {
             if (inTargetQuestion) break; // Moved past the question's chapter
             inTargetChapter = (chapterMatch[1] === String(chapterNumber));
             inTargetQuestion = false; // Reset question flag when chapter changes
+             // console.log(`PDF Extractor: Checking Chapter ${chapterMatch[1]}. Target Chapter: ${chapterNumber}. Match: ${inTargetChapter}`);
         } else if (inTargetChapter) {
             const questionMatch = line.match(questionStartRegex);
             if (questionMatch) {
+                // This line starts *a* question within the target chapter
                 if (inTargetQuestion) break; // Found the start of the *next* question
-                const qNum = parseInt(questionMatch[1].replace(/[\.\)]/, ''));
+
+                const qNum = parseInt(questionMatch[1], 10);
+                 // console.log(`PDF Extractor: Found Q line for Q ${qNum}. Target Q: ${questionNumber}.`);
                 if (qNum === questionNumber) {
+                    // console.log(`PDF Extractor: MATCH! Starting Q ${qNum}.`);
                     inTargetQuestion = true;
                     foundQuestion = true;
-                    questionText += line + "\n";
+                    questionLines.push(line); // Add the first line
                 }
             } else if (inTargetQuestion) {
                 // Append line if inside the target question block
-                questionText += line + "\n";
+                questionLines.push(line);
             }
         }
     }
-    return foundQuestion ? questionText.trim() : ""; // Return trimmed text if found
+    return foundQuestion ? questionLines.join('\n').trim() : ""; // Return joined text if found
 }
 
 
