@@ -277,23 +277,12 @@ function loadData() {
     if (!data) {
         data = JSON.parse(JSON.stringify(initialData));
         saveData(data);
-    } else if (!data.subjects) {
-        data = {
-            subjects: {
-                '1': {
-                    name: "Fundamentals of Physics",
-                    max_questions: 42,
-                    chapters: data.chapters || {},
-                    pending_exams: data.pending_exams || []
-                }
+    } else {
+        for (let subject of Object.values(data.subjects)) {
+            if (!subject.studiedChapters) {
+                subject.studiedChapters = [];
             }
-        };
-        for (let chap of Object.values(data.subjects['1'].chapters)) {
-            chap.mistake_history = chap.mistake_history || [];
-            chap.consecutive_mastery = chap.consecutive_mastery || 0;
-            chap.available_questions = chap.available_questions || Array.from({length: chap.total_questions}, (_, i) => i + 1);
         }
-        saveData(data);
     }
     return data;
 }
@@ -307,31 +296,7 @@ function updateSubjectInfo() {
 }
 
 function generateTest() {
-    showLoading("Generating Test...");
-    setTimeout(() => {
-        let chapters = currentSubject.chapters;
-        let max_questions = currentSubject.max_questions;
-        if (Object.keys(chapters).length === 0) {
-            document.getElementById('content').innerHTML = '<p class="text-red-500">No chapters available. Please add chapters first.</p>';
-            hideLoading();
-            return;
-        }
-        let allocation = allocateQuestions(chapters, max_questions);
-        let exam_id = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 16);
-        let output = `<p class="font-bold">Generating test for exam ID: ${exam_id}</p>`;
-        output += `<p>Today's test allocation (${max_questions} questions total):</p>`;
-        for (let chap_num in allocation) {
-            let n = allocation[chap_num];
-            if (n > 0) {
-                let questions = selectNewQuestions(chapters[chap_num], n);
-                output += `<p>Chapter ${chap_num}: ${n} questions - select questions ${questions.join(', ')}</p>`;
-            }
-        }
-        currentSubject.pending_exams.push({id: exam_id, allocation, results_entered: false});
-        saveData(data);
-        document.getElementById('content').innerHTML = output;
-        hideLoading();
-    }, 500);
+    showTestOptions();
 }
 
 function showEnterResults() {
@@ -417,128 +382,6 @@ function submitResults(index, chap_nums) {
         </div>`;
         hideLoading();
     }, 500);
-}
-
-function showAddChapters() {
-    let output = `
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-4">
-            <h2 class="text-xl font-semibold mb-4 text-primary-600 dark:text-primary-400">Add New Chapters</h2>
-            <div class="mb-4">
-                <label for="num-chapters" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Number of new chapters
-                </label>
-                <input id="num-chapters" type="number" min="1" value="1" placeholder="Enter number of chapters" 
-                    class="border rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-            </div>
-            <button onclick="addChaptersForm()" class="btn-primary w-full">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
-                </svg>
-                Continue
-            </button>
-        </div>
-    `;
-    document.getElementById('content').innerHTML = output;
-}
-
-function addChaptersForm() {
-    let num_chapters = parseInt(document.getElementById('num-chapters').value);
-    if (isNaN(num_chapters) || num_chapters < 1) {
-        alert("Please enter a positive integer.");
-        return;
-    }
-    let output = '<div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-4">';
-    output += '<h2 class="text-xl font-semibold mb-4 text-primary-600 dark:text-primary-400">Enter Chapter Details</h2>';
-    output += '<div class="space-y-4">';
-    let inputs = [];
-    for (let i = 0; i < num_chapters; i++) {
-        output += `
-            <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                <h3 class="font-medium mb-3 text-gray-700 dark:text-gray-300">Chapter ${i + 1}</h3>
-                <div class="mb-3">
-                    <label for="chap-num-${i}" class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Chapter number</label>
-                    <input id="chap-num-${i}" type="text" placeholder="Enter chapter number" 
-                        class="border rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white">
-                </div>
-                <div>
-                    <label for="chap-questions-${i}" class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Total questions</label>
-                    <input id="chap-questions-${i}" type="number" min="1" placeholder="Enter number of questions" 
-                        class="border rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white">
-                </div>
-            </div>
-        `;
-        inputs.push(i);
-    }
-    output += '</div>';
-    output += `<button onclick="submitChapters(${JSON.stringify(inputs)})" class="mt-6 btn-primary w-full">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-        </svg>
-        Submit Chapters
-    </button>`;
-    output += '</div>';
-    document.getElementById('content').innerHTML = output;
-}
-
-function submitChapters(indices) {
-    showLoading("Adding Chapters...");
-    setTimeout(() => {
-        let chapters = currentSubject.chapters;
-        for (let i of indices) {
-            let chap_num = document.getElementById(`chap-num-${i}`).value;
-            let total_questions = parseInt(document.getElementById(`chap-questions-${i}`).value);
-            if (chap_num in chapters) {
-                hideLoading();
-                alert(`Chapter ${chap_num} already exists.`);
-                return;
-            }
-            if (!chap_num || isNaN(total_questions) || total_questions < 1) {
-                hideLoading();
-                alert("Please enter valid chapter number and questions.");
-                return;
-            }
-            chapters[chap_num] = {
-                total_questions,
-                total_attempted: 0,
-                total_wrong: 0,
-                available_questions: Array.from({length: total_questions}, (_, j) => j + 1),
-                mistake_history: [],
-                consecutive_mastery: 0
-            };
-        }
-        saveData(data);
-        document.getElementById('content').innerHTML = `
-        <div class="bg-green-100 dark:bg-green-900 border-l-4 border-green-500 text-green-700 dark:text-green-200 p-4 rounded-md animate-fade-in">
-            <div class="flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                <p class="font-medium">Chapters added successfully!</p>
-            </div>
-        </div>`;
-        hideLoading();
-    }, 500);
-}
-
-function showDeleteExam() {
-    let pending_exams = currentSubject.pending_exams;
-    if (pending_exams.length === 0) {
-        document.getElementById('content').innerHTML = '<p class="text-red-500">No pending exams to delete.</p>';
-        return;
-    }
-    let output = '<p class="font-bold mb-4">Select an exam to delete:</p><div class="space-y-2">';
-    pending_exams.forEach((exam, i) => {
-        output += `<div class="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200">
-            <button onclick="confirmDeleteExam(${i})" class="w-full text-left flex justify-between items-center">
-                <span>${i + 1}. ${exam.id}</span>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-                </svg>
-            </button>
-        </div>`;
-    });
-    output += '</div>';
-    document.getElementById('content').innerHTML = output;
 }
 
 function confirmDeleteExam(index) {
@@ -1079,4 +922,258 @@ if (localStorage.getItem('theme') === 'dark') {
     document.documentElement.classList.add('dark');
 }
 
+function parseChaptersFromMD(mdContent) {
+    const chapters = {};
+    const chapterRegex = /### Chapter (\d+):/g;
+    const problemRegex = /- \[ \] Question \d+: .*/g;
+    let match;
+    let currentChapter = null;
+
+    while ((match = chapterRegex.exec(mdContent)) !== null) {
+        currentChapter = match[1];
+        chapters[currentChapter] = 0;
+    }
+
+    const lines = mdContent.split('\n');
+    lines.forEach(line => {
+        if (line.startsWith('### Chapter ')) {
+            currentChapter = line.match(/\d+/)[0];
+        } else if (problemRegex.test(line) && currentChapter) {
+            chapters[currentChapter]++;
+        }
+    });
+
+    return chapters;
+}
+
+function markChapterAsStudied(chapterNum) {
+    if (!currentSubject.studiedChapters) {
+        currentSubject.studiedChapters = [];
+    }
+    if (!currentSubject.studiedChapters.includes(chapterNum)) {
+        currentSubject.studiedChapters.push(chapterNum);
+        saveData(data);
+    }
+}
+
+function unmarkChapterAsStudied(chapterNum) {
+    if (currentSubject.studiedChapters) {
+        currentSubject.studiedChapters = currentSubject.studiedChapters.filter(chap => chap !== chapterNum);
+        saveData(data);
+    }
+}
+
+function getStudiedChapters() {
+    return currentSubject.studiedChapters || [];
+}
+
+function showTestOptions() {
+    document.getElementById('content').innerHTML = `
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-4">
+            <h2 class="text-xl font-semibold mb-4 text-primary-600 dark:text-primary-400">Generate Test</h2>
+            <div class="space-y-4">
+                <button onclick="generateStudiedMaterialTest()" class="btn-primary w-full">
+                    Test on Studied Material
+                </button>
+                <button onclick="showSpecificChaptersForm()" class="btn-primary w-full">
+                    Test on Specific Chapters
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+function generateStudiedMaterialTest() {
+    const studiedChapters = getStudiedChapters();
+    if (studiedChapters.length === 0) {
+        alert("No chapters have been studied yet.");
+        return;
+    }
+    const chapters = Object.fromEntries(
+        Object.entries(currentSubject.chapters).filter(([chapNum]) => studiedChapters.includes(chapNum))
+    );
+    const allocation = allocateQuestions(chapters, currentSubject.max_questions);
+    generateTestFromAllocation(allocation);
+}
+
+function generateSpecificChaptersTest(chapters) {
+    const selectedChapters = Object.fromEntries(
+        Object.entries(currentSubject.chapters).filter(([chapNum]) => chapters.includes(chapNum))
+    );
+    const allocation = allocateQuestions(selectedChapters, currentSubject.max_questions);
+    generateTestFromAllocation(allocation);
+}
+
+function showTestingModes(testType) {
+    document.getElementById('content').innerHTML = `
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-4">
+            <h2 class="text-xl font-semibold mb-4 text-primary-600 dark:text-primary-400">Choose Testing Mode</h2>
+            <div class="space-y-4">
+                <button onclick="generateOnlineTest('${testType}')" class="btn-primary w-full">
+                    Online Testing
+                </button>
+                <button onclick="generatePDFTest('${testType}')" class="btn-primary w-full">
+                    PDF Testing
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+function generateOnlineTest(testType) {
+    let chapters;
+    if (testType === 'studied') {
+        chapters = getStudiedChapters();
+    } else if (testType === 'specific') {
+        chapters = getSelectedChapters();
+    }
+    const questions = fetchProblemsForChapters(chapters);
+    if (questions.length === 0) {
+        alert("No questions available for the selected chapters.");
+        return;
+    }
+    displayQuestion(questions[0], 0);
+}
+
+function generatePDFTest(testType) {
+    let chapters;
+    if (testType === 'studied') {
+        chapters = getStudiedChapters();
+    } else if (testType === 'specific') {
+        chapters = getSelectedChapters();
+    }
+    const questions = fetchProblemsForChapters(chapters);
+    if (questions.length === 0) {
+        alert("No questions available for the selected chapters.");
+        return;
+    }
+    generateQuestionsPDF(questions);
+    generateSolutionsPDF(questions);
+}
+
+function fetchProblemsForChapters(chapters) {
+    const problems = [];
+    const mdContent = getMDContent(); // Assume this function retrieves the MD file content
+    const lines = mdContent.split('\n');
+    let currentChapter = null;
+    chapters.forEach(chap => {
+        const chapterRegex = new RegExp(`### Chapter ${chap}:`);
+        lines.forEach(line => {
+            if (chapterRegex.test(line)) {
+                currentChapter = chap;
+            } else if (currentChapter === chap && line.startsWith('- [ ] Question')) {
+                const questionText = line.split(': ')[1].split(' (ans:')[0];
+                const answer = line.match(/ans:(\w)/)[1];
+                problems.push({ question: questionText, answer: answer });
+            }
+        });
+    });
+    return problems;
+}
+
+function displayQuestion(question, index) {
+    const content = document.getElementById('content');
+    content.innerHTML = `
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-4">
+            <h2 class="text-xl font-semibold mb-4 text-primary-600 dark:text-primary-400">Question ${index + 1}</h2>
+            <p class="mb-4">${question.question}</p>
+            <div class="space-y-2">
+                <button onclick="submitAnswer('A')" class="btn-primary w-full">A</button>
+                <button onclick="submitAnswer('B')" class="btn-primary w-full">B</button>
+                <button onclick="submitAnswer('C')" class="btn-primary w-full">C</button>
+                <button onclick="submitAnswer('D')" class="btn-primary w-full">D</button>
+            </div>
+            <div class="flex justify-between mt-4">
+                <button onclick="prevQuestion(${index})" class="btn-secondary">Previous</button>
+                <button onclick="nextQuestion(${index})" class="btn-secondary">Next</button>
+            </div>
+        </div>
+    `;
+    startTimer();
+}
+
+function submitAnswer(answer) {
+    const currentQuestionIndex = getCurrentQuestionIndex();
+    const questions = getQuestions();
+    questions[currentQuestionIndex].userAnswer = answer;
+    saveQuestions(questions);
+}
+
+function showTestResults() {
+    const questions = getQuestions();
+    let correct = 0;
+    questions.forEach(q => {
+        if (q.userAnswer === q.answer) correct++;
+    });
+    const content = document.getElementById('content');
+    content.innerHTML = `
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-4">
+            <h2 class="text-xl font-semibold mb-4 text-primary-600 dark:text-primary-400">Test Results</h2>
+            <p>You got ${correct} out of ${questions.length} correct.</p>
+        </div>
+    `;
+}
+
+function generateQuestionsPDF(questions) {
+    const doc = new jsPDF();
+    doc.setFontSize(12);
+    questions.forEach((q, i) => {
+        doc.text(`Question ${i + 1}: ${q.question}`, 10, 10 + i * 20);
+    });
+    doc.save('questions.pdf');
+}
+
+function generateSolutionsPDF(questions) {
+    const doc = new jsPDF();
+    doc.setFontSize(12);
+    questions.forEach((q, i) => {
+        doc.text(`Question ${i + 1}: ${q.answer}`, 10, 10 + i * 20);
+    });
+    doc.save('solutions.pdf');
+}
+
+function showExamsDashboard() {
+    const exams = getExams();
+    const content = document.getElementById('content');
+    content.innerHTML = `
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-4">
+            <h2 class="text-xl font-semibold mb-4 text-primary-600 dark:text-primary-400">Exams Dashboard</h2>
+            <ul>
+                ${exams.map(exam => `<li>${exam.date}: ${exam.status}</li>`).join('')}
+            </ul>
+        </div>
+    `;
+}
+
+function viewExamStatistics(examId) {
+    const exam = getExamById(examId);
+    const content = document.getElementById('content');
+    content.innerHTML = `
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-4">
+            <h2 class="text-xl font-semibold mb-4 text-primary-600 dark:text-primary-400">Exam Statistics</h2>
+            <p>Correct Answers: ${exam.correct}</p>
+            <p>Total Questions: ${exam.total}</p>
+        </div>
+    `;
+}
+
+function editExamResults(examId) {
+    const exam = getExamById(examId);
+    const content = document.getElementById('content');
+    content.innerHTML = `
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-4">
+            <h2 class="text-xl font-semibold mb-4 text-primary-600 dark:text-primary-400">Edit Exam Results</h2>
+            <input type="number" id="correctAnswers" value="${exam.correct}" />
+            <button onclick="saveExamResults(${examId})">Save</button>
+        </div>
+    `;
+}
+
+function deleteExam(examId) {
+    const exams = getExams().filter(exam => exam.id !== examId);
+    saveExams(exams);
+    showExamsDashboard();
+}
+
 updateSubjectInfo();
+
