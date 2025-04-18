@@ -18,90 +18,137 @@ const initialData = {
                     "available_questions": [
                         4, 5, 6, 7, 8, 9, 10, 11, 12, 16, 17, 18, 20, 21, 22, 23, 24, 25
                     ],
-                    "latex_problems": [], // Store LaTeX problems
                     "mistake_history": [],
                     "consecutive_mastery": 0
                 },
                 "2": {
                     "total_questions": 77,
-                    "total_attempted": 8,
-                    "total_wrong": 2,
+                    "total_attempted": 9,
+                    "total_wrong": 1,
                     "available_questions": [
-                        2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20,
-                        21, 22, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 35, 36, 37, 38,
-                        39, 40, 41, 42, 43, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 56,
-                        57, 58, 59, 60, 61, 62, 63, 64, 65, 67, 68, 69, 70, 71, 72, 73,
-                        74, 75, 76
+                        2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
+                        24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 35, 36, 37, 40, 41, 42, 43, 45,
+                        46, 47, 48, 49, 50, 51, 52, 53, 54, 56, 58, 59, 60, 61, 62, 63, 64, 65,
+                        67, 68, 69, 70, 71, 72, 73, 74, 75, 76
                     ],
-                    "latex_problems": [],
                     "mistake_history": [],
                     "consecutive_mastery": 0
                 },
                 "3": {
                     "total_questions": 39,
-                    "total_attempted": 6,
-                    "total_wrong": 2,
+                    "total_attempted": 7,
+                    "total_wrong": 3,
                     "available_questions": [
-                        2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 20,
-                        21, 22, 23, 24, 25, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37,
-                        38
+                        5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, 22, 23, 24, 25, 27,
+                        28, 29, 30, 31, 33, 34, 35, 36
                     ],
-                    "latex_problems": [],
                     "mistake_history": [],
                     "consecutive_mastery": 0
                 },
                 "4": {
                     "total_questions": 47,
                     "total_attempted": 6,
-                    "total_wrong": 2,
+                    "total_wrong": 0,
                     "available_questions": [
-                        2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16, 17, 18, 19, 20,
-                        21, 22, 23, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 36, 37, 38,
-                        39, 40, 41, 42, 43, 44, 45, 46
+                        2, 3, 4, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
+                        27, 28, 29, 30, 31, 32, 33, 34, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46
                     ],
-                    "latex_problems": [],
                     "mistake_history": [],
                     "consecutive_mastery": 0
                 },
                 "5": {
                     "total_questions": 69,
-                    "total_attempted": 8,
+                    "total_attempted": 10,
                     "total_wrong": 2,
                     "available_questions": [
-                        2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20,
-                        21, 22, 23, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 36, 37, 38,
-                        39, 40, 41, 42, 43, 44, 45, 47, 48, 49, 50, 51, 52, 53, 54, 55,
-                        56, 57, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68
+                        4, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 21, 22, 23, 25, 26, 27,
+                        28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43, 44, 47, 48, 49, 50,
+                        51, 52, 53, 54, 55, 56, 57, 59, 60, 61, 62, 63, 64, 65, 66
                     ],
-                    "latex_problems": [],
                     "mistake_history": [],
                     "consecutive_mastery": 0
                 },
                 "6": {
                     "total_questions": 71,
-                    "total_attempted": 8,
-                    "total_wrong": 2,
+                    "total_attempted": 15,
+                    "total_wrong": 7,
                     "available_questions": [
-                        2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-                        22, 23, 24, 25, 26, 27, 28, 29, 30, 32, 33, 34, 35, 36, 37, 38,
-                        39, 40, 42, 43, 44, 45, 46, 47, 48, 49, 50, 52, 53, 54, 55, 56,
-                        57, 58, 59, 60, 62, 63, 64, 65, 66, 67, 68, 69, 70
+                        4, 5, 7, 8, 12, 13, 15, 17, 18, 19, 20, 22, 23, 24, 25, 29, 30, 32, 33, 34,
+                        35, 36, 37, 39, 40, 42, 43, 44, 46, 47, 50, 52, 53, 54, 55, 56, 57, 58, 60,
+                        62, 63, 64, 66, 67, 68
                     ],
-                    "latex_problems": [],
                     "mistake_history": [],
                     "consecutive_mastery": 0
                 },
                 "7": {
                     "total_questions": 67,
                     "total_attempted": 8,
-                    "total_wrong": 2,
+                    "total_wrong": 1,
                     "available_questions": [
-                        2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20,
-                        21, 22, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 35, 36, 37, 38,
-                        39, 40, 41, 42, 43, 44, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55,
-                        57, 58, 59, 60, 61, 62, 63, 64, 65, 66
+                        2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
+                        24, 25, 26, 27, 28, 29, 30, 31, 32, 36, 37, 38, 39, 40, 41, 42, 43, 44, 46,
+                        47, 48, 49, 50, 51, 52, 53, 54, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66
                     ],
-                    "latex_problems": [],
+                    "mistake_history": [],
+                    "consecutive_mastery": 0
+                },
+                "8": {
+                    "total_questions": 61,
+                    "total_attempted": 10,
+                    "total_wrong": 3,
+                    "available_questions": [
+                        4, 5, 7, 8, 10, 11, 12, 13, 15, 16, 17, 18, 19, 21, 22, 23, 29, 31, 32, 33,
+                        34, 35, 37, 38, 39, 40, 44, 45, 46, 47, 48, 50, 51, 52, 54, 56, 57, 58, 59
+                    ],
+                    "mistake_history": [],
+                    "consecutive_mastery": 0
+                },
+                "9": {
+                    "total_questions": 81,
+                    "total_attempted": 13,
+                    "total_wrong": 3,
+                    "available_questions": [
+                        3, 5, 6, 7, 9, 10, 12, 13, 15, 16, 17, 18, 19, 21, 22, 23, 24, 26, 29, 30,
+                        31, 33, 35, 36, 37, 38, 44, 46, 47, 48, 51, 53, 54, 55, 56, 58, 59, 60, 61,
+                        63, 64, 65, 66, 67, 69, 70, 71, 73, 75, 76, 77, 78
+                    ],
+                    "mistake_history": [],
+                    "consecutive_mastery": 0
+                },
+                "10": {
+                    "total_questions": 81,
+                    "total_attempted": 0,
+                    "total_wrong": 0,
+                    "available_questions": [
+                        2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 18, 19, 20, 21, 22, 23,
+                        24, 26, 27, 28, 29, 30, 31, 32, 34, 35, 36, 37, 38, 39, 40, 42, 43, 44, 45,
+                        46, 47, 48, 50, 51, 52, 53, 54, 55, 56, 58, 59, 60, 61, 62, 63, 64, 66, 67,
+                        68, 69, 70, 71, 72, 74, 75, 76, 77, 78, 79, 80
+                    ],
+                    "mistake_history": [],
+                    "consecutive_mastery": 0
+                },
+                "11": {
+                    "total_questions": 54,
+                    "total_attempted": 0,
+                    "total_wrong": 0,
+                    "available_questions": [
+                        2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 20, 21, 22, 23,
+                        24, 25, 26, 28, 29, 30, 31, 32, 33, 34, 35, 37, 38, 39, 40, 41, 42, 43, 44,
+                        46, 47, 48, 49, 50, 51, 52, 53
+                    ],
+                    "mistake_history": [],
+                    "consecutive_mastery": 0
+                },
+                "12": {
+                    "total_questions": 53,
+                    "total_attempted": 0,
+                    "total_wrong": 0,
+                    "available_questions": [
+                        2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 19, 20, 21, 22, 23,
+                        24, 25, 26, 28, 29, 30, 31, 32, 33, 34, 35, 37, 38, 39, 40, 41, 42, 43, 45,
+                        46, 47, 48, 49, 50, 51, 52
+                    ],
                     "mistake_history": [],
                     "consecutive_mastery": 0
                 }
@@ -116,7 +163,9 @@ const initialData = {
                         "4": 0,
                         "5": 3,
                         "6": 7,
-                        "7": 1
+                        "7": 1,
+                        "8": 10,
+                        "9": 13
                     }
                 },
                 {
@@ -128,7 +177,9 @@ const initialData = {
                         "4": 1,
                         "5": 3,
                         "6": 7,
-                        "7": 1
+                        "7": 1,
+                        "8": 10,
+                        "9": 13
                     }
                 },
                 {
@@ -140,7 +191,12 @@ const initialData = {
                         "4": 1,
                         "5": 2,
                         "6": 4,
-                        "7": 1
+                        "7": 1,
+                        "8": 2,
+                        "9": 3,
+                        "10": 11,
+                        "11": 7,
+                        "12": 7
                     },
                     "results_entered": false
                 }
@@ -236,7 +292,6 @@ function loadData() {
             chap.mistake_history = chap.mistake_history || [];
             chap.consecutive_mastery = chap.consecutive_mastery || 0;
             chap.available_questions = chap.available_questions || Array.from({length: chap.total_questions}, (_, i) => i + 1);
-            chap.latex_problems = chap.latex_problems || [];
         }
         saveData(data);
     }
@@ -269,29 +324,14 @@ function generateTest() {
             let n = allocation[chap_num];
             if (n > 0) {
                 let questions = selectNewQuestions(chapters[chap_num], n);
-                let latex_problems = selectLatexProblems(chapters[chap_num], questions);
                 output += `<p>Chapter ${chap_num}: ${n} questions - select questions ${questions.join(', ')}</p>`;
-                output += `<div class="mathjax-container">`;
-                latex_problems.forEach((problem, idx) => {
-                    output += `<div class="mb-2">Problem ${questions[idx]}: \\[${problem.latex}\\]</div>`;
-                });
-                output += `</div>`;
             }
         }
         currentSubject.pending_exams.push({id: exam_id, allocation, results_entered: false});
         saveData(data);
         document.getElementById('content').innerHTML = output;
-        if (typeof MathJax !== 'undefined') {
-            MathJax.typesetPromise().catch(err => console.error('MathJax typesetting error:', err));
-        }
         hideLoading();
     }, 500);
-}
-
-function selectLatexProblems(chap, questions) {
-    return questions
-        .map(q => chap.latex_problems.find(p => p.problem_number === q))
-        .filter(p => p !== undefined);
 }
 
 function showEnterResults() {
@@ -462,7 +502,6 @@ function submitChapters(indices) {
                 total_attempted: 0,
                 total_wrong: 0,
                 available_questions: Array.from({length: total_questions}, (_, j) => j + 1),
-                latex_problems: [],
                 mistake_history: [],
                 consecutive_mastery: 0
             };
@@ -611,7 +650,7 @@ function selectSubject(id) {
             document.getElementById('content').innerHTML = `
             <div class="bg-green-100 dark:bg-green-900 border-l-4 border-green-500 text-green-700 dark:text-green-200 p-4 rounded-md animate-fade-in">
                 <div class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="current0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                     </svg>
                     <p class="font-medium">Subject changed to ${currentSubject.name}</p>
@@ -664,36 +703,29 @@ function updateSubject(id) {
         let max_questions = parseInt(document.getElementById('edit-max-questions').value);
         if (!name || isNaN(max_questions) || max_questions < 1) {
             hideLoading();
-            alert("Please enter a valid subject name and number of questions.");
+            alert("Please enter valid subject name and maximum questions.");
             return;
         }
         data.subjects[id].name = name;
         data.subjects[id].max_questions = max_questions;
-        currentSubject = data.subjects[id];
+        if (currentSubject === data.subjects[id]) {
+            currentSubject = data.subjects[id];
+            updateSubjectInfo();
+        }
         saveData(data);
-        updateSubjectInfo();
-        document.getElementById('content').innerHTML = `
-        <div class="bg-green-100 dark:bg-green-900 border-l-4 border-green-500 text-green-700 dark:text-green-200 p-4 rounded-md animate-fade-in">
-            <div class="flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                <p class="font-medium">Subject updated successfully!</p>
-            </div>
-        </div>`;
+        showManageSubjects();
         hideLoading();
     }, 500);
 }
 
 function confirmDeleteSubject(id) {
-    let subject = data.subjects[id];
     document.getElementById('content').innerHTML = `
         <div class="bg-red-100 dark:bg-red-900/30 p-4 rounded-lg text-center mb-4">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-red-500 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
             <p class="font-bold text-red-600 dark:text-red-400 text-lg mb-2">Delete Subject</p>
-            <p class="text-gray-700 dark:text-gray-300 mb-4">Are you sure you want to delete the subject "${subject.name}"? This action cannot be undone.</p>
+            <p class="text-gray-700 dark:text-gray-300 mb-4">Are you sure you want to delete subject "${data.subjects[id].name}"? This action cannot be undone.</p>
             <div class="flex justify-center space-x-3">
                 <button onclick="deleteSubject('${id}')" class="btn-danger flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
@@ -715,27 +747,22 @@ function confirmDeleteSubject(id) {
 function deleteSubject(id) {
     showLoading("Deleting Subject...");
     setTimeout(() => {
-        delete data.subjects[id];
-        if (Object.keys(data.subjects).length === 0) {
-            data.subjects['1'] = {
-                name: "Default Subject",
-                max_questions: 42,
-                chapters: {},
-                pending_exams: []
-            };
+        if (Object.keys(data.subjects).length <= 1) {
+            hideLoading();
+            alert("Cannot delete the last subject. At least one subject must remain.");
+            showManageSubjects();
+            return;
         }
-        currentSubject = Object.values(data.subjects)[0];
+        if (currentSubject === data.subjects[id]) {
+            let otherSubjectId = Object.keys(data.subjects).find(sid => sid !== id);
+            if (otherSubjectId) {
+                currentSubject = data.subjects[otherSubjectId];
+                updateSubjectInfo();
+            }
+        }
+        delete data.subjects[id];
         saveData(data);
-        updateSubjectInfo();
-        document.getElementById('content').innerHTML = `
-        <div class="bg-green-100 dark:bg-green-900 border-l-4 border-green-500 text-green-700 dark:text-green-200 p-4 rounded-md animate-fade-in">
-            <div class="flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                <p class="font-medium">Subject deleted successfully!</p>
-            </div>
-        </div>`;
+        showManageSubjects();
         hideLoading();
     }, 500);
 }
@@ -747,26 +774,21 @@ function addSubject() {
         let max_questions = parseInt(document.getElementById('max-questions').value);
         if (!name || isNaN(max_questions) || max_questions < 1) {
             hideLoading();
-            alert("Please enter a valid subject name and number of questions.");
+            alert("Please enter valid subject name and maximum questions.");
             return;
         }
-        let id = Math.max(...Object.keys(data.subjects).map(Number), 0) + 1;
-        data.subjects[id] = {
-            name,
-            max_questions,
+        let newId = Object.keys(data.subjects).length + 1;
+        while (data.subjects[newId]) {
+            newId++;
+        }
+        data.subjects[newId] = {
+            name: name,
+            max_questions: max_questions,
             chapters: {},
             pending_exams: []
         };
         saveData(data);
-        document.getElementById('content').innerHTML = `
-        <div class="bg-green-100 dark:bg-green-900 border-l-4 border-green-500 text-green-700 dark:text-green-200 p-4 rounded-md animate-fade-in">
-            <div class="flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                <p class="font-medium">Subject "${name}" added successfully!</p>
-            </div>
-        </div>`;
+        showManageSubjects();
         hideLoading();
     }, 500);
 }
@@ -774,201 +796,199 @@ function addSubject() {
 function showProgressDashboard() {
     document.getElementById('menu').classList.add('hidden');
     document.getElementById('dashboard').classList.remove('hidden');
-    document.getElementById('content').innerHTML = '';
-    updateCharts();
+    let chapters = currentSubject.chapters;
+    if (Object.keys(chapters).length === 0) {
+        document.getElementById('dashboard').innerHTML = '<p class="text-red-500">No chapters available to display in dashboard.</p>';
+        return;
+    }
+    renderCharts();
 }
 
-function updateCharts() {
+function renderCharts() {
     let chapters = currentSubject.chapters;
-    let labels = Object.keys(chapters).sort((a, b) => parseInt(a) - parseInt(b));
-    let attemptedData = labels.map(chap => chapters[chap].total_attempted);
-    let wrongData = labels.map(chap => chapters[chap].total_wrong);
-    let masteryData = labels.map(chap => chapters[chap].consecutive_mastery);
-    let difficultyData = labels.map(chap => calculateDifficulty(chapters[chap]));
-
+    let chapterNumbers = Object.keys(chapters).sort((a, b) => parseInt(a) - parseInt(b));
     if (charts.attemptedChart) charts.attemptedChart.destroy();
     if (charts.wrongChart) charts.wrongChart.destroy();
     if (charts.masteryChart) charts.masteryChart.destroy();
     if (charts.difficultyChart) charts.difficultyChart.destroy();
-
-    charts.attemptedChart = new Chart(document.getElementById('attemptedChart'), {
+    let attempted = chapterNumbers.map(num => chapters[num].total_attempted);
+    let wrong = chapterNumbers.map(num => chapters[num].total_wrong);
+    let mastery = chapterNumbers.map(num => chapters[num].consecutive_mastery || 0);
+    let difficulty = chapterNumbers.map(num => calculateDifficulty(chapters[num]));
+    let attemptedCtx = document.getElementById('attemptedChart').getContext('2d');
+    charts.attemptedChart = new Chart(attemptedCtx, {
         type: 'bar',
         data: {
-            labels,
+            labels: chapterNumbers.map(num => `Ch. ${num}`),
             datasets: [{
                 label: 'Questions Attempted',
-                data: attemptedData,
-                backgroundColor: '#3B82F6',
-                borderColor: '#2563EB',
+                data: attempted,
+                backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                borderColor: 'rgb(59, 130, 246)',
                 borderWidth: 1
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            scales: {
-                y: { beginAtZero: true, title: { display: true, text: 'Questions' } },
-                x: { title: { display: true, text: 'Chapter' } }
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        title: function(tooltipItems) {
+                            return `Chapter ${tooltipItems[0].label.substring(3)}`;
+                        }
+                    }
+                }
             },
-            plugins: { legend: { display: false } }
+            scales: {
+                y: { beginAtZero: true, ticks: { precision: 0 } }
+            }
         }
     });
-
-    charts.wrongChart = new Chart(document.getElementById('wrongChart'), {
+    let wrongCtx = document.getElementById('wrongChart').getContext('2d');
+    charts.wrongChart = new Chart(wrongCtx, {
         type: 'bar',
         data: {
-            labels,
+            labels: chapterNumbers.map(num => `Ch. ${num}`),
             datasets: [{
                 label: 'Wrong Answers',
-                data: wrongData,
-                backgroundColor: '#EF4444',
-                borderColor: '#DC2626',
+                data: wrong,
+                backgroundColor: 'rgba(239, 68, 68, 0.7)',
+                borderColor: 'rgb(239, 68, 68)',
                 borderWidth: 1
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            scales: {
-                y: { beginAtZero: true, title: { display: true, text: 'Wrong Answers' } },
-                x: { title: { display: true, text: 'Chapter' } }
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        title: function(tooltipItems) {
+                            return `Chapter ${tooltipItems[0].label.substring(3)}`;
+                        }
+                    }
+                }
             },
-            plugins: { legend: { display: false } }
+            scales: {
+                y: { beginAtZero: true, ticks: { precision: 0 } }
+            }
         }
     });
-
-    charts.masteryChart = new Chart(document.getElementById('masteryChart'), {
+    let masteryCtx = document.getElementById('masteryChart').getContext('2d');
+    charts.masteryChart = new Chart(masteryCtx, {
         type: 'bar',
         data: {
-            labels,
+            labels: chapterNumbers.map(num => `Ch. ${num}`),
             datasets: [{
                 label: 'Consecutive Mastery',
-                data: masteryData,
-                backgroundColor: '#10B981',
-                borderColor: '#059669',
+                data: mastery,
+                backgroundColor: 'rgba(34, 197, 94, 0.7)',
+                borderColor: 'rgb(34, 197, 94)',
                 borderWidth: 1
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            scales: {
-                y: { beginAtZero: true, title: { display: true, text: 'Mastery Count' } },
-                x: { title: { display: true, text: 'Chapter' } }
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        title: function(tooltipItems) {
+                            return `Chapter ${tooltipItems[0].label.substring(3)}`;
+                        }
+                    }
+                }
             },
-            plugins: { legend: { display: false } }
+            scales: {
+                y: { beginAtZero: true, ticks: { precision: 0 } }
+            }
         }
     });
-
-    charts.difficultyChart = new Chart(document.getElementById('difficultyChart'), {
+    let difficultyCtx = document.getElementById('difficultyChart').getContext('2d');
+    charts.difficultyChart = new Chart(difficultyCtx, {
         type: 'bar',
         data: {
-            labels,
+            labels: chapterNumbers.map(num => `Ch. ${num}`),
             datasets: [{
-                label: 'Chapter Difficulty',
-                data: difficultyData,
-                backgroundColor: '#F59E0B',
-                borderColor: '#D97706',
+                label: 'Difficulty Score',
+                data: difficulty,
+                backgroundColor: function(context) {
+                    const value = context.dataset.data[context.dataIndex];
+                    return value < 30 ? 'rgba(34, 197, 94, 0.7)' : 
+                           value < 70 ? 'rgba(234, 179, 8, 0.7)' : 
+                           'rgba(239, 68, 68, 0.7)';
+                },
+                borderColor: function(context) {
+                    const value = context.dataset.data[context.dataIndex];
+                    return value < 30 ? 'rgb(34, 197, 94)' : 
+                           value < 70 ? 'rgb(234, 179, 8)' : 
+                           'rgb(239, 68, 68)';
+                },
                 borderWidth: 1
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            scales: {
-                y: { beginAtZero: true, max: 200, title: { display: true, text: 'Difficulty Score' } },
-                x: { title: { display: true, text: 'Chapter' } }
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        title: function(tooltipItems) {
+                            return `Chapter ${tooltipItems[0].label.substring(3)}`;
+                        },
+                        label: function(tooltipItem) {
+                            return `Difficulty: ${tooltipItem.raw.toFixed(2)}`;
+                        }
+                    }
+                }
             },
-            plugins: { legend: { display: false } }
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    }
+                }
+            }
         }
     });
 }
 
-function closeDashboard() {
-    document.getElementById('dashboard').classList.add('hidden');
-    document.getElementById('menu').classList.remove('hidden');
-    document.getElementById('content').innerHTML = '';
+function showLoading(message) {
+    document.getElementById('loading-message').textContent = message;
+    document.getElementById('loading-overlay').classList.remove('hidden');
 }
 
-function showUploadPDF() {
-    document.getElementById('content').innerHTML = `
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-4">
-            <h2 class="text-xl font-semibold mb-4 text-primary-600 dark:text-primary-400">Upload Textbook PDF</h2>
-            <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                <div class="mb-4">
-                    <label for="pdf-upload" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Select PDF File
-                    </label>
-                    <input id="pdf-upload" type="file" accept=".pdf" 
-                        class="border rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white">
-                </div>
-                <div class="mb-4">
-                    <label for="chapter-select" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Assign to Chapter
-                    </label>
-                    <select id="chapter-select" class="border rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white">
-                        ${Object.keys(currentSubject.chapters).map(chap => `<option value="${chap}">Chapter ${chap}</option>`).join('')}
-                    </select>
-                </div>
-                <button onclick="processPDF()" class="btn-primary w-full">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm7-1.414L14.414 6H12a1 1 0 01-1-1V2.586zM7 10a1 1 0 011-1h4a1 1 0 110 2H8a1 1 0 01-1-1zm0 3a1 1 0 011-1h4a1 1 0 110 2H8a1 1 0 01-1-1z" clip-rule="evenodd" />
-                    </svg>
-                    Process PDF
-                </button>
-            </div>
-        </div>
-    `;
-}
-
-function processPDF() {
-    showLoading("Processing PDF...");
-    const fileInput = document.getElementById('pdf-upload');
-    const chapter = document.getElementById('chapter-select').value;
-    if (!fileInput.files.length) {
-        hideLoading();
-        alert("Please select a PDF file.");
-        return;
-    }
-    const file = fileInput.files[0];
-    const formData = new FormData();
-    formData.append('pdf', file);
-    formData.append('chapter', chapter);
-
-    // Note: Actual PDF processing requires a backend server.
-    // This is a placeholder for frontend simulation.
-    // Replace with actual API call to your backend processing script.
-    setTimeout(() => {
-        // Simulate fetching processed problems (replace with actual API response)
-        const simulatedProblems = [
-            { problem_number: 1, latex: "x^2 + 2x + 1 = 0" },
-            { problem_number: 2, latex: "\\int_{0}^{1} x^2 \\, dx" }
-        ];
-        currentSubject.chapters[chapter].latex_problems.push(...simulatedProblems);
-        saveData(data);
-        document.getElementById('content').innerHTML = `
-        <div class="bg-green-100 dark:bg-green-900 border-l-4 border-green-500 text-green-700 dark:text-green-200 p-4 rounded-md animate-fade-in">
-            <div class="flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                <p class="font-medium">PDF processed successfully! Added ${simulatedProblems.length} problems to Chapter ${chapter}.</p>
-            </div>
-        </div>`;
-        hideLoading();
-    }, 1000);
+function hideLoading() {
+    document.getElementById('loading-overlay').classList.add('hidden');
 }
 
 function exportData() {
     showLoading("Exporting Data...");
     setTimeout(() => {
-        const dataStr = JSON.stringify(data, null, 2);
-        const blob = new Blob([dataStr], { type: 'application/json' });
+        const data = JSON.parse(localStorage.getItem(DATA_KEY));
+        if (!data) {
+            document.getElementById('content').innerHTML = '<p class="text-red-500">No data to export.</p>';
+            hideLoading();
+            return;
+        }
+        const jsonString = JSON.stringify(data, null, 2);
+        const blob = new Blob([jsonString], { type: "application/json" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'test_generator_data.json';
+        a.download = `test_generator_data_${new Date().toISOString().slice(0,10)}.json`;
+        document.body.appendChild(a);
         a.click();
+        document.body.removeChild(a);
         URL.revokeObjectURL(url);
         document.getElementById('content').innerHTML = `
         <div class="bg-green-100 dark:bg-green-900 border-l-4 border-green-500 text-green-700 dark:text-green-200 p-4 rounded-md animate-fade-in">
@@ -984,91 +1004,76 @@ function exportData() {
 }
 
 function importData() {
-    document.getElementById('content').innerHTML = `
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-4">
-            <h2 class="text-xl font-semibold mb-4 text-primary-600 dark:text-primary-400">Import Data</h2>
-            <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                <div class="mb-4">
-                    <label for="data-import" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Select JSON File
-                    </label>
-                    <input id="data-import" type="file" accept=".json" 
-                        class="border rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white">
-                </div>
-                <button onclick="processImport()" class="btn-primary w-full">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
-                    </svg>
-                    Import Data
-                </button>
-            </div>
-        </div>
-    `;
-}
-
-function processImport() {
     showLoading("Importing Data...");
-    const fileInput = document.getElementById('data-import');
-    if (!fileInput.files.length) {
-        hideLoading();
-        alert("Please select a JSON file.");
-        return;
-    }
-    const file = fileInput.files[0];
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const importedData = JSON.parse(e.target.result);
-            if (!importedData.subjects) throw new Error("Invalid data format");
-            data = importedData;
-            currentSubject = Object.values(data.subjects)[0];
-            saveData(data);
-            updateSubjectInfo();
-            document.getElementById('content').innerHTML = `
-            <div class="bg-green-100 dark:bg-green-900 border-l-4 border-green-500 text-green-700 dark:text-green-200 p-4 rounded-md animate-fade-in">
-                <div class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    <p class="font-medium">Data imported successfully!</p>
-                </div>
-            </div>`;
-        } catch (err) {
-            alert("Error importing data: " + err.message);
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = function(event) {
+        const file = event.target.files[0];
+        if (!file) {
+            hideLoading();
+            return;
         }
-        hideLoading();
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const importedData = JSON.parse(e.target.result);
+                if (!importedData.subjects) {
+                    document.getElementById('content').innerHTML = '<p class="text-red-500">Invalid data format.</p>';
+                    hideLoading();
+                    return;
+                }
+                saveData(importedData);
+                data = loadData();
+                currentSubject = Object.values(data.subjects)[0];
+                updateSubjectInfo();
+                document.getElementById('content').innerHTML = `
+                <div class="bg-green-100 dark:bg-green-900 border-l-4 border-green-500 text-green-700 dark:text-green-200 p-4 rounded-md animate-fade-in">
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <p class="font-medium">Data imported successfully!</p>
+                    </div>
+                </div>`;
+                hideLoading();
+            } catch (e) {
+                document.getElementById('content').innerHTML = '<p class="text-red-500">Error importing data: ' + e.message + '</p>';
+                hideLoading();
+            }
+        };
+        reader.readAsText(file);
     };
-    reader.readAsText(file);
+    input.click();
 }
 
 function exit() {
     showLoading("Exiting...");
     setTimeout(() => {
         document.getElementById('content').innerHTML = `
-        <div class="bg-gray-100 dark:bg-gray-900 p-4 rounded-md text-center animate-fade-in">
-            <p class="text-lg font-medium text-gray-700 dark:text-gray-200">Thank you for using the Test Generator!</p>
-            <p class="text-gray-500 dark:text-gray-400">Your progress has been saved.</p>
+        <div class="bg-blue-100 dark:bg-blue-900 border-l-4 border-blue-500 text-blue-700 dark:text-blue-200 p-4 rounded-md animate-fade-in">
+            <div class="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <p class="font-medium">Goodbye!</p>
+            </div>
         </div>`;
         hideLoading();
+        setTimeout(() => window.close(), 1000);
     }, 500);
-}
-
-function showLoading(message) {
-    document.getElementById('loading-message').textContent = message;
-    document.getElementById('loading-overlay').classList.remove('hidden');
-}
-
-function hideLoading() {
-    document.getElementById('loading-overlay').classList.add('hidden');
 }
 
 document.getElementById('theme-toggle').addEventListener('click', () => {
     document.documentElement.classList.toggle('dark');
     localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
-    updateCharts();
 });
 
-document.getElementById('close-dashboard').addEventListener('click', closeDashboard);
+document.getElementById('close-dashboard').addEventListener('click', () => {
+    document.getElementById('dashboard').classList.add('hidden');
+    document.getElementById('menu').classList.remove('hidden');
+    document.getElementById('content').innerHTML = '';
+});
 
 if (localStorage.getItem('theme') === 'dark') {
     document.documentElement.classList.add('dark');
