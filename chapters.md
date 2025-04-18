@@ -11083,7 +11083,7 @@ B. 4 C.7 D. 9 ans: D
 
 9.An electron is in a quantum state for which there are seven allowed values of the Z component of the angular momentum. The magnitude of the angular momentum is:
 
-$\sqrt{9}\hbar$ $\begin{array}{c}{{\sqrt{3}\hbar}}\\{{\sqrt{7}\hbar}}\\\end{array}$ $\sqrt{12}\hbar$ $\sqrt{14}\hbar$ ans: D
+$\sqrt{9}\hbar$ $\begin{array}{c}{\sqrt{3}\hbar}\\{\sqrt{7}\hbar}\\\end{array}$ $\sqrt{12}\hbar$ $\sqrt{14}\hbar$ ans: D
 
 10.The number of states in a subshellwith orbital quantum number $\ell=3$ is
 
