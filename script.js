@@ -5,205 +5,163 @@ const usedQuestions = {
     '7': [1, 12, 23, 34, 45, 56, 67]
 };
 
-const initialData = {
-    "subjects": {
-        "1": {
-            "name": "Fundamentals of Physics",
-            "max_questions": 42,
-            "chapters": {
+let data = loadData();
+let currentSubject = Object.values(data.subjects)[0];
+let charts = {};
+
+// State for online testing
+let currentQuestionIndex = 0;
+let userAnswers = {};
+let timerInterval;
+let timeLeft = 7200; // 2 hours in seconds
+let questions = []; // Global to store questions during online test
+let examId = ''; // Global to store current exam ID during online test
+
+function saveData(data) {
+    localStorage.setItem(DATA_KEY, JSON.stringify(data));
+}
+
+function loadData() {
+    let data = JSON.parse(localStorage.getItem(DATA_KEY));
+    if (!data) {
+        data = {
+            "subjects": {
                 "1": {
-                    "total_questions": 28,
-                    "total_attempted": 6,
-                    "total_wrong": 2,
-                    "available_questions": [
-                        4, 5, 6, 7, 8, 9, 10, 11, 12, 16, 17, 18, 20, 21, 22, 23, 24, 25
-                    ],
-                    "mistake_history": [],
-                    "consecutive_mastery": 0
-                },
-                "2": {
-                    "total_questions": 77,
-                    "total_attempted": 9,
-                    "total_wrong": 1,
-                    "available_questions": [
-                        2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
-                        24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 35, 36, 37, 40, 41, 42, 43, 45,
-                        46, 47, 48, 49, 50, 51, 52, 53, 54, 56, 58, 59, 60, 61, 62, 63, 64, 65,
-                        67, 68, 69, 70, 71, 72, 73, 74, 75, 76
-                    ],
-                    "mistake_history": [],
-                    "consecutive_mastery": 0
-                },
-                "3": {
-                    "total_questions": 39,
-                    "total_attempted": 7,
-                    "total_wrong": 3,
-                    "available_questions": [
-                        5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, 22, 23, 24, 25, 27,
-                        28, 29, 30, 31, 33, 34, 35, 36
-                    ],
-                    "mistake_history": [],
-                    "consecutive_mastery": 0
-                },
-                "4": {
-                    "total_questions": 47,
-                    "total_attempted": 6,
-                    "total_wrong": 0,
-                    "available_questions": [
-                        2, 3, 4, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
-                        27, 28, 29, 30, 31, 32, 33, 34, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46
-                    ],
-                    "mistake_history": [],
-                    "consecutive_mastery": 0
-                },
-                "5": {
-                    "total_questions": 69,
-                    "total_attempted": 10,
-                    "total_wrong": 2,
-                    "available_questions": [
-                        4, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 21, 22, 23, 25, 26, 27,
-                        28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43, 44, 47, 48, 49, 50,
-                        51, 52, 53, 54, 55, 56, 57, 59, 60, 61, 62, 63, 64, 65, 66
-                    ],
-                    "mistake_history": [],
-                    "consecutive_mastery": 0
-                },
-                "6": {
-                    "total_questions": 71,
-                    "total_attempted": 15,
-                    "total_wrong": 7,
-                    "available_questions": [
-                        4, 5, 7, 8, 12, 13, 15, 17, 18, 19, 20, 22, 23, 24, 25, 29, 30, 32, 33, 34,
-                        35, 36, 37, 39, 40, 42, 43, 44, 46, 47, 50, 52, 53, 54, 55, 56, 57, 58, 60,
-                        62, 63, 64, 66, 67, 68
-                    ],
-                    "mistake_history": [],
-                    "consecutive_mastery": 0
-                },
-                "7": {
-                    "total_questions": 67,
-                    "total_attempted": 8,
-                    "total_wrong": 1,
-                    "available_questions": [
-                        2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
-                        24, 25, 26, 27, 28, 29, 30, 31, 32, 36, 37, 38, 39, 40, 41, 42, 43, 44, 46,
-                        47, 48, 49, 50, 51, 52, 53, 54, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66
-                    ],
-                    "mistake_history": [],
-                    "consecutive_mastery": 0
-                },
-                "8": {
-                    "total_questions": 61,
-                    "total_attempted": 10,
-                    "total_wrong": 3,
-                    "available_questions": [
-                        4, 5, 7, 8, 10, 11, 12, 13, 15, 16, 17, 18, 19, 21, 22, 23, 29, 31, 32, 33,
-                        34, 35, 37, 38, 39, 40, 44, 45, 46, 47, 48, 50, 51, 52, 54, 56, 57, 58, 59
-                    ],
-                    "mistake_history": [],
-                    "consecutive_mastery": 0
-                },
-                "9": {
-                    "total_questions": 81,
-                    "total_attempted": 13,
-                    "total_wrong": 3,
-                    "available_questions": [
-                        3, 5, 6, 7, 9, 10, 12, 13, 15, 16, 17, 18, 19, 21, 22, 23, 24, 26, 29, 30,
-                        31, 33, 35, 36, 37, 38, 44, 46, 47, 48, 51, 53, 54, 55, 56, 58, 59, 60, 61,
-                        63, 64, 65, 66, 67, 69, 70, 71, 73, 75, 76, 77, 78
-                    ],
-                    "mistake_history": [],
-                    "consecutive_mastery": 0
-                },
-                "10": {
-                    "total_questions": 81,
-                    "total_attempted": 0,
-                    "total_wrong": 0,
-                    "available_questions": [
-                        2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 18, 19, 20, 21, 22, 23,
-                        24, 26, 27, 28, 29, 30, 31, 32, 34, 35, 36, 37, 38, 39, 40, 42, 43, 44, 45,
-                        46, 47, 48, 50, 51, 52, 53, 54, 55, 56, 58, 59, 60, 61, 62, 63, 64, 66, 67,
-                        68, 69, 70, 71, 72, 74, 75, 76, 77, 78, 79, 80
-                    ],
-                    "mistake_history": [],
-                    "consecutive_mastery": 0
-                },
-                "11": {
-                    "total_questions": 54,
-                    "total_attempted": 0,
-                    "total_wrong": 0,
-                    "available_questions": [
-                        2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 20, 21, 22, 23,
-                        24, 25, 26, 28, 29, 30, 31, 32, 33, 34, 35, 37, 38, 39, 40, 41, 42, 43, 44,
-                        46, 47, 48, 49, 50, 51, 52, 53
-                    ],
-                    "mistake_history": [],
-                    "consecutive_mastery": 0
-                },
-                "12": {
-                    "total_questions": 53,
-                    "total_attempted": 0,
-                    "total_wrong": 0,
-                    "available_questions": [
-                        2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 19, 20, 21, 22, 23,
-                        24, 25, 26, 28, 29, 30, 31, 32, 33, 34, 35, 37, 38, 39, 40, 41, 42, 43, 45,
-                        46, 47, 48, 49, 50, 51, 52
-                    ],
-                    "mistake_history": [],
-                    "consecutive_mastery": 0
+                    "name": "Fundamentals of Physics",
+                    "max_questions": 42,
+                    "chapters": {},
+                    "studied_chapters": [],
+                    "pending_exams": [],
+                    "past_exams": []
                 }
-            },
-            "pending_exams": [
-                {
-                    "id": "2025-04-11_23:46",
-                    "allocation": {
-                        "1": 3,
-                        "2": 2,
-                        "3": 3,
-                        "4": 0,
-                        "5": 3,
-                        "6": 7,
-                        "7": 1,
-                        "8": 10,
-                        "9": 13
-                    }
-                },
-                {
-                    "id": "2025-04-12_00:03",
-                    "allocation": {
-                        "1": 3,
-                        "2": 1,
-                        "3": 3,
-                        "4": 1,
-                        "5": 3,
-                        "6": 7,
-                        "7": 1,
-                        "8": 10,
-                        "9": 13
-                    }
-                },
-                {
-                    "id": "2025-04-15_21:38",
-                    "allocation": {
-                        "1": 1,
-                        "2": 1,
-                        "3": 2,
-                        "4": 1,
-                        "5": 2,
-                        "6": 4,
-                        "7": 1,
-                        "8": 2,
-                        "9": 3,
-                        "10": 11,
-                        "11": 7,
-                        "12": 7
-                    },
-                    "results_entered": false
+            }
+        };
+        saveData(data);
+    } else if (!data.subjects) {
+        data = {
+            subjects: {
+                '1': {
+                    name: "Fundamentals of Physics",
+                    max_questions: 42,
+                    chapters: data.chapters || {},
+                    studied_chapters: data.studied_chapters || [],
+                    pending_exams: data.pending_exams || [],
+                    past_exams: data.past_exams || []
                 }
-            ]
+            }
+        };
+        for (let chap of Object.values(data.subjects['1'].chapters)) {
+            chap.mistake_history = chap.mistake_history || [];
+            chap.consecutive_mastery = chap.consecutive_mastery || 0;
+            chap.available_questions = chap.available_questions || Array.from({length: chap.total_questions}, (_, i) => i + 1);
+        }
+        saveData(data);
+    }
+    // Load chapters from MD file
+    fetchChapters();
+    return data;
+}
+
+// Create a chapter parser function that extracts chapters and problems from an MD file
+function parseChapters(text) {
+    const chapters = {};
+    const chapterRegex = /###\s*Chapter\s*(\d+):/i;
+    const lines = text.split('\n');
+    let currentChapter = null;
+    let problems = [];
+    
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        const chapterMatch = line.match(chapterRegex);
+        
+        if (chapterMatch) {
+            // Save previous chapter if exists
+            if (currentChapter) {
+                chapters[currentChapter] = {
+                    total_questions: problems.length,
+                    problems: problems,
+                    total_attempted: 0,
+                    total_wrong: 0,
+                    mistake_history: [],
+                    consecutive_mastery: 0,
+                    available_questions: Array.from({length: problems.length}, (_, i) => i + 1)
+                };
+            }
+            
+            // Start new chapter
+            currentChapter = chapterMatch[1];
+            problems = [];
+        } 
+        else if (line.match(/^\d+\.\s+/) && currentChapter) {
+            // This is a problem
+            let problemText = line;
+            
+            // Include following lines until next problem or chapter
+            while (i + 1 < lines.length && 
+                   !lines[i + 1].trim().match(/^\d+\.\s+/) && 
+                   !lines[i + 1].trim().match(chapterRegex)) {
+                i++;
+                problemText += '\n' + lines[i];
+            }
+            
+            problems.push(problemText.trim());
         }
     }
-};
+    
+    // Save the last chapter
+    if (currentChapter) {
+        chapters[currentChapter] = {
+            total_questions: problems.length,
+            problems: problems,
+            total_attempted: 0,
+            total_wrong: 0,
+            mistake_history: [],
+            consecutive_mastery: 0,
+            available_questions: Array.from({length: problems.length}, (_, i) => i + 1)
+        };
+    }
+    
+    return chapters;
+}
+
+function fetchChapters() {
+    showLoading("Loading chapters...");
+    fetch('output.md')
+        .then(response => {
+            if (!response.ok) throw new Error('MD file not found');
+            return response.text();
+        })
+        .then(text => {
+            const chapters = parseChapters(text);
+            if (Object.keys(chapters).length === 0) {
+                throw new Error('No chapters found in MD file');
+            }
+            currentSubject.chapters = chapters;
+            saveData(data);
+            updateChapterList();
+            hideLoading();
+        })
+        .catch(error => {
+            console.error('Error loading MD file:', error);
+            document.getElementById('content').innerHTML = `<p class="text-red-500">${error.message}</p>`;
+            hideLoading();
+        });
+}
+
+function parseProblem(text) {
+    const lines = text.split('\n');
+    const questionLine = lines[0];
+    const questionMatch = questionLine.match(/^(\d+\.\s+.*?)(?:\s+A\..*|$)/);
+    const question = questionMatch ? questionMatch[1] : questionLine;
+    const options = [];
+    let answer = '';
+    for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (/^[A-E]\./.test(line)) options.push(line);
+        else if (line.startsWith('ans:')) answer = line.split(':')[1].trim();
+    }
+    return { question, options, answer };
+}
 
 function calculateDifficulty(chap) {
     if (chap.total_attempted > 0) {
@@ -268,700 +226,704 @@ function selectNewQuestions(chap, n) {
     return selected.sort((a, b) => a - b);
 }
 
-function saveData(data) {
-    localStorage.setItem(DATA_KEY, JSON.stringify(data));
-}
-
-function loadData() {
-    let data = JSON.parse(localStorage.getItem(DATA_KEY));
-    if (!data) {
-        data = JSON.parse(JSON.stringify(initialData));
-        saveData(data);
-    } else if (!data.subjects) {
-        data = {
-            subjects: {
-                '1': {
-                    name: "Fundamentals of Physics",
-                    max_questions: 42,
-                    chapters: data.chapters || {},
-                    pending_exams: data.pending_exams || []
-                }
-            }
-        };
-        for (let chap of Object.values(data.subjects['1'].chapters)) {
-            chap.mistake_history = chap.mistake_history || [];
-            chap.consecutive_mastery = chap.consecutive_mastery || 0;
-            chap.available_questions = chap.available_questions || Array.from({length: chap.total_questions}, (_, i) => i + 1);
-        }
-        saveData(data);
-    }
-    return data;
-}
-
-let data = loadData();
-let currentSubject = Object.values(data.subjects)[0];
-let charts = {};
-
 function updateSubjectInfo() {
     document.getElementById('subject-info').innerHTML = `<p class="text-lg">Current Subject: ${currentSubject.name}</p>`;
 }
 
-function generateTest() {
-    showLoading("Generating Test...");
-    setTimeout(() => {
-        let chapters = currentSubject.chapters;
-        let max_questions = currentSubject.max_questions;
-        if (Object.keys(chapters).length === 0) {
-            document.getElementById('content').innerHTML = '<p class="text-red-500">No chapters available. Please add chapters first.</p>';
-            hideLoading();
-            return;
-        }
-        let allocation = allocateQuestions(chapters, max_questions);
-        let exam_id = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 16);
-        let output = `<p class="font-bold">Generating test for exam ID: ${exam_id}</p>`;
-        output += `<p>Today's test allocation (${max_questions} questions total):</p>`;
-        for (let chap_num in allocation) {
-            let n = allocation[chap_num];
-            if (n > 0) {
-                let questions = selectNewQuestions(chapters[chap_num], n);
-                output += `<p>Chapter ${chap_num}: ${n} questions - select questions ${questions.join(', ')}</p>`;
+function showMarkChapters() {
+    document.getElementById('content').innerHTML = `
+        <div id="chapters-studied" class="mb-4 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+            <h2 class="text-xl font-semibold mb-2 text-primary-600 dark:text-primary-400">Chapters Studied</h2>
+            <div id="chapter-list" class="space-y-2"></div>
+        </div>
+    `;
+    updateChapterList();
+}
+
+function updateChapterList() {
+    const chapterList = document.getElementById('chapter-list');
+    if (!chapterList) return;
+    chapterList.innerHTML = '';
+    const chapters = currentSubject.chapters;
+    for (const chapNum in chapters) {
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = `chapter-${chapNum}`;
+        checkbox.checked = currentSubject.studied_chapters.includes(chapNum);
+        checkbox.addEventListener('change', () => {
+            if (checkbox.checked) {
+                if (!currentSubject.studied_chapters.includes(chapNum)) {
+                    currentSubject.studied_chapters.push(chapNum);
+                }
+            } else {
+                currentSubject.studied_chapters = currentSubject.studied_chapters.filter(c => c !== chapNum);
             }
-        }
-        currentSubject.pending_exams.push({id: exam_id, allocation, results_entered: false});
-        saveData(data);
-        document.getElementById('content').innerHTML = output;
-        hideLoading();
-    }, 500);
-}
-
-function showEnterResults() {
-    let pending_exams = currentSubject.pending_exams;
-    if (pending_exams.length === 0) {
-        document.getElementById('content').innerHTML = '<p class="text-red-500">No pending exams to enter results for.</p>';
-        return;
+            saveData(data);
+            chapterList.insertAdjacentHTML('beforeend', `<p class="text-green-500">Chapter ${chapNum} updated.</p>`);
+            setTimeout(() => chapterList.querySelector('p')?.remove(), 2000);
+        });
+        const label = document.createElement('label');
+        label.htmlFor = `chapter-${chapNum}`;
+        label.textContent = `Chapter ${chapNum} (${chapters[chapNum].total_questions} questions)`;
+        const div = document.createElement('div');
+        div.appendChild(checkbox);
+        div.appendChild(label);
+        chapterList.appendChild(div);
     }
-    let output = '<p class="font-bold mb-4">Select an exam to enter results for:</p><div class="space-y-2">';
-    pending_exams.forEach((exam, i) => {
-        output += `<div class="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200">
-            <button onclick="enterResults(${i})" class="w-full text-left flex justify-between items-center">
-                <span>${i + 1}. ${exam.id}</span>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary-500" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                </svg>
-            </button>
-        </div>`;
-    });
-    output += '</div>';
-    document.getElementById('content').innerHTML = output;
 }
 
-function enterResults(index) {
-    let exam = currentSubject.pending_exams[index];
-    let allocation = exam.allocation;
-    let output = `<p class="font-bold mb-4">Entering results for exam ${exam.id}:</p><div class="space-y-4">`;
-    let inputs = [];
-    for (let chap_num in allocation) {
-        let n = allocation[chap_num];
-        if (n > 0) {
-            output += `
-            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                <label for="wrong-${chap_num}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Chapter ${chap_num}: number of wrong answers (0 to ${n})
-                </label>
-                <input id="wrong-${chap_num}" type="number" min="0" max="${n}" value="0" 
-                    class="border rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white">
-            </div>`;
-            inputs.push(chap_num);
-        }
-    }
-    output += `</div>
-    <button onclick="submitResults(${index}, ${JSON.stringify(inputs)})" 
-        class="mt-6 w-full btn-primary">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-        </svg>
-        Submit Results
-    </button>`;
-    document.getElementById('content').innerHTML = output;
-}
-
-function submitResults(index, chap_nums) {
-    showLoading("Saving Results...");
-    setTimeout(() => {
-        let exam = currentSubject.pending_exams[index];
-        let chapters = currentSubject.chapters;
-        for (let chap_num of chap_nums) {
-            let n = exam.allocation[chap_num];
-            let wrong = parseInt(document.getElementById(`wrong-${chap_num}`).value);
-            if (isNaN(wrong) || wrong < 0 || wrong > n) {
-                hideLoading();
-                alert(`Invalid input for Chapter ${chap_num}. Must be between 0 and ${n}.`);
-                return;
-            }
-            chapters[chap_num].total_attempted += n;
-            chapters[chap_num].total_wrong += wrong;
-            chapters[chap_num].mistake_history.push(wrong);
-            chapters[chap_num].consecutive_mastery = wrong === 0 ? (chapters[chap_num].consecutive_mastery || 0) + 1 : 0;
-        }
-        exam.results_entered = true;
-        currentSubject.pending_exams.splice(index, 1);
-        saveData(data);
-        document.getElementById('content').innerHTML = `
-        <div class="bg-green-100 dark:bg-green-900 border-l-4 border-green-500 text-green-700 dark:text-green-200 p-4 rounded-md animate-fade-in">
-            <div class="flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                <p class="font-medium">Results entered successfully!</p>
-            </div>
-        </div>`;
-        hideLoading();
-    }, 500);
-}
-
-function showAddChapters() {
-    let output = `
+function showExamDashboard() {
+    document.getElementById('content').innerHTML = `
         <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-4">
-            <h2 class="text-xl font-semibold mb-4 text-primary-600 dark:text-primary-400">Add New Chapters</h2>
+            <h2 class="text-xl font-semibold mb-4 text-primary-600 dark:text-primary-400">Exam Dashboard</h2>
+            <div class="space-y-4">
+                <button onclick="generateTest('studied')" class="btn-primary w-full">
+                    Test on Studied Material
+                </button>
+                <button onclick="showSpecificChaptersForm()" class="btn-primary w-full">
+                    Test on Specific Chapters
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+function showSpecificChaptersForm() {
+    document.getElementById('content').innerHTML = `
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-4">
+            <h2 class="text-xl font-semibold mb-4 text-primary-600 dark:text-primary-400">Select Chapters</h2>
             <div class="mb-4">
-                <label for="num-chapters" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Number of new chapters
+                <label for="chapters-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Enter chapter numbers (comma-separated)
                 </label>
-                <input id="num-chapters" type="number" min="1" value="1" placeholder="Enter number of chapters" 
+                <input id="chapters-input" type="text" placeholder="e.g., 1,2,3" 
                     class="border rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
             </div>
-            <button onclick="addChaptersForm()" class="btn-primary w-full">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
-                </svg>
+            <button onclick="generateTest('specific')" class="btn-primary w-full">
                 Continue
             </button>
         </div>
     `;
-    document.getElementById('content').innerHTML = output;
 }
 
-function addChaptersForm() {
-    let num_chapters = parseInt(document.getElementById('num-chapters').value);
-    if (isNaN(num_chapters) || num_chapters < 1) {
-        alert("Please enter a positive integer.");
+function generateTest(type) {
+    showLoading("Generating Test...");
+    setTimeout(() => {
+        let chaptersToUse;
+        if (type === 'studied') {
+            chaptersToUse = currentSubject.studied_chapters;
+            if (chaptersToUse.length === 0) {
+                document.getElementById('content').innerHTML = '<p class="text-red-500">No studied chapters available.</p>';
+                hideLoading();
+                return;
+            }
+        } else {
+            const input = document.getElementById('chapters-input').value;
+            chaptersToUse = input.split(',').map(c => c.trim()).filter(c => c in currentSubject.chapters);
+            if (chaptersToUse.length === 0) {
+                document.getElementById('content').innerHTML = '<p class="text-red-500">Invalid or no chapters selected.</p>';
+                hideLoading();
+                return;
+            }
+        }
+        const chapters = Object.fromEntries(
+            Object.entries(currentSubject.chapters).filter(([chapNum]) => chaptersToUse.includes(chapNum))
+        );
+        const allocation = allocateQuestions(chapters, currentSubject.max_questions);
+        const selectedQuestions = {};
+        for (let chapNum in allocation) {
+            const n = allocation[chapNum];
+            if (n > 0) {
+                const questions = selectNewQuestions(chapters[chapNum], n);
+                selectedQuestions[chapNum] = questions;
+            }
+        }
+        const exam_id = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 16);
+        currentSubject.pending_exams.push({
+            id: exam_id,
+            allocation,
+            selectedQuestions,
+            chapters: chaptersToUse,
+            results_entered: false
+        });
+        saveData(data);
+        showTestingOptions(exam_id);
+        hideLoading();
+    }, 500);
+}
+
+function showTestingOptions(exam_id) {
+    document.getElementById('content').innerHTML = `
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-4">
+            <h2 class="text-xl font-semibold mb-4 text-primary-600 dark:text-primary-400">Choose Testing Method for Exam ${exam_id}</h2>
+            <div class="space-y-4">
+                <button onclick="startOnlineTest('${exam_id}')" class="btn-primary w-full">
+                    Online Testing
+                </button>
+                <button onclick="generatePDFTest('${exam_id}')" class="btn-primary w-full">
+                    PDF Testing
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+function startOnlineTest(exam_id) {
+    const exam = getExamById(exam_id);
+    if (!exam) {
+        document.getElementById('content').innerHTML = '<p class="text-red-500">Exam not found.</p>';
         return;
     }
-    let output = '<div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-4">';
-    output += '<h2 class="text-xl font-semibold mb-4 text-primary-600 dark:text-primary-400">Enter Chapter Details</h2>';
-    output += '<div class="space-y-4">';
-    let inputs = [];
-    for (let i = 0; i < num_chapters; i++) {
-        output += `
-            <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                <h3 class="font-medium mb-3 text-gray-700 dark:text-gray-300">Chapter ${i + 1}</h3>
-                <div class="mb-3">
-                    <label for="chap-num-${i}" class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Chapter number</label>
-                    <input id="chap-num-${i}" type="text" placeholder="Enter chapter number" 
-                        class="border rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white">
+    
+    // Set up global state for the test
+    examId = exam_id;
+    questions = [];
+    
+    // Prepare questions for the test
+    for (let chapNum in exam.selectedQuestions) {
+        const chap = currentSubject.chapters[chapNum];
+        exam.selectedQuestions[chapNum].forEach(qNum => {
+            const problemText = chap.problems[qNum - 1];
+            const parsed = parseProblem(problemText);
+            questions.push({ 
+                chapNum, 
+                qNum, 
+                question: parsed.question,
+                options: parsed.options,
+                answer: parsed.answer
+            });
+        });
+    }
+    
+    currentQuestionIndex = 0;
+    userAnswers = {};
+    timeLeft = 7200; // 2 hours
+    
+    // Make sure MathJax is loaded for LaTeX rendering
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js';
+    script.async = true;
+    document.head.appendChild(script);
+    
+    // Initialize the test interface
+    displayQuestion();
+    startTimer();
+}
+
+function displayQuestion() {
+    if (currentQuestionIndex >= questions.length) {
+        endOnlineTest();
+        return;
+    }
+    
+    const q = questions[currentQuestionIndex];
+    
+    // Clean question text for display (remove answer)
+    let questionText = q.question.replace(/ans:[A-E]/, '');
+    
+    // Prepare options HTML if available
+    let optionsHTML = '';
+    if (q.options && q.options.length > 0) {
+        optionsHTML = '<div class="options-container mt-4">';
+        q.options.forEach(option => {
+            const letter = option.match(/^([A-E])\./)[1];
+            optionsHTML += `
+                <div class="option-item p-2 mb-2 border rounded">
+                    <input type="radio" name="answer" id="option-${letter}" value="${letter}">
+                    <label for="option-${letter}" class="ml-2">${option}</label>
                 </div>
-                <div>
-                    <label for="chap-questions-${i}" class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Total questions</label>
-                    <input id="chap-questions-${i}" type="number" min="1" placeholder="Enter number of questions" 
-                        class="border rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white">
-                </div>
+            `;
+        });
+        optionsHTML += '</div>';
+    } else {
+        // Free response input
+        optionsHTML = `
+            <div class="mt-4">
+                <input id="free-answer-input" type="text" class="input-field w-full" 
+                    placeholder="Enter your answer">
             </div>
         `;
-        inputs.push(i);
     }
-    output += '</div>';
-    output += `<button onclick="submitChapters(${JSON.stringify(inputs)})" class="mt-6 btn-primary w-full">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-        </svg>
-        Submit Chapters
-    </button>`;
-    output += '</div>';
-    document.getElementById('content').innerHTML = output;
-}
-
-function submitChapters(indices) {
-    showLoading("Adding Chapters...");
-    setTimeout(() => {
-        let chapters = currentSubject.chapters;
-        for (let i of indices) {
-            let chap_num = document.getElementById(`chap-num-${i}`).value;
-            let total_questions = parseInt(document.getElementById(`chap-questions-${i}`).value);
-            if (chap_num in chapters) {
-                hideLoading();
-                alert(`Chapter ${chap_num} already exists.`);
-                return;
-            }
-            if (!chap_num || isNaN(total_questions) || total_questions < 1) {
-                hideLoading();
-                alert("Please enter valid chapter number and questions.");
-                return;
-            }
-            chapters[chap_num] = {
-                total_questions,
-                total_attempted: 0,
-                total_wrong: 0,
-                available_questions: Array.from({length: total_questions}, (_, j) => j + 1),
-                mistake_history: [],
-                consecutive_mastery: 0
-            };
-        }
-        saveData(data);
-        document.getElementById('content').innerHTML = `
-        <div class="bg-green-100 dark:bg-green-900 border-l-4 border-green-500 text-green-700 dark:text-green-200 p-4 rounded-md animate-fade-in">
-            <div class="flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                <p class="font-medium">Chapters added successfully!</p>
-            </div>
-        </div>`;
-        hideLoading();
-    }, 500);
-}
-
-function showDeleteExam() {
-    let pending_exams = currentSubject.pending_exams;
-    if (pending_exams.length === 0) {
-        document.getElementById('content').innerHTML = '<p class="text-red-500">No pending exams to delete.</p>';
-        return;
-    }
-    let output = '<p class="font-bold mb-4">Select an exam to delete:</p><div class="space-y-2">';
-    pending_exams.forEach((exam, i) => {
-        output += `<div class="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200">
-            <button onclick="confirmDeleteExam(${i})" class="w-full text-left flex justify-between items-center">
-                <span>${i + 1}. ${exam.id}</span>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-                </svg>
-            </button>
-        </div>`;
-    });
-    output += '</div>';
-    document.getElementById('content').innerHTML = output;
-}
-
-function confirmDeleteExam(index) {
-    let exam = currentSubject.pending_exams[index];
-    document.getElementById('content').innerHTML = `
-        <div class="bg-red-100 dark:bg-red-900/30 p-4 rounded-lg text-center mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-red-500 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-            <p class="font-bold text-red-600 dark:text-red-400 text-lg mb-2">Delete Exam</p>
-            <p class="text-gray-700 dark:text-gray-300 mb-4">Are you sure you want to delete exam ${exam.id}?</p>
-            <div class="flex justify-center space-x-3">
-                <button onclick="deleteExam(${index})" class="btn-danger flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-                    </svg>
-                    Delete
-                </button>
-                <button onclick="showDeleteExam()" class="btn-secondary flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                    </svg>
-                    Cancel
-                </button>
-            </div>
-        </div>
-    `;
-}
-
-function deleteExam(index) {
-    showLoading("Deleting Exam...");
-    setTimeout(() => {
-        currentSubject.pending_exams.splice(index, 1);
-        saveData(data);
-        document.getElementById('content').innerHTML = `
-        <div class="bg-green-100 dark:bg-green-900 border-l-4 border-green-500 text-green-700 dark:text-green-200 p-4 rounded-md animate-fade-in">
-            <div class="flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                <p class="font-medium">Exam deleted successfully!</p>
-            </div>
-        </div>`;
-        hideLoading();
-    }, 500);
-}
-
-function showManageSubjects() {
-    let output = `
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-4">
-            <h2 class="text-xl font-semibold mb-4 text-primary-600 dark:text-primary-400">Manage Subjects</h2>
-            <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                <h3 class="font-medium mb-3 text-gray-700 dark:text-gray-300">Current Subjects</h3>
-                <div class="space-y-2">
-                    ${Object.entries(data.subjects).map(([id, subject]) => `
-                        <div class="flex justify-between items-center p-2 bg-white dark:bg-gray-600 rounded shadow-sm">
-                            <span>${subject.name}</span>
-                            <div class="flex space-x-2">
-                                <button onclick="selectSubject('${id}')" class="p-1 text-primary-500 hover:text-primary-600 dark:text-primary-400">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                    </svg>
-                                </button>
-                                <button onclick="editSubject('${id}')" class="p-1 text-blue-500 hover:text-blue-600 dark:text-blue-400">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                                    </svg>
-                                </button>
-                                <button onclick="confirmDeleteSubject('${id}')" class="p-1 text-red-500 hover:text-red-600 dark:text-red-400">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-            <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                <h3 class="font-medium mb-3 text-gray-700 dark:text-gray-300">Add New Subject</h3>
-                <div class="mb-3">
-                    <label for="subject-name" class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Subject Name</label>
-                    <input id="subject-name" type="text" placeholder="Enter subject name" 
-                        class="border rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white">
-                </div>
-                <div class="mb-3">
-                    <label for="max-questions" class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Maximum Questions per Test</label>
-                    <input id="max-questions" type="number" min="1" value="42" placeholder="Enter maximum questions" 
-                        class="border rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white">
-                </div>
-                <button onclick="addSubject()" class="btn-primary w-full">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
-                    </svg>
-                    Add Subject
-                </button>
-            </div>
-        </div>
-    `;
-    document.getElementById('content').innerHTML = output;
-}
-
-function selectSubject(id) {
-    showLoading("Switching Subject...");
-    setTimeout(() => {
-        if (data.subjects[id]) {
-            currentSubject = data.subjects[id];
-            updateSubjectInfo();
-            document.getElementById('content').innerHTML = `
-            <div class="bg-green-100 dark:bg-green-900 border-l-4 border-green-500 text-green-700 dark:text-green-200 p-4 rounded-md animate-fade-in">
-                <div class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="current0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    <p class="font-medium">Subject changed to ${currentSubject.name}</p>
-                </div>
-            </div>`;
-        }
-        hideLoading();
-    }, 500);
-}
-
-function editSubject(id) {
-    let subject = data.subjects[id];
+    
     document.getElementById('content').innerHTML = `
         <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-4">
-            <h2 class="text-xl font-semibold mb-4 text-primary-600 dark:text-primary-400">Edit Subject</h2>
-            <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                <div class="mb-3">
-                    <label for="edit-subject-name" class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Subject Name</label>
-                    <input id="edit-subject-name" type="text" value="${subject.name}" 
-                        class="border rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white">
-                </div>
-                <div class="mb-3">
-                    <label for="edit-max-questions" class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Maximum Questions per Test</label>
-                    <input id="edit-max-questions" type="number" min="1" value="${subject.max_questions}" 
-                        class="border rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white">
-                </div>
-                <div class="flex space-x-3 mt-4">
-                    <button onclick="updateSubject('${id}')" class="btn-primary flex-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                        </svg>
-                        Save Changes
-                    </button>
-                    <button onclick="showManageSubjects()" class="btn-secondary flex-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                        </svg>
-                        Cancel
-                    </button>
-                </div>
-            </div>
-        </div>
-    `;
-}
-
-function updateSubject(id) {
-    showLoading("Updating Subject...");
-    setTimeout(() => {
-        let name = document.getElementById('edit-subject-name').value;
-        let max_questions = parseInt(document.getElementById('edit-max-questions').value);
-        if (!name || isNaN(max_questions) || max_questions < 1) {
-            hideLoading();
-            alert("Please enter valid subject name and maximum questions.");
-            return;
-        }
-        data.subjects[id].name = name;
-        data.subjects[id].max_questions = max_questions;
-        if (currentSubject === data.subjects[id]) {
-            currentSubject = data.subjects[id];
-            updateSubjectInfo();
-        }
-        saveData(data);
-        showManageSubjects();
-        hideLoading();
-    }, 500);
-}
-
-function confirmDeleteSubject(id) {
-    document.getElementById('content').innerHTML = `
-        <div class="bg-red-100 dark:bg-red-900/30 p-4 rounded-lg text-center mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-red-500 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-            <p class="font-bold text-red-600 dark:text-red-400 text-lg mb-2">Delete Subject</p>
-            <p class="text-gray-700 dark:text-gray-300 mb-4">Are you sure you want to delete subject "${data.subjects[id].name}"? This action cannot be undone.</p>
-            <div class="flex justify-center space-x-3">
-                <button onclick="deleteSubject('${id}')" class="btn-danger flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-                    </svg>
-                    Delete
-                </button>
-                <button onclick="showManageSubjects()" class="btn-secondary flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                    </svg>
-                    Cancel
+            <h2 class="text-xl font-semibold mb-4">Question ${currentQuestionIndex + 1} of ${questions.length}</h2>
+            <div class="question-text mb-4">${questionText}</div>
+            ${optionsHTML}
+            <div class="flex space-x-4 mt-4">
+                ${currentQuestionIndex > 0 ? 
+                    '<button onclick="navigateToPreviousQuestion()" class="btn-secondary">Previous</button>' : ''}
+                <button onclick="submitAnswer()" class="btn-primary">
+                    ${currentQuestionIndex < questions.length - 1 ? 'Next' : 'Finish'}
                 </button>
             </div>
+            <p id="timer" class="mt-4">Time Left: ${formatTime(timeLeft)}</p>
         </div>
     `;
+    
+    // Render LaTeX if present
+    if (window.MathJax) {
+        window.MathJax.typeset();
+    }
 }
 
-function deleteSubject(id) {
-    showLoading("Deleting Subject...");
-    setTimeout(() => {
-        if (Object.keys(data.subjects).length <= 1) {
-            hideLoading();
-            alert("Cannot delete the last subject. At least one subject must remain.");
-            showManageSubjects();
-            return;
+function submitAnswer() {
+    const q = questions[currentQuestionIndex];
+    let answer = '';
+    
+    // Get answer based on question type
+    if (q.options && q.options.length > 0) {
+        const selectedOption = document.querySelector('input[name="answer"]:checked');
+        if (selectedOption) {
+            answer = selectedOption.value;
         }
-        if (currentSubject === data.subjects[id]) {
-            let otherSubjectId = Object.keys(data.subjects).find(sid => sid !== id);
-            if (otherSubjectId) {
-                currentSubject = data.subjects[otherSubjectId];
-                updateSubjectInfo();
-            }
-        }
-        delete data.subjects[id];
-        saveData(data);
-        showManageSubjects();
-        hideLoading();
-    }, 500);
+    } else {
+        answer = document.getElementById('free-answer-input').value.trim();
+    }
+    
+    // Save answer
+    userAnswers[`${q.chapNum}-${q.qNum}`] = answer;
+    
+    // Move to next question
+    currentQuestionIndex++;
+    displayQuestion();
 }
 
-function addSubject() {
-    showLoading("Adding Subject...");
-    setTimeout(() => {
-        let name = document.getElementById('subject-name').value;
-        let max_questions = parseInt(document.getElementById('max-questions').value);
-        if (!name || isNaN(max_questions) || max_questions < 1) {
-            hideLoading();
-            alert("Please enter valid subject name and maximum questions.");
-            return;
-        }
-        let newId = Object.keys(data.subjects).length + 1;
-        while (data.subjects[newId]) {
-            newId++;
-        }
-        data.subjects[newId] = {
-            name: name,
-            max_questions: max_questions,
-            chapters: {},
-            pending_exams: []
-        };
-        saveData(data);
-        showManageSubjects();
-        hideLoading();
-    }, 500);
+function navigateToPreviousQuestion() {
+    if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        displayQuestion();
+    }
 }
 
-function showProgressDashboard() {
-    document.getElementById('menu').classList.add('hidden');
-    document.getElementById('dashboard').classList.remove('hidden');
-    let chapters = currentSubject.chapters;
-    if (Object.keys(chapters).length === 0) {
-        document.getElementById('dashboard').innerHTML = '<p class="text-red-500">No chapters available to display in dashboard.</p>';
+function getExamById(exam_id) {
+    return currentSubject.pending_exams.find(exam => exam.id === exam_id) ||
+           currentSubject.past_exams.find(exam => exam.id === exam_id);
+}
+
+// Exam Management
+function createExam() {
+    const examId = `E${Date.now()}`; // Unique ID based on timestamp
+    const selectedQuestions = {};
+    // Example logic to select questions (customize as needed)
+    currentSubject.chapters.forEach((chapter, index) => {
+        if (chapter.problems.length > 0) {
+            selectedQuestions[index] = [1]; // Select first problem as an example
+        }
+    });
+    const newExam = { id: examId, selectedQuestions };
+    currentSubject.pending_exams = currentSubject.pending_exams || [];
+    currentSubject.pending_exams.push(newExam);
+    saveData(data); // Assuming saveData is defined earlier
+    showExamsDashboard();
+}
+
+
+
+// Online Testing
+function startOnlineTest(exam_id) {
+    const exam = getExamById(exam_id);
+    if (!exam) {
+        document.getElementById('content').innerHTML = '<p class="text-red-500">Exam not found.</p>';
         return;
     }
-    renderCharts();
+    examId = exam_id;
+    questions = [];
+    for (let chapNum in exam.selectedQuestions) {
+        const chap = currentSubject.chapters[chapNum];
+        exam.selectedQuestions[chapNum].forEach(qNum => {
+            const parsed = parseProblem(chap.problems[qNum - 1]);
+            questions.push({ chapNum, qNum, ...parsed });
+        });
+    }
+    currentQuestionIndex = 0;
+    userAnswers = {};
+    timeLeft = 7200; // 2 hours
+    displayQuestion();
+    startTimer();
 }
 
-function renderCharts() {
-    let chapters = currentSubject.chapters;
-    let chapterNumbers = Object.keys(chapters).sort((a, b) => parseInt(a) - parseInt(b));
-    if (charts.attemptedChart) charts.attemptedChart.destroy();
-    if (charts.wrongChart) charts.wrongChart.destroy();
-    if (charts.masteryChart) charts.masteryChart.destroy();
-    if (charts.difficultyChart) charts.difficultyChart.destroy();
-    let attempted = chapterNumbers.map(num => chapters[num].total_attempted);
-    let wrong = chapterNumbers.map(num => chapters[num].total_wrong);
-    let mastery = chapterNumbers.map(num => chapters[num].consecutive_mastery || 0);
-    let difficulty = chapterNumbers.map(num => calculateDifficulty(chapters[num]));
-    let attemptedCtx = document.getElementById('attemptedChart').getContext('2d');
-    charts.attemptedChart = new Chart(attemptedCtx, {
-        type: 'bar',
-        data: {
-            labels: chapterNumbers.map(num => `Ch. ${num}`),
-            datasets: [{
-                label: 'Questions Attempted',
-                data: attempted,
-                backgroundColor: 'rgba(59, 130, 246, 0.7)',
-                borderColor: 'rgb(59, 130, 246)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        title: function(tooltipItems) {
-                            return `Chapter ${tooltipItems[0].label.substring(3)}`;
-                        }
-                    }
-                }
-            },
-            scales: {
-                y: { beginAtZero: true, ticks: { precision: 0 } }
-            }
-        }
-    });
-    let wrongCtx = document.getElementById('wrongChart').getContext('2d');
-    charts.wrongChart = new Chart(wrongCtx, {
-        type: 'bar',
-        data: {
-            labels: chapterNumbers.map(num => `Ch. ${num}`),
-            datasets: [{
-                label: 'Wrong Answers',
-                data: wrong,
-                backgroundColor: 'rgba(239, 68, 68, 0.7)',
-                borderColor: 'rgb(239, 68, 68)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        title: function(tooltipItems) {
-                            return `Chapter ${tooltipItems[0].label.substring(3)}`;
-                        }
-                    }
-                }
-            },
-            scales: {
-                y: { beginAtZero: true, ticks: { precision: 0 } }
-            }
-        }
-    });
-    let masteryCtx = document.getElementById('masteryChart').getContext('2d');
-    charts.masteryChart = new Chart(masteryCtx, {
-        type: 'bar',
-        data: {
-            labels: chapterNumbers.map(num => `Ch. ${num}`),
-            datasets: [{
-                label: 'Consecutive Mastery',
-                data: mastery,
-                backgroundColor: 'rgba(34, 197, 94, 0.7)',
-                borderColor: 'rgb(34, 197, 94)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        title: function(tooltipItems) {
-                            return `Chapter ${tooltipItems[0].label.substring(3)}`;
-                        }
-                    }
-                }
-            },
-            scales: {
-                y: { beginAtZero: true, ticks: { precision: 0 } }
-            }
-        }
-    });
-    let difficultyCtx = document.getElementById('difficultyChart').getContext('2d');
-    charts.difficultyChart = new Chart(difficultyCtx, {
-        type: 'bar',
-        data: {
-            labels: chapterNumbers.map(num => `Ch. ${num}`),
-            datasets: [{
-                label: 'Difficulty Score',
-                data: difficulty,
-                backgroundColor: function(context) {
-                    const value = context.dataset.data[context.dataIndex];
-                    return value < 30 ? 'rgba(34, 197, 94, 0.7)' : 
-                           value < 70 ? 'rgba(234, 179, 8, 0.7)' : 
-                           'rgba(239, 68, 68, 0.7)';
-                },
-                borderColor: function(context) {
-                    const value = context.dataset.data[context.dataIndex];
-                    return value < 30 ? 'rgb(34, 197, 94)' : 
-                           value < 70 ? 'rgb(234, 179, 8)' : 
-                           'rgb(239, 68, 68)';
-                },
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        title: function(tooltipItems) {
-                            return `Chapter ${tooltipItems[0].label.substring(3)}`;
-                        },
-                        label: function(tooltipItem) {
-                            return `Difficulty: ${tooltipItem.raw.toFixed(2)}`;
-                        }
-                    }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    max: 100,
-                    ticks: {
-                        callback: function(value) {
-                            return value + '%';
-                        }
-                    }
-                }
-            }
-        }
-    });
+function displayQuestion() {
+    if (currentQuestionIndex >= questions.length) {
+        endOnlineTest();
+        return;
+    }
+    const q = questions[currentQuestionIndex];
+    document.getElementById('content').innerHTML = `
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-4">
+            <h2 class="text-xl font-semibold mb-4">Question ${currentQuestionIndex + 1} of ${questions.length}</h2>
+            <p class="mb-4">${q.qNum}. ${q.question}</p>
+            <input id="answer-input" type="text" class="input-field mb-4" placeholder="Your answer">
+            <div class="flex space-x-4">
+                <button onclick="submitAnswer()" class="btn-primary">${currentQuestionIndex < questions.length - 1 ? 'Next' : 'Finish'}</button>
+            </div>
+            <p id="timer" class="mt-4">Time Left: ${formatTime(timeLeft)}</p>
+        </div>
+    `;
 }
 
+function submitAnswer() {
+    const answer = document.getElementById('answer-input').value.trim();
+    const q = questions[currentQuestionIndex];
+    userAnswers[`${q.chapNum}-${q.qNum}`] = answer;
+    currentQuestionIndex++;
+    displayQuestion();
+}
+
+function startTimer() {
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById('timer').textContent = `Time Left: ${formatTime(timeLeft)}`;
+        if (timeLeft <= 0) endOnlineTest();
+    }, 1000);
+}
+
+function formatTime(seconds) {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    return `${h}:${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+}
+
+function endOnlineTest() {
+    clearInterval(timerInterval);
+    let score = 0;
+    questions.forEach(q => {
+        if (userAnswers[`${q.chapNum}-${q.qNum}`] === q.answer) score++;
+    });
+    const percentage = ((score / questions.length) * 100).toFixed(2);
+    const exam = getExamById(examId);
+    exam.results = { score, total: questions.length, percentage };
+    currentSubject.past_exams.push(exam);
+    currentSubject.pending_exams = currentSubject.pending_exams.filter(e => e.id !== examId);
+    saveData(data);
+    document.getElementById('content').innerHTML = `
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-4">
+            <h2 class="text-xl font-semibold mb-4">Exam ${examId} Results</h2>
+            <p>Score: ${score} / ${questions.length} (${percentage}%)</p>
+            <button onclick="showExamsDashboard()" class="btn-primary mt-4">Back to Dashboard</button>
+        </div>
+    `;
+}
+
+// Helper function to get exam by ID
+function getExamById(exam_id) {
+    return (currentSubject.pending_exams || []).concat(currentSubject.past_exams || []).find(exam => exam.id === exam_id);
+}
+
+// Exams Dashboard
+function showExamsDashboard() {
+    const pendingExams = currentSubject.pending_exams || [];
+    const pastExams = currentSubject.past_exams || [];
+
+    document.getElementById('content').innerHTML = `
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-4">
+            <h2 class="text-xl font-semibold mb-4 text-primary-600 dark:text-primary-400">Exams Dashboard</h2>
+            
+            <h3 class="text-lg font-medium mb-2">Pending Exams</h3>
+            <div class="mb-6">
+                ${pendingExams.length === 0 ? 
+                    '<p class="text-gray-500">No pending exams</p>' : 
+                    `<ul class="space-y-2 mb-4">
+                        ${pendingExams.map(exam => `
+                            <li class="flex justify-between items-center p-2 bg-gray-100 dark:bg-gray-700 rounded">
+                                <span>Exam ${exam.id}</span>
+                                <div>
+                                    <button onclick="enterResults('${exam.id}')" class="btn-primary mr-2">Enter Results</button>
+                                    <button onclick="startOnlineTest('${exam.id}')" class="btn-secondary mr-2">Resume Test</button>
+                                    <button onclick="generatePDFTest('${exam.id}')" class="btn-secondary mr-2">PDF</button>
+                                    <button onclick="deleteExam('${exam.id}', 'pending')" class="btn-danger">Delete</button>
+                                </div>
+                            </li>
+                        `).join('')}
+                    </ul>`
+                }
+            </div>
+            
+            <h3 class="text-lg font-medium mb-2">Past Exams</h3>
+            <div>
+                ${pastExams.length === 0 ? 
+                    '<p class="text-gray-500">No past exams</p>' : 
+                    `<ul class="space-y-2">
+                        ${pastExams.map(exam => `
+                            <li class="flex justify-between items-center p-2 bg-gray-100 dark:bg-gray-700 rounded">
+                                <span>Exam ${exam.id} - Score: ${exam.results ? exam.results.percentage + '%' : 'N/A'}</span>
+                                <div>
+                                    <button onclick="viewStats('${exam.id}')" class="btn-primary mr-2">View Stats</button>
+                                    <button onclick="alterResults('${exam.id}')" class="btn-secondary mr-2">Alter Results</button>
+                                    <button onclick="deleteExam('${exam.id}', 'past')" class="btn-danger">Delete</button>
+                                </div>
+                            </li>
+                        `).join('')}
+                    </ul>`
+                }
+            </div>
+            
+            <button onclick="showExamDashboard()" class="btn-primary mt-6">Back to Exam Creation</button>
+        </div>
+    `;
+}
+
+function viewStats(exam_id) {
+    const exam = getExamById(exam_id);
+    if (!exam || !exam.results) {
+        document.getElementById('content').innerHTML = '<p class="text-red-500">No results available.</p>';
+        return;
+    }
+    
+    document.getElementById('content').innerHTML = `
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-4">
+            <h2 class="text-xl font-semibold mb-4 text-primary-600 dark:text-primary-400">Exam ${exam_id} Stats</h2>
+            
+            <div class="stats-container mb-4">
+                <p>Score: ${exam.results.score} / ${exam.results.total} (${exam.results.percentage}%)</p>
+                <p>Date: ${new Date(exam.id.replace(/-/g, ':')).toLocaleDateString()}</p>
+                <p>Chapters: ${exam.chapters.join(', ')}</p>
+            </div>
+            
+            <div class="chapter-breakdown mb-6">
+                <h3 class="text-lg font-medium mb-2">Chapter Breakdown</h3>
+                <table class="w-full">
+                    <thead>
+                        <tr>
+                            <th class="text-left">Chapter</th>
+                            <th class="text-left">Questions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${Object.entries(exam.allocation).map(([chapNum, count]) => `
+                            <tr>
+                                <td>Chapter ${chapNum}</td>
+                                <td>${count}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+            
+            <button onclick="showExamsDashboard()" class="btn-primary">Back to Dashboard</button>
+        </div>
+    `;
+}
+
+function alterResults(exam_id) {
+    const exam = getExamById(exam_id);
+    if (!exam) {
+        document.getElementById('content').innerHTML = '<p class="text-red-500">Exam not found.</p>';
+        return;
+    }
+    
+    document.getElementById('content').innerHTML = `
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-4">
+            <h2 class="text-xl font-semibold mb-4">Alter Results for Exam ${exam_id}</h2>
+            
+            <div class="mb-4">
+                <label for="score" class="block text-sm font-medium mb-1">Score</label>
+                <input id="score" type="number" min="0" value="${exam.results?.score || 0}" 
+                    class="input-field mb-4" placeholder="Score">
+            </div>
+            
+            <div class="mb-4">
+                <label for="total" class="block text-sm font-medium mb-1">Total Questions</label>
+                <input id="total" type="number" min="1" value="${exam.results?.total || questions.length}" 
+                    class="input-field mb-4" placeholder="Total Questions">
+            </div>
+            
+            <div class="flex space-x-4">
+                <button onclick="updateResults('${exam_id}')" class="btn-primary">Update Results</button>
+                <button onclick="showExamsDashboard()" class="btn-secondary">Cancel</button>
+            </div>
+        </div>
+    `;
+}
+
+function updateResults(exam_id) {
+    const score = parseInt(document.getElementById('score').value);
+    const total = parseInt(document.getElementById('total').value);
+    
+    if (isNaN(score) || isNaN(total) || score < 0 || total < 1 || score > total) {
+        alert('Please enter valid score and total values');
+        return;
+    }
+    
+    const exam = getExamById(exam_id);
+    if (!exam) return;
+    
+    const percentage = ((score / total) * 100).toFixed(2);
+    exam.results = { score, total, percentage };
+    
+    // If this was a pending exam, move it to past exams
+    if (currentSubject.pending_exams.some(e => e.id === exam_id)) {
+        currentSubject.past_exams.push(exam);
+        currentSubject.pending_exams = currentSubject.pending_exams.filter(e => e.id !== exam_id);
+    }
+    
+    saveData(data);
+    showExamsDashboard();
+}
+
+function enterResults(exam_id) {
+    const exam = getExamById(exam_id);
+    if (!exam) {
+        document.getElementById('content').innerHTML = '<p class="text-red-500">Exam not found.</p>';
+        return;
+    }
+    document.getElementById('content').innerHTML = `
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-4">
+            <h2 class="text-xl font-semibold mb-4">Enter Results for Exam ${exam_id}</h2>
+            <input id="score" type="number" min="0" class="input-field mb-4" placeholder="Score">
+            <input id="total" type="number" min="0" class="input-field mb-4" placeholder="Total Questions">
+            <button onclick="submitResults('${exam_id}')" class="btn-primary">Submit</button>
+        </div>
+    `;
+}
+
+function submitResults(exam_id) {
+    const score = parseInt(document.getElementById('score').value);
+    const total = parseInt(document.getElementById('total').value);
+    if (isNaN(score) || isNaN(total) || score > total) {
+        alert('Invalid input');
+        return;
+    }
+    const percentage = ((score / total) * 100).toFixed(2);
+    const exam = getExamById(exam_id);
+    exam.results = { score, total, percentage };
+    currentSubject.past_exams.push(exam);
+    currentSubject.pending_exams = currentSubject.pending_exams.filter(e => e.id !== exam_id);
+    saveData(data);
+    showExamsDashboard();
+}
+
+function alterResults(exam_id) {
+    const exam = getExamById(exam_id);
+    if (!exam || !exam.results) {
+        document.getElementById('content').innerHTML = '<p class="text-red-500">No results to alter.</p>';
+        return;
+    }
+    document.getElementById('content').innerHTML = `
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-4">
+            <h2 class="text-xl font-semibold mb-4">Alter Results for Exam ${exam_id}</h2>
+            <input id="score" type="number" value="${exam.results.score}" class="input-field mb-4" placeholder="Score">
+            <input id="total" type="number" value="${exam.results.total}" class="input-field mb-4" placeholder="Total Questions">
+            <button onclick="submitResults('${exam_id}')" class="btn-primary">Update</button>
+        </div>
+    `;
+}
+
+function viewStats(exam_id) {
+    const exam = getExamById(exam_id);
+    if (!exam || !exam.results) {
+        document.getElementById('content').innerHTML = '<p class="text-red-500">No results available.</p>';
+        return;
+    }
+    document.getElementById('content').innerHTML = `
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-4">
+            <h2 class="text-xl font-semibold mb-4 text-primary-600 dark:text-primary-400">Exam ${exam_id} Stats</h2>
+            <p>Score: ${exam.results.score} / ${exam.results.total} (${exam.results.percentage}%)</p>
+        </div>
+    `;
+}
+
+function alterResults(exam_id) {
+    const exam = getExamById(exam_id);
+    if (!exam) {
+        document.getElementById('content').innerHTML = '<p class="text-red-500">Exam not found.</p>';
+        return;
+    }
+    // Placeholder for result alteration UI
+    document.getElementById('content').innerHTML = `<p>Alter results for exam ${exam_id} (implement UI as needed)</p>`;
+}
+
+function deleteExam(exam_id, type) {
+    if (confirm(`Are you sure you want to delete exam ${exam_id}?`)) {
+        if (type === 'pending') {
+            currentSubject.pending_exams = currentSubject.pending_exams.filter(exam => exam.id !== exam_id);
+        } else {
+            currentSubject.past_exams = currentSubject.past_exams.filter(exam => exam.id !== exam_id);
+        }
+        saveData(data);
+        showExamsDashboard(); // Refresh dashboard
+    }
+}
+
+// PDF Testing
+function generatePDFTest(exam_id) {
+    const exam = getExamById(exam_id);
+    if (!exam) {
+        document.getElementById('content').innerHTML = '<p class="text-red-500">Exam not found.</p>';
+        return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const questionsDoc = new jsPDF();
+    const solutionsDoc = new jsPDF();
+    
+    // Add LaTeX-like headers (simulation as we're using jsPDF)
+    const latexHeader = 
+        "\\documentclass[12pt]{article}\n" +
+        "\\usepackage{enumitem}\n" +
+        "\\usepackage[margin=1.5cm]{geometry}\n" +
+        "\\usepackage{tikz}\n" +
+        "\\usepackage{graphicx}\n" +
+        "\\usepackage{amsmath}\n\n" +
+        "\\begin{document}\n" +
+        "\\title{Exam Questions}\n" +
+        `\\date{${new Date().toLocaleDateString()}}\n` +
+        "\\maketitle\n\n";
+    
+    questionsDoc.setFontSize(9);
+    questionsDoc.text(latexHeader, 10, 10);
+    
+    solutionsDoc.setFontSize(9);
+    solutionsDoc.text(latexHeader.replace("Exam Questions", "Solution Manual"), 10, 10);
+    
+    let y = 40; // Start after the header
+    
+    questionsDoc.setFontSize(12);
+    solutionsDoc.setFontSize(12);
+
+    // Add questions from each chapter
+    for (let chapNum in exam.selectedQuestions) {
+        const chap = currentSubject.chapters[chapNum];
+        const questionNums = exam.selectedQuestions[chapNum];
+        
+        questionNums.forEach(qNum => {
+            const problemText = chap.problems[qNum - 1];
+            const parsed = parseProblem(problemText);
+            
+            // Question document
+            if (y > 270) {
+                questionsDoc.addPage();
+                y = 20;
+            }
+            const questionOnly = parsed.question.replace(/ans:[A-E]/, '');
+            questionsDoc.text(questionOnly, 10, y);
+            
+            // Solution document
+            if (y > 270) {
+                solutionsDoc.addPage();
+                y = 20;
+            }
+            solutionsDoc.text(`${parsed.question} (Ans: ${parsed.answer})`, 10, y);
+            
+            y += 15; // Adjust spacing between questions
+        });
+    }
+    
+    // Add LaTeX footer
+    const latexFooter = "\\end{document}";
+    questionsDoc.text(latexFooter, 10, y);
+    solutionsDoc.text(latexFooter, 10, y);
+
+    const date = new Date().toISOString().split('T')[0];
+    questionsDoc.save(`Questions_${exam_id}_${date}.pdf`);
+    solutionsDoc.save(`Solution_manual_${exam_id}_${date}.pdf`);
+    
+    document.getElementById('content').innerHTML = '<p class="text-green-500">PDFs generated successfully.</p>';
+}
+
+// Utility Functions
 function showLoading(message) {
     document.getElementById('loading-message').textContent = message;
     document.getElementById('loading-overlay').classList.remove('hidden');
@@ -971,112 +933,152 @@ function hideLoading() {
     document.getElementById('loading-overlay').classList.add('hidden');
 }
 
-function exportData() {
-    showLoading("Exporting Data...");
-    setTimeout(() => {
-        const data = JSON.parse(localStorage.getItem(DATA_KEY));
-        if (!data) {
-            document.getElementById('content').innerHTML = '<p class="text-red-500">No data to export.</p>';
-            hideLoading();
-            return;
-        }
-        const jsonString = JSON.stringify(data, null, 2);
-        const blob = new Blob([jsonString], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `test_generator_data_${new Date().toISOString().slice(0,10)}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        document.getElementById('content').innerHTML = `
-        <div class="bg-green-100 dark:bg-green-900 border-l-4 border-green-500 text-green-700 dark:text-green-200 p-4 rounded-md animate-fade-in">
-            <div class="flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                <p class="font-medium">Data exported successfully!</p>
-            </div>
-        </div>`;
-        hideLoading();
-    }, 500);
+// Initialization
+document.addEventListener('DOMContentLoaded', () => {
+    updateSubjectInfo(); // Assuming this exists from earlier messages
+});
+
+// Add a new subject
+function addSubject(name, max_questions) {
+    const subjectId = Object.keys(data.subjects).length + 1;
+    data.subjects[subjectId] = {
+        name: name,
+        max_questions: max_questions,
+        chapters: {},
+        studied_chapters: [],
+        pending_exams: [],
+        past_exams: []
+    };
+    saveData(data);
+    switchSubject(subjectId); // Switch to the newly added subject
 }
 
-function importData() {
-    showLoading("Importing Data...");
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json';
-    input.onchange = function(event) {
-        const file = event.target.files[0];
-        if (!file) {
-            hideLoading();
-            return;
+// Switch to a different subject
+function switchSubject(subjectId) {
+    if (data.subjects[subjectId]) {
+        currentSubject = data.subjects[subjectId];
+        updateSubjectInfo();
+        fetchChapters(); // Reload chapters for the new subject
+    } else {
+        console.error('Subject not found');
+        document.getElementById('content').innerHTML = '<p class="text-red-500">Subject not found.</p>';
+    }
+}
+
+// UI to manage subjects
+function showSubjectManagement() {
+    const subjects = data.subjects;
+    let html = `
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-4">
+            <h2 class="text-xl font-semibold mb-4 text-primary-600 dark:text-primary-400">Subject Management</h2>
+            <div class="mb-4">
+                <input id="new-subject-name" type="text" placeholder="Subject Name" class="input-field mr-2">
+                <input id="new-subject-max" type="number" placeholder="Max Questions" class="input-field mr-2">
+                <button onclick="addSubject(document.getElementById('new-subject-name').value, parseInt(document.getElementById('new-subject-max').value))" class="btn-primary">Add Subject</button>
+            </div>
+            <h3 class="text-lg font-medium mb-2">Current Subjects</h3>
+            <ul class="space-y-2">
+    `;
+    for (const [id, subject] of Object.entries(subjects)) {
+        html += `
+            <li class="flex justify-between items-center p-2 bg-gray-100 dark:bg-gray-700 rounded">
+                <span>${subject.name}</span>
+                <button onclick="switchSubject('${id}')" class="btn-primary">Switch</button>
+            </li>
+        `;
+    }
+    html += '</ul></div>';
+    document.getElementById('content').innerHTML = html;
+}
+
+function parseProblem(text) {
+    const lines = text.trim().split('\n');
+    if (lines.length === 0) return { question: 'Invalid problem', options: [], answer: '' };
+
+    // Extract question (first line up to options or end)
+    const questionMatch = lines[0].match(/^(\d+\.\s+.*?)(?=\s+[A-E]\.|$)/);
+    const question = questionMatch ? questionMatch[1] : lines[0];
+    
+    const options = [];
+    let answer = '';
+    let inOptions = false;
+
+    for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (/^[A-E]\.\s+/.test(line)) {
+            inOptions = true;
+            options.push(line);
+        } else if (line.startsWith('ans:') && !inOptions) {
+            answer = line.split(':')[1].trim();
+        } else if (inOptions && line.startsWith('ans:')) {
+            answer = line.split(':')[1].trim();
+        } else if (line && !inOptions) {
+            // Append to question if no options yet
+            question += '\n' + line;
         }
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const importedData = JSON.parse(e.target.result);
-                if (!importedData.subjects) {
-                    document.getElementById('content').innerHTML = '<p class="text-red-500">Invalid data format.</p>';
-                    hideLoading();
-                    return;
+    }
+
+    // Fallback: if no 'ans:' found, assume last option is correct (common in some formats)
+    if (!answer && options.length > 0) {
+        answer = options[options.length - 1].match(/^[A-E]/)[0];
+    }
+
+    return { question, options, answer };
+}
+
+function saveData(data) {
+    try {
+        localStorage.setItem(DATA_KEY, JSON.stringify(data));
+    } catch (e) {
+        console.error('Error saving data:', e);
+        document.getElementById('content').innerHTML = '<p class="text-red-500">Failed to save data.</p>';
+    }
+}
+
+function loadData() {
+    let data = JSON.parse(localStorage.getItem(DATA_KEY));
+    if (!data || typeof data !== 'object') {
+        data = {
+            subjects: {
+                '1': {
+                    name: "Fundamentals of Physics",
+                    max_questions: 42,
+                    chapters: {},
+                    studied_chapters: [],
+                    pending_exams: [],
+                    past_exams: []
                 }
-                saveData(importedData);
-                data = loadData();
-                currentSubject = Object.values(data.subjects)[0];
-                updateSubjectInfo();
-                document.getElementById('content').innerHTML = `
-                <div class="bg-green-100 dark:bg-green-900 border-l-4 border-green-500 text-green-700 dark:text-green-200 p-4 rounded-md animate-fade-in">
-                    <div class="flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                        </svg>
-                        <p class="font-medium">Data imported successfully!</p>
-                    </div>
-                </div>`;
-                hideLoading();
-            } catch (e) {
-                document.getElementById('content').innerHTML = '<p class="text-red-500">Error importing data: ' + e.message + '</p>';
-                hideLoading();
             }
         };
-        reader.readAsText(file);
-    };
-    input.click();
+    } else if (!data.subjects) {
+        // Migrate old data format
+        data = {
+            subjects: {
+                '1': {
+                    name: "Fundamentals of Physics",
+                    max_questions: 42,
+                    chapters: data.chapters || {},
+                    studied_chapters: data.studied_chapters || [],
+                    pending_exams: data.pending_exams || [],
+                    past_exams: data.past_exams || []
+                }
+            }
+        };
+    }
+
+    // Validate and initialize chapter data
+    for (const subject of Object.values(data.subjects)) {
+        for (const chap of Object.values(subject.chapters)) {
+            chap.mistake_history = chap.mistake_history || [];
+            chap.consecutive_mastery = chap.consecutive_mastery || 0;
+            chap.available_questions = chap.available_questions || 
+                Array.from({ length: chap.total_questions || 0 }, (_, i) => i + 1);
+            chap.total_attempted = chap.total_attempted || 0;
+            chap.total_wrong = chap.total_wrong || 0;
+        }
+    }
+
+    saveData(data);
+    fetchChapters(); // Load chapters into the first subject by default
+    return data;
 }
-
-function exit() {
-    showLoading("Exiting...");
-    setTimeout(() => {
-        document.getElementById('content').innerHTML = `
-        <div class="bg-blue-100 dark:bg-blue-900 border-l-4 border-blue-500 text-blue-700 dark:text-blue-200 p-4 rounded-md animate-fade-in">
-            <div class="flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                <p class="font-medium">Goodbye!</p>
-            </div>
-        </div>`;
-        hideLoading();
-        setTimeout(() => window.close(), 1000);
-    }, 500);
-}
-
-document.getElementById('theme-toggle').addEventListener('click', () => {
-    document.documentElement.classList.toggle('dark');
-    localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
-});
-
-document.getElementById('close-dashboard').addEventListener('click', () => {
-    document.getElementById('dashboard').classList.add('hidden');
-    document.getElementById('menu').classList.remove('hidden');
-    document.getElementById('content').innerHTML = '';
-});
-
-if (localStorage.getItem('theme') === 'dark') {
-    document.documentElement.classList.add('dark');
-}
-
-updateSubjectInfo();
