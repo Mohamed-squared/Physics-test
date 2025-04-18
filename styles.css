@@ -339,7 +339,7 @@ svg {
     border-top-color: #4B5563;
 }
 
-/* Question Container Styles (Adapted from Prompt 6) */
+/* Question Container Styles */
 .question-container {
     min-height: 200px;
     margin-bottom: 1.5rem;
@@ -368,7 +368,7 @@ svg {
     color: #9CA3AF;
 }
 
-/* Options Container Styles (Adapted from Prompt 6) */
+/* Options Container Styles */
 .options-container {
     display: flex;
     flex-direction: column;
@@ -714,7 +714,7 @@ svg {
     background-color: #6B7280;
 }
 
-/* Exams Dashboard Table Styles (Adapted from Prompt 8) */
+/* Exams Dashboard Table Styles */
 .exam-table {
     width: 100%;
     border-collapse: collapse;
@@ -815,7 +815,7 @@ svg {
     display: block;
 }
 
-/* Results Table Styles (Adapted from Prompt 6 and 8) */
+/* Results Table Styles */
 .result-table {
     width: 100%;
     border-collapse: collapse;
@@ -870,7 +870,7 @@ svg {
     color: #F87171;
 }
 
-/* Stats Box Styles (Adapted from Prompt 6) */
+/* Stats Box Styles */
 .stats {
     display: flex;
     justify-content: space-around;
@@ -911,7 +911,7 @@ svg {
     color: #9CA3AF;
 }
 
-/* Setup Form Styles (Adapted from Prompt 6) */
+/* Setup Form Styles */
 .setup-form {
     margin-bottom: 1.5rem;
 }
