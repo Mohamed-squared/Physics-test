@@ -155,6 +155,27 @@ function hideLoading() {
 }
 
 // Helper for rendering LaTeX in a specific element or the whole document body
+function renderLatexInElement(element = document.body) {
+    if (!element) return;
+    if (window.renderMathInElement) {
+       try {
+           window.renderMathInElement(element, {
+                delimiters: [
+                   { left: '$$', right: '$$', display: true },
+                   { left: '$', right: '$', display: false },
+                   { left: '\\(', right: '\\)', display: false },
+                   { left: '\\[', right: '\\]', display: true }
+               ],
+               throwOnError: false,
+               //trust: true // Use if rendering complex user-provided content, handle security implications
+           });
+       } catch (error) {
+           console.error("KaTeX rendering error in element:", element, error);
+       }
+   } else {
+       // console.warn("KaTeX auto-render not loaded yet.");
+   }
+}
 
 
 // --- Markdown Parsing ---
@@ -666,6 +687,8 @@ function updateSubjectInfo() {
 
 function displayContent(html) {
     document.getElementById('content').innerHTML = html;
+    // Attempt to render LaTeX after content is injected
+    requestAnimationFrame(() => renderLatexInElement(document.getElementById('content')));
 }
 
 function clearContent() {
@@ -1407,6 +1430,16 @@ function displayCurrentQuestion() {
        document.getElementById('submit-btn').classList.add('hidden');
    }
 
+   // Render LaTeX after content update
+   requestAnimationFrame(() => {
+        renderLatexInElement(document.getElementById('question-text-area'));
+        (question.options || []).forEach(opt => {
+            const optElement = document.getElementById(`option-text-${opt.letter}`);
+            if (optElement) {
+                renderLatexInElement(optElement);
+            }
+        });
+   });
 }
 
 
@@ -2006,7 +2039,9 @@ function showExamDetails(index) {
         requestAnimationFrame(() => {
             exam.questions.forEach((q, i) => {
                 const element = document.getElementById(`details-q-${i}-text`);
-                });
+                renderLatexInElement(element); // Use helper
+                 // Also render options if they exist in the details HTML (which they don't currently)
+            });
         });
     }
 }
