@@ -1,14 +1,12 @@
 const DATA_KEY = 'test_generator_data_v2'; // Changed key for new structure
 const PDF_GENERATION_OPTIONS = {
-    margin: 1.5, // Margin in cm
-    filename: 'exam.pdf', // Default filename, will be updated
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true, logging: false }, // Improve quality, allow cross-origin images if needed
-    jsPDF: { unit: 'cm', format: 'a4', orientation: 'portrait' },
-    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] } // Better page breaking
+    margin:       1.5, // Margin in cm
+    filename:     'exam.pdf', // Default filename, will be updated
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { scale: 2, useCORS: true, logging: false }, // Improve quality, allow cross-origin images if needed
+    jsPDF:        { unit: 'cm', format: 'a4', orientation: 'portrait' },
+    pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] } // Better page breaking
 };
-// --- Configuration ---
-// REPLACE WITH THE RAW URL OF YOUR MARKDOWN FILE ON GITHUB
 const MARKDOWN_FILE_URL = 'chapters.md';
 const LATEX_PDF_HEADER = `\\documentclass[12pt]{article}
 \\usepackage{enumitem} % For customizing list labels
@@ -31,17 +29,202 @@ const ONLINE_TEST_DURATION_MINUTES = 120; // 2 hours
 const initialData = {
     "subjects": {
         "1": {
-            "id": "1",
             "name": "Fundamentals of Physics",
-            "max_questions_per_test": 42,
-            "chapters": {}, // Will be populated by MD parse
-            "studied_chapters": [],
-            "pending_exams": [],
-            "exam_history": []
+            "max_questions": 42,
+            "chapters": {
+                "1": {
+                    "total_questions": 28,
+                    "total_attempted": 6,
+                    "total_wrong": 2,
+                    "available_questions": [
+                        4, 5, 6, 7, 8, 9, 10, 11, 12, 16, 17, 18, 20, 21, 22, 23, 24, 25
+                    ],
+                    "mistake_history": [],
+                    "consecutive_mastery": 0
+                },
+                "2": {
+                    "total_questions": 77,
+                    "total_attempted": 9,
+                    "total_wrong": 1,
+                    "available_questions": [
+                        2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
+                        24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 35, 36, 37, 40, 41, 42, 43, 45,
+                        46, 47, 48, 49, 50, 51, 52, 53, 54, 56, 58, 59, 60, 61, 62, 63, 64, 65,
+                        67, 68, 69, 70, 71, 72, 73, 74, 75, 76
+                    ],
+                    "mistake_history": [],
+                    "consecutive_mastery": 0
+                },
+                "3": {
+                    "total_questions": 39,
+                    "total_attempted": 7,
+                    "total_wrong": 3,
+                    "available_questions": [
+                        5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, 22, 23, 24, 25, 27,
+                        28, 29, 30, 31, 33, 34, 35, 36
+                    ],
+                    "mistake_history": [],
+                    "consecutive_mastery": 0
+                },
+                "4": {
+                    "total_questions": 47,
+                    "total_attempted": 6,
+                    "total_wrong": 0,
+                    "available_questions": [
+                        2, 3, 4, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
+                        27, 28, 29, 30, 31, 32, 33, 34, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46
+                    ],
+                    "mistake_history": [],
+                    "consecutive_mastery": 0
+                },
+                "5": {
+                    "total_questions": 69,
+                    "total_attempted": 10,
+                    "total_wrong": 2,
+                    "available_questions": [
+                        4, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 21, 22, 23, 25, 26, 27,
+                        28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43, 44, 47, 48, 49, 50,
+                        51, 52, 53, 54, 55, 56, 57, 59, 60, 61, 62, 63, 64, 65, 66
+                    ],
+                    "mistake_history": [],
+                    "consecutive_mastery": 0
+                },
+                "6": {
+                    "total_questions": 71,
+                    "total_attempted": 15,
+                    "total_wrong": 7,
+                    "available_questions": [
+                        4, 5, 7, 8, 12, 13, 15, 17, 18, 19, 20, 22, 23, 24, 25, 29, 30, 32, 33, 34,
+                        35, 36, 37, 39, 40, 42, 43, 44, 46, 47, 50, 52, 53, 54, 55, 56, 57, 58, 60,
+                        62, 63, 64, 66, 67, 68
+                    ],
+                    "mistake_history": [],
+                    "consecutive_mastery": 0
+                },
+                "7": {
+                    "total_questions": 67,
+                    "total_attempted": 8,
+                    "total_wrong": 1,
+                    "available_questions": [
+                        2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
+                        24, 25, 26, 27, 28, 29, 30, 31, 32, 36, 37, 38, 39, 40, 41, 42, 43, 44, 46,
+                        47, 48, 49, 50, 51, 52, 53, 54, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66
+                    ],
+                    "mistake_history": [],
+                    "consecutive_mastery": 0
+                },
+                "8": {
+                    "total_questions": 61,
+                    "total_attempted": 10,
+                    "total_wrong": 3,
+                    "available_questions": [
+                        4, 5, 7, 8, 10, 11, 12, 13, 15, 16, 17, 18, 19, 21, 22, 23, 29, 31, 32, 33,
+                        34, 35, 37, 38, 39, 40, 44, 45, 46, 47, 48, 50, 51, 52, 54, 56, 57, 58, 59
+                    ],
+                    "mistake_history": [],
+                    "consecutive_mastery": 0
+                },
+                "9": {
+                    "total_questions": 81,
+                    "total_attempted": 13,
+                    "total_wrong": 3,
+                    "available_questions": [
+                        3, 5, 6, 7, 9, 10, 12, 13, 15, 16, 17, 18, 19, 21, 22, 23, 24, 26, 29, 30,
+                        31, 33, 35, 36, 37, 38, 44, 46, 47, 48, 51, 53, 54, 55, 56, 58, 59, 60, 61,
+                        63, 64, 65, 66, 67, 69, 70, 71, 73, 75, 76, 77, 78
+                    ],
+                    "mistake_history": [],
+                    "consecutive_mastery": 0
+                },
+                "10": {
+                    "total_questions": 81,
+                    "total_attempted": 0,
+                    "total_wrong": 0,
+                    "available_questions": [
+                        2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 18, 19, 20, 21, 22, 23,
+                        24, 26, 27, 28, 29, 30, 31, 32, 34, 35, 36, 37, 38, 39, 40, 42, 43, 44, 45,
+                        46, 47, 48, 50, 51, 52, 53, 54, 55, 56, 58, 59, 60, 61, 62, 63, 64, 66, 67,
+                        68, 69, 70, 71, 72, 74, 75, 76, 77, 78, 79, 80
+                    ],
+                    "mistake_history": [],
+                    "consecutive_mastery": 0
+                },
+                "11": {
+                    "total_questions": 54,
+                    "total_attempted": 0,
+                    "total_wrong": 0,
+                    "available_questions": [
+                        2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 20, 21, 22, 23,
+                        24, 25, 26, 28, 29, 30, 31, 32, 33, 34, 35, 37, 38, 39, 40, 41, 42, 43, 44,
+                        46, 47, 48, 49, 50, 51, 52, 53
+                    ],
+                    "mistake_history": [],
+                    "consecutive_mastery": 0
+                },
+                "12": {
+                    "total_questions": 53,
+                    "total_attempted": 0,
+                    "total_wrong": 0,
+                    "available_questions": [
+                        2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 19, 20, 21, 22, 23,
+                        24, 25, 26, 28, 29, 30, 31, 32, 33, 34, 35, 37, 38, 39, 40, 41, 42, 43, 45,
+                        46, 47, 48, 49, 50, 51, 52
+                    ],
+                    "mistake_history": [],
+                    "consecutive_mastery": 0
+                }
+            },
+            "pending_exams": [
+                {
+                    "id": "2025-04-11_23:46",
+                    "allocation": {
+                        "1": 3,
+                        "2": 2,
+                        "3": 3,
+                        "4": 0,
+                        "5": 3,
+                        "6": 7,
+                        "7": 1,
+                        "8": 10,
+                        "9": 13
+                    }
+                },
+                {
+                    "id": "2025-04-12_00:03",
+                    "allocation": {
+                        "1": 3,
+                        "2": 1,
+                        "3": 3,
+                        "4": 1,
+                        "5": 3,
+                        "6": 7,
+                        "7": 1,
+                        "8": 10,
+                        "9": 13
+                    }
+                },
+                {
+                    "id": "2025-04-15_21:38",
+                    "allocation": {
+                        "1": 1,
+                        "2": 1,
+                        "3": 2,
+                        "4": 1,
+                        "5": 2,
+                        "6": 4,
+                        "7": 1,
+                        "8": 2,
+                        "9": 3,
+                        "10": 11,
+                        "11": 7,
+                        "12": 7
+                    },
+                    "results_entered": false
+                }
+            ]
         }
     }
 };
-
 
 // --- Core Data & State ---
 let data = null; // Loaded in initializeApp
@@ -52,46 +235,27 @@ let currentOnlineTestState = null; // Holds state during an online test
 
 // --- Utility Functions ---
 function saveData(dataToSave) {
-    try {
-        localStorage.setItem(DATA_KEY, JSON.stringify(dataToSave));
-    } catch (e) {
-        console.error("Error saving data to localStorage:", e);
-        alert("Error saving data. Your progress might not be saved. LocalStorage might be full or disabled.");
-    }
+    localStorage.setItem(DATA_KEY, JSON.stringify(dataToSave));
 }
 
 async function loadData() {
     console.log("Loading data...");
-    let loadedData = null;
-    try {
-        const storedData = localStorage.getItem(DATA_KEY);
-        if (storedData) {
-            loadedData = JSON.parse(storedData);
+    let loadedData = JSON.parse(localStorage.getItem(DATA_KEY));
+    if (!loadedData || !loadedData.subjects || Object.keys(loadedData.subjects).length === 0) {
+        console.log("No valid data found in localStorage, initializing...");
+        loadedData = JSON.parse(JSON.stringify(initialData));
+        // Ensure default subject has necessary fields
+        if (!loadedData.subjects["1"]) {
+           loadedData.subjects["1"] = JSON.parse(JSON.stringify(initialData.subjects["1"]));
         }
-    } catch (e) {
-        console.error("Error parsing data from localStorage:", e);
-        alert("Error reading saved data. Starting with initial data.");
-        loadedData = null; // Force reinitialization
-    }
-
-
-    if (!loadedData || !loadedData.subjects || typeof loadedData.subjects !== 'object' || Object.keys(loadedData.subjects).length === 0) {
-        console.log("No valid data found in localStorage or error parsing, initializing...");
-        loadedData = JSON.parse(JSON.stringify(initialData)); // Deep copy
     } else {
         console.log("Data loaded from localStorage.");
         // --- Data Migration/Validation ---
         for (const subjectId in loadedData.subjects) {
             const subject = loadedData.subjects[subjectId];
             subject.id = subject.id || subjectId; // Ensure ID exists
-            subject.name = subject.name || `Subject ${subjectId}`;
             subject.studied_chapters = subject.studied_chapters || [];
-            // Validate pending exams: ensure allocation is object, not just count
-            subject.pending_exams = (subject.pending_exams || []).map(exam => ({
-                 ...exam,
-                 allocation: (typeof exam.allocation === 'object' && exam.allocation !== null) ? exam.allocation : {},
-                 results_entered: exam.results_entered || false
-            }));
+            subject.pending_exams = subject.pending_exams || [];
             subject.exam_history = subject.exam_history || [];
             subject.max_questions_per_test = subject.max_questions_per_test || 42;
             subject.chapters = subject.chapters || {};
@@ -104,7 +268,6 @@ async function loadData() {
                 chap.mistake_history = chap.mistake_history || [];
                 chap.consecutive_mastery = chap.consecutive_mastery || 0;
                 // available_questions will be repopulated after MD parse
-                 chap.available_questions = chap.available_questions || []; // Ensure it's at least an empty array
             }
         }
     }
@@ -112,9 +275,7 @@ async function loadData() {
     // --- Fetch and Parse Markdown ---
     try {
         console.log("Fetching Markdown file:", MARKDOWN_FILE_URL);
-        // Add cache-busting query parameter to URL to avoid stale cache issues
-        const url = `${MARKDOWN_FILE_URL}?t=${new Date().getTime()}`;
-        const response = await fetch(url);
+        const response = await fetch(MARKDOWN_FILE_URL);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -133,7 +294,7 @@ async function loadData() {
         markdownContentCache = null; // Ensure cache is null on error
         // Decide how to handle failure: load without MD? Show error?
         // For now, continue with potentially stale chapter data if loadedData exists
-        if (Object.keys(loadedData.subjects).length === 0 || Object.keys(loadedData.subjects["1"]?.chapters || {}).length === 0) { // Check if data is truly empty
+        if (!loadedData) { // If initialization failed AND fetch failed
              alert("FATAL: Could not initialize data or load chapters from Markdown. Please check the URL and network connection.");
              return null; // Indicate fatal error
         } else {
@@ -145,112 +306,114 @@ async function loadData() {
 }
 
 function showLoading(message) {
-    const msgElement = document.getElementById('loading-message');
-    if (msgElement) msgElement.textContent = message;
-    document.getElementById('loading-overlay')?.classList.remove('hidden');
+    document.getElementById('loading-message').textContent = message;
+    document.getElementById('loading-overlay').classList.remove('hidden');
 }
 
 function hideLoading() {
-    document.getElementById('loading-overlay')?.classList.add('hidden');
+    document.getElementById('loading-overlay').classList.add('hidden');
 }
 
-// Helper for rendering LaTeX in a specific element or the whole document body
-function renderLatexInElement(element = document.body) {
-    if (!element) return;
+function renderLatex() {
     if (window.renderMathInElement) {
-       try {
-           window.renderMathInElement(element, {
-                delimiters: [
-                   { left: '$$', right: '$$', display: true },
-                   { left: '$', right: '$', display: false },
-                   { left: '\\(', right: '\\)', display: false },
-                   { left: '\\[', right: '\\]', display: true }
-               ],
-               throwOnError: false,
-               //trust: true // Use if rendering complex user-provided content, handle security implications
-           });
-       } catch (error) {
-           console.error("KaTeX rendering error in element:", element, error);
-       }
-   } else {
-       // console.warn("KaTeX auto-render not loaded yet.");
-   }
+        try {
+            window.renderMathInElement(document.getElementById('content'), {
+                 delimiters: [
+                    { left: '$$', right: '$$', display: true },
+                    { left: '$', right: '$', display: false },
+                    { left: '\\(', right: '\\)', display: false },
+                    { left: '\\[', right: '\\]', display: true }
+                ],
+                throwOnError: false
+            });
+             window.renderMathInElement(document.getElementById('online-test-area'), { // Also render in test area
+                 delimiters: [
+                    { left: '$$', right: '$$', display: true },
+                    { left: '$', right: '$', display: false },
+                    { left: '\\(', right: '\\)', display: false },
+                    { left: '\\[', right: '\\]', display: true }
+                ],
+                throwOnError: false
+            });
+        } catch (error) {
+            console.error("KaTeX rendering error:", error);
+        }
+    } else {
+        console.warn("KaTeX auto-render not loaded yet.");
+    }
 }
-
 
 // --- Markdown Parsing ---
 
 function updateChaptersFromMarkdown(subject, mdContent) {
-    const parsedChapters = parseChaptersFromMarkdown(mdContent); // Gets { number: total_questions }
+    const parsedChapters = parseChaptersFromMarkdown(mdContent);
     const existingChapters = subject.chapters || {};
     const updatedChapters = {};
-    const allKnownChapterNumbers = new Set([...Object.keys(existingChapters), ...Object.keys(parsedChapters)]);
 
-    allKnownChapterNumbers.forEach(chapNum => {
-        const parsedChapData = parsedChapters[chapNum];
-        const existingChapData = existingChapters[chapNum];
-        const newTotal = parsedChapData?.total_questions ?? 0; // Total from MD (or 0 if not in MD)
-
-        if (existingChapData) {
-            // Chapter exists in data
-            updatedChapters[chapNum] = { ...existingChapData }; // Start with existing data
-
-            if (parsedChapData) {
-                // Chapter also exists in MD, update total and maybe available
-                if (existingChapData.total_questions !== newTotal) {
-                    console.log(`Chapter ${chapNum}: Total questions changed from ${existingChapData.total_questions} to ${newTotal}. Resetting available questions.`);
-                    updatedChapters[chapNum].total_questions = newTotal;
-                    // Reset available questions: start with all, then remove attempted ones IF we still have history?
-                    // Safest: Just reset to all questions up to the new total.
-                    updatedChapters[chapNum].available_questions = Array.from({ length: newTotal }, (_, j) => j + 1);
-                    // Note: This loses the 'attempted' status if total changes. A more complex merge could preserve it.
-                } else {
-                    // Total is the same, ensure available_questions is valid
-                    updatedChapters[chapNum].total_questions = newTotal; // Ensure total is set
-                    updatedChapters[chapNum].available_questions = (existingChapData.available_questions || Array.from({ length: newTotal }, (_, j) => j + 1))
-                        .filter(q => q > 0 && q <= newTotal) // Ensure valid range
-                        .sort((a, b) => a - b);
-                    updatedChapters[chapNum].available_questions = [...new Set(updatedChapters[chapNum].available_questions)]; // Remove duplicates
-                }
-            } else {
-                // Chapter exists in data BUT NOT in MD anymore
-                console.warn(`Chapter ${chapNum} exists in data but not found in the Markdown file. Marking total_questions as 0.`);
-                updatedChapters[chapNum].total_questions = 0;
-                updatedChapters[chapNum].available_questions = [];
-            }
-
-        } else if (parsedChapData) {
-            // New chapter found ONLY in MD
-            console.log(`Chapter ${chapNum}: Found new chapter in Markdown with ${newTotal} questions.`);
+    for (const chapNum in parsedChapters) {
+        const parsedChap = parsedChapters[chapNum];
+        if (existingChapters[chapNum]) {
+            // Update total_questions, keep existing stats
             updatedChapters[chapNum] = {
-                total_questions: newTotal,
+                ...existingChapters[chapNum],
+                total_questions: parsedChap.total_questions,
+                // Recalculate available_questions based on new total and existing attempts
+                // This is complex. Simpler: just reset available if total changes?
+                // Safer approach: Reset available questions if total changes.
+                available_questions: (existingChapters[chapNum].total_questions !== parsedChap.total_questions)
+                    ? Array.from({ length: parsedChap.total_questions }, (_, j) => j + 1)
+                    : existingChapters[chapNum].available_questions || Array.from({ length: parsedChap.total_questions }, (_, j) => j + 1),
+            };
+             // Ensure available_questions doesn't contain numbers > new total_questions
+             if (updatedChapters[chapNum].available_questions) {
+                updatedChapters[chapNum].available_questions = updatedChapters[chapNum].available_questions.filter(q => q <= parsedChap.total_questions);
+             }
+
+        } else {
+            // New chapter found in MD
+            updatedChapters[chapNum] = {
+                total_questions: parsedChap.total_questions,
                 total_attempted: 0,
                 total_wrong: 0,
-                available_questions: Array.from({ length: newTotal }, (_, j) => j + 1),
+                available_questions: Array.from({ length: parsedChap.total_questions }, (_, j) => j + 1),
                 mistake_history: [],
                 consecutive_mastery: 0
             };
         }
-         // Ensure essential fields exist even if modified
-         updatedChapters[chapNum].total_attempted = updatedChapters[chapNum]?.total_attempted ?? 0;
-         updatedChapters[chapNum].total_wrong = updatedChapters[chapNum]?.total_wrong ?? 0;
-         updatedChapters[chapNum].mistake_history = updatedChapters[chapNum]?.mistake_history ?? [];
-         updatedChapters[chapNum].consecutive_mastery = updatedChapters[chapNum]?.consecutive_mastery ?? 0;
-    });
+    }
+
+     // Handle chapters that were in data but NOT in MD (optional: mark as inactive or remove?)
+     // For now, let's keep them but maybe log a warning.
+     for (const chapNum in existingChapters) {
+         if (!parsedChapters[chapNum]) {
+             console.warn(`Chapter ${chapNum} exists in data but not found in the Markdown file. Keeping existing data.`);
+             // Optionally remove or mark inactive:
+             // delete updatedChapters[chapNum];
+             // Or add a flag: updatedChapters[chapNum].isActive = false;
+              if (!updatedChapters[chapNum]) { // Keep it if it wasn't already handled (e.g., total changed)
+                 updatedChapters[chapNum] = existingChapters[chapNum];
+             }
+         }
+     }
+
 
     subject.chapters = updatedChapters;
 }
 
+// --- Markdown Parsing (REVISED) ---
 
 function parseChaptersFromMarkdown(mdContent) {
-    const chapters = {}; // Store as { chapNumString: { total_questions: count } }
+    const chapters = {};
     if (!mdContent) return chapters;
 
     const lines = mdContent.split('\n');
-    let currentChapterNum = null;
+    let currentChapter = null;
     let questionCount = 0;
 
+    // Regex to find chapter lines: Allow optional leading text/numbers before "Chapter"
+    // Matches "### Chapter X: TITLE", "XXX Chapter X: TITLE", etc. Case-insensitive for "Chapter".
     const chapterRegex = /^(?:.*?\s+)?###\s+Chapter\s+(\d+):?.*?$/i;
+    // Question regex: starts with number(.) or number() followed by space. Allows leading whitespace.
     const questionRegex = /^\s*\d+[\.\)]\s+.*/;
 
     for (const line of lines) {
@@ -258,39 +421,48 @@ function parseChaptersFromMarkdown(mdContent) {
         const chapterMatch = trimmedLine.match(chapterRegex);
 
         if (chapterMatch) {
-            // Finalize previous chapter's count
-            if (currentChapterNum !== null) {
-                if (!chapters[currentChapterNum]) chapters[currentChapterNum] = {};
-                chapters[currentChapterNum].total_questions = questionCount;
-                // console.log(`---> Finalized Chapter ${currentChapterNum} with ${questionCount} questions.`);
+            // Finalize previous chapter's count if one was active
+            if (currentChapter !== null && questionCount > 0) {
+                 // Ensure the chapter entry exists before assigning count
+                 if (!chapters[currentChapter]) {
+                     chapters[currentChapter] = { number: currentChapter, total_questions: 0 };
+                 }
+                 chapters[currentChapter].total_questions = questionCount;
+                 console.log(`---> Finalized Chapter ${currentChapter} with ${questionCount} questions.`);
             }
             // Start new chapter
-            currentChapterNum = chapterMatch[1]; // Chapter number (string)
+            currentChapter = chapterMatch[1]; // Chapter number is group 1
             questionCount = 0; // Reset question count
-            if (!chapters[currentChapterNum]) {
-                 chapters[currentChapterNum] = { total_questions: 0 };
+            // Initialize chapter entry if it doesn't exist
+            if (!chapters[currentChapter]) {
+                 chapters[currentChapter] = { number: currentChapter, total_questions: 0 };
             }
-            // console.log(`---> Found Chapter ${currentChapterNum}`);
-        } else if (currentChapterNum !== null && questionRegex.test(line)) {
+            console.log(`---> Found Chapter ${currentChapter}`);
+        } else if (currentChapter !== null && questionRegex.test(line)) {
+             // Count line as a question only if we are inside a chapter
+             // and the line matches the question format.
             questionCount++;
+             // console.log(`    Q${questionCount} in Ch ${currentChapter}: ${line.substring(0, 30)}...`);
         }
     }
 
     // Finalize the last chapter's count
-    if (currentChapterNum !== null) {
-         if (!chapters[currentChapterNum]) chapters[currentChapterNum] = {};
-         chapters[currentChapterNum].total_questions = questionCount;
-         // console.log(`---> Finalized LAST Chapter ${currentChapterNum} with ${questionCount} questions.`);
+    if (currentChapter !== null && questionCount > 0) {
+         if (!chapters[currentChapter]) { // Ensure entry exists
+             chapters[currentChapter] = { number: currentChapter, total_questions: 0 };
+         }
+         chapters[currentChapter].total_questions = questionCount;
+         console.log(`---> Finalized LAST Chapter ${currentChapter} with ${questionCount} questions.`);
     }
 
+     console.log("Final Parsed Chapters Object:", JSON.stringify(chapters, null, 2));
     if (Object.keys(chapters).length === 0) {
         console.error("ERROR: No chapters were parsed. Check chapterRegex and MD format.");
-    } else {
-        // console.log("Final Parsed Chapters Object:", JSON.stringify(chapters, null, 2));
     }
-    return chapters; // Return { "1": { total_questions: 28 }, "2": { total_questions: 77 }, ... }
+    return chapters;
 }
 
+// --- (updateChaptersFromMarkdown remains the same as before) ---
 
 function extractQuestionsFromMarkdown(mdContent, selectedQuestionsMap) {
     const extracted = {
@@ -302,7 +474,7 @@ function extractQuestionsFromMarkdown(mdContent, selectedQuestionsMap) {
         return extracted;
     }
 
-    // console.log("Extracting questions for map:", JSON.stringify(selectedQuestionsMap));
+    console.log("Extracting questions for map:", JSON.stringify(selectedQuestionsMap));
 
     const lines = markdownContentCache.split('\n');
     let currentChapter = null;
@@ -311,9 +483,10 @@ function extractQuestionsFromMarkdown(mdContent, selectedQuestionsMap) {
 
     const chapterRegex = /^###\s+Chapter\s+(\d+):?.*?$/i;
     const questionStartRegex = /^\s*(\d+)\s*[\.\)]\s*(.*)/;
+    // Regex for options: Optional leading space, A-E (case-insensitive), . or ), space, then text. Captures letter and text.
     const optionRegex = /^\s*([A-Ea-e])[\.\)]\s+(.*)/;
-    // More specific answer regex: Must be at end of line, allows optional space before letter
-    const answerRegex = /(?:ans|answer)\s*:\s*([a-zA-Z\d])\s*$/i;
+     // Regex for answer: Flexible, looks for "ans:" or "answer:" potentially at the end of a line. Captures preceding text and answer letter.
+     const answerRegex = /^(.*?(?:ans|answer)\s*:\s*([a-zA-Z\d]))(?:\s+.*)?$/i;
     const imageRegex = /!\[(.*?)\]\((.*?)\)/; // Basic Markdown image
 
     function finalizeQuestion() {
@@ -326,43 +499,31 @@ function extractQuestionsFromMarkdown(mdContent, selectedQuestionsMap) {
             if (currentQuestion.answerLine) {
                  const answerMatch = currentQuestion.answerLine.match(answerRegex);
                  if (answerMatch) {
-                     answer = answerMatch[1].toUpperCase(); // Group 1 is the letter/digit
+                     answer = answerMatch[2].toUpperCase();
                  }
+             }
+
+            // Remove answer line from the main text if it was appended there accidentally
+            if (currentQuestion.answerLine && fullText.endsWith(currentQuestion.answerLine)) {
+                 fullText = fullText.substring(0, fullText.length - currentQuestion.answerLine.length).trim();
             }
 
-            // Remove the answer line from the full text if it was accidentally included
-            // Need to be careful here, only remove if it's the *exact* last line
-            if (currentQuestion.answerLine && currentQuestion.textLines.length > 0 && currentQuestion.textLines[currentQuestion.textLines.length - 1] === currentQuestion.answerLine) {
-                 currentQuestion.textLines.pop(); // Remove last line if it was the answer line
-                 fullText = currentQuestion.textLines.join('\n').trim(); // Re-join
-            }
-
-            // Extract image and optionally remove from text
+            // Extract image
             const imageMatch = fullText.match(imageRegex);
             const imageUrl = imageMatch ? imageMatch[2] : null;
-            if (imageUrl) {
-                 // Decide whether to keep the ![alt](url) in the text or remove it
-                 // Let's remove it for cleaner display if image property is used
-                 // fullText = fullText.replace(imageRegex, '').trim();
-            }
-
-             // Format options: ensure text is trimmed
-             const formattedOptions = currentQuestion.options.map(opt => ({
-                 letter: opt.letter,
-                 text: opt.text.trim() // Trim final option text
-             }));
-
+            // Optional: Remove image markdown from text if you only want to display it via the image property
+            // fullText = fullText.replace(imageRegex, '').trim();
 
             extracted.questions.push({
                 id: questionId,
                 chapter: currentChapter,
                 number: currentQuestion.number,
                 text: fullText,
-                options: formattedOptions, // Use trimmed options
+                options: currentQuestion.options, // Array of {letter: 'A', text: '...'}
                 image: imageUrl,
                 answer: answer // Store answer found via regex
             });
-             // console.log(`Finalized Q: ${questionId}`, {text: fullText.substring(0,50), options: formattedOptions, answer});
+            // console.log(`Finalized Q: ${questionId}`, currentQuestion);
 
             // Store answer separately as well
             if (answer) {
@@ -373,78 +534,82 @@ function extractQuestionsFromMarkdown(mdContent, selectedQuestionsMap) {
     }
 
     for (const line of lines) {
-        // Don't trim line here yet, preserve indentation for potential code blocks within questions/options
         const trimmedLine = line.trim();
         const chapterMatch = trimmedLine.match(chapterRegex);
-        const questionMatch = line.match(questionStartRegex); // Match on raw line
-        const optionMatch = trimmedLine.match(optionRegex); // Match on trimmed line for options
-        const answerMatch = trimmedLine.match(answerRegex); // Match on trimmed line for answer
+        const questionMatch = line.match(questionStartRegex); // Use original line for question start
+        const optionMatch = trimmedLine.match(optionRegex);
+        const answerMatch = trimmedLine.match(answerRegex); // Check every line for the answer pattern
 
         if (chapterMatch) {
-            finalizeQuestion();
+            finalizeQuestion(); // Finalize previous question before switching chapter
             currentChapter = chapterMatch[1];
             processingState = 'seeking_question';
+            // console.log(`--> Switched to Chapter ${currentChapter}`);
             continue;
         }
 
-        if (processingState === 'seeking_chapter') continue;
+        if (processingState === 'seeking_chapter') continue; // Skip lines before first chapter
 
         if (questionMatch) {
-            finalizeQuestion();
+            finalizeQuestion(); // Finalize previous question
             const qNum = parseInt(questionMatch[1], 10);
-            const firstLineText = questionMatch[2]; // Keep potential leading space from original line
+            const firstLineText = questionMatch[2].trim(); // Text on the first line of the question
 
             const chapterKey = String(currentChapter);
             if (selectedQuestionsMap[chapterKey] && selectedQuestionsMap[chapterKey].includes(qNum)) {
+                // Start processing this selected question
                 currentQuestion = {
                     number: qNum,
-                    textLines: [firstLineText], // Store first line's text
+                    textLines: [firstLineText], // Start with text from the first line
                     options: [],
-                    answerLine: null
+                    answerLine: null // Reset answer line
                 };
-                processingState = 'in_question_text';
-                // console.log(`--> Starting selected Q: Ch ${chapterKey} Q ${qNum}`);
+                processingState = 'in_question_text'; // Assume text first, then options
+                // console.log(`--> Starting selected question: Ch ${chapterKey} Q ${qNum}`);
             } else {
+                // It's a question, but not one we need, ignore until next question/chapter
                 processingState = 'seeking_question';
                 currentQuestion = null;
             }
-            continue;
+            continue; // Move to next line
         }
 
+        // --- Processing lines *within* a selected question ---
         if (currentQuestion) {
-            // Check for answer line FIRST, as it definitively ends the question content
-            if (answerMatch) {
-                 currentQuestion.answerLine = trimmedLine; // Store the line where answer was found
+             if (answerMatch && !optionMatch) { // Make sure it's not an option line formatted like 'Ans: A...'
+                 // Found the answer line, store it and stop adding lines to text/options
+                 currentQuestion.answerLine = trimmedLine;
                  processingState = 'found_answer';
-                  // Don't 'continue' here, let subsequent lines be ignored until next question/chapter
-            } else if (optionMatch && processingState !== 'found_answer') {
-                // Found a new option
-                processingState = 'in_options';
+                 // console.log(`Found answer line for Q${currentQuestion.number}: ${trimmedLine}`);
+                 // Don't continue yet, let finalizeQuestion handle it later
+                 // If the answer is the *very last* thing for the question, it will be finalized
+                 // when the next question or chapter starts, or at the end of the file.
+             } else if (optionMatch && processingState !== 'found_answer') {
+                // Found an option line
+                processingState = 'in_options'; // Switch state
                 currentQuestion.options.push({
                     letter: optionMatch[1].toUpperCase(),
-                    text: optionMatch[2] // Store initial text, might be multi-line
+                    text: optionMatch[2].trim()
                 });
-                 // console.log(`  Added option ${optionMatch[1]}`);
-            } else if (trimmedLine.length === 0 && processingState !== 'found_answer') {
-                 // Handle blank lines: Append to question text if in that state, otherwise ignore or append to option?
-                 if (processingState === 'in_question_text') {
-                     currentQuestion.textLines.push(''); // Preserve blank line in question text
-                 } else if (processingState === 'in_options' && currentQuestion.options.length > 0) {
-                     // Append blank line to the current option text
-                     currentQuestion.options[currentQuestion.options.length - 1].text += '\n';
-                 }
-            } else if (processingState !== 'found_answer') {
-                 // It's a continuation line (neither blank, nor option start, nor answer)
-                 if (processingState === 'in_options' && currentQuestion.options.length > 0) {
-                     // Append to the *last* option's text
-                     currentQuestion.options[currentQuestion.options.length - 1].text += '\n' + line; // Append raw line
+                 // console.log(`  Added option ${optionMatch[1]} for Q${currentQuestion.number}`);
+             } else if (trimmedLine.length > 0 && processingState !== 'found_answer') {
+                // Regular line of text belonging to the question or potentially multi-line option
+                if (processingState === 'in_options' && currentQuestion.options.length > 0) {
+                     // Append to the *last* option's text (for multi-line options)
+                     const lastOption = currentQuestion.options[currentQuestion.options.length - 1];
+                     lastOption.text += '\n' + line; // Preserve original spacing if needed? Or just trimmed? Let's try raw line.
                  } else {
-                     // Append to question text (default)
-                     processingState = 'in_question_text'; // Ensure state
-                     currentQuestion.textLines.push(line); // Append raw line
+                     // Append to question text
+                     processingState = 'in_question_text'; // Ensure state is correct
+                     currentQuestion.textLines.push(line); // Add raw line to preserve formatting
                  }
-            }
-             // If state is 'found_answer', we simply ignore subsequent lines until a new question/chapter starts
+             } else if (trimmedLine.length === 0 && processingState !== 'found_answer') {
+                 // Allow blank lines within question text, but not if we found answer
+                 if (processingState === 'in_question_text') {
+                     currentQuestion.textLines.push(''); // Keep blank line
+                 }
+                 // Ignore blank lines if in options maybe? Or append to last option? Let's ignore for now.
+             }
         }
     }
     finalizeQuestion(); // Finalize the very last question
@@ -452,162 +617,236 @@ function extractQuestionsFromMarkdown(mdContent, selectedQuestionsMap) {
     console.log(`Extraction finished. Found ${extracted.questions.length} questions.`);
     // console.log("Sample Extracted Question:", JSON.stringify(extracted.questions[0], null, 2));
     // console.log("Answers Map:", extracted.answers);
-    if (extracted.questions.length === 0 && Object.keys(selectedQuestionsMap).reduce((sum, key) => sum + selectedQuestionsMap[key].length, 0) > 0) {
-        console.error("Extraction Error: Selected questions but extracted none. Check Regex and MD format near selected questions.");
-    }
     return extracted;
 }
 
+// --- (extractFullQuestionTextForPdf remains the same as before, but ensure it uses the correct chapterRegex) ---
+function extractFullQuestionTextForPdf(mdContent, chapterNumber, questionNumber) {
+    // Extracts the full text including the answer line for a specific question
+    if (!mdContent) return "";
 
-// --- Difficulty & Allocation (No change needed from previous working version) ---
+    const lines = mdContent.split('\n');
+    let inTargetChapter = false;
+    let inTargetQuestion = false;
+    let questionLines = [];
+    let foundQuestion = false;
+
+    // Use the same regex as the main extractors
+    const chapterRegex = /^###\s+Chapter\s+(\d+):?.*?$/i;
+    const questionStartRegex = /^\s*(\d+)\s*[\.\)]\s+.*/; // Match start, don't capture text here
+
+    for (const line of lines) {
+        const trimmedLine = line.trim();
+        const chapterMatch = trimmedLine.match(chapterRegex);
+
+        if (chapterMatch) {
+            if (inTargetQuestion) break; // Moved past the question's chapter
+            inTargetChapter = (chapterMatch[1] === String(chapterNumber));
+            inTargetQuestion = false; // Reset question flag when chapter changes
+             // console.log(`PDF Extractor: Checking Chapter ${chapterMatch[1]}. Target Chapter: ${chapterNumber}. Match: ${inTargetChapter}`);
+        } else if (inTargetChapter) {
+            const questionMatch = line.match(questionStartRegex);
+            if (questionMatch) {
+                // This line starts *a* question within the target chapter
+                if (inTargetQuestion) break; // Found the start of the *next* question
+
+                const qNum = parseInt(questionMatch[1], 10);
+                 // console.log(`PDF Extractor: Found Q line for Q ${qNum}. Target Q: ${questionNumber}.`);
+                if (qNum === questionNumber) {
+                    // console.log(`PDF Extractor: MATCH! Starting Q ${qNum}.`);
+                    inTargetQuestion = true;
+                    foundQuestion = true;
+                    questionLines.push(line); // Add the first line
+                }
+            } else if (inTargetQuestion) {
+                // Append line if inside the target question block
+                questionLines.push(line);
+            }
+        }
+    }
+    return foundQuestion ? questionLines.join('\n').trim() : ""; // Return joined text if found
+}
+
+
+// --- Difficulty & Allocation ---
 
 function calculateDifficulty(chap) {
+    // Clamp total_wrong to be <= total_attempted if data is inconsistent
     const attempted = Math.max(chap.total_attempted || 0, 0);
     const wrong = Math.min(Math.max(chap.total_wrong || 0, 0), attempted);
 
     if (attempted > 0) {
         let error_rate = wrong / attempted;
+        // Ensure base difficulty is at least 10, even with 0 errors after attempts
         let base_difficulty = Math.max(error_rate * 100, 10);
+
+        // Calculate consecutive mistakes from the *end* of the history
         let consecutive_mistakes = 0;
         if (chap.mistake_history && chap.mistake_history.length > 0) {
             for (let i = chap.mistake_history.length - 1; i >= 0; i--) {
-                if (chap.mistake_history[i] > 0) consecutive_mistakes++; else break;
+                if (chap.mistake_history[i] > 0) {
+                    consecutive_mistakes++;
+                } else {
+                    break; // Stop at the first non-mistake (0 wrong answers)
+                }
             }
         }
+        // Increase difficulty significantly for consecutive mistakes
         let difficultyScore = base_difficulty + (consecutive_mistakes * 20);
-        return Math.min(difficultyScore, 150);
+        return Math.min(difficultyScore, 150); // Cap difficulty (e.g., at 150%)
     }
-    return 100;
+    // If never attempted, assume maximum difficulty to prioritize it
+    return 100; // Use 100 as default for unattempted
 }
 
+
 function allocateQuestions(chaptersToConsider, total_test_questions) {
+    // chaptersToConsider: object { chapNum: chapterData, ... } already filtered
     let weights = {};
-    let chapterDetails = []; // Store { chap_num, weight, available, total }
+    let availableChapterCount = 0;
 
     for (let chap_num in chaptersToConsider) {
         let chap = chaptersToConsider[chap_num];
+        // Only consider chapters that actually have questions defined
         if (chap.total_questions > 0) {
-            let mastery = chap.consecutive_mastery || 0;
-            let weight_factor = mastery >= 6 ? 0.3 : mastery >= 3 ? 0.6 : 1.0;
-            let difficulty = calculateDifficulty(chap);
-            let weight = difficulty * weight_factor;
-            weights[chap_num] = weight;
-             chapterDetails.push({
-                chap_num: chap_num,
-                weight: weight,
-                available: chap.available_questions?.length || 0, // Use current available count
-                total: chap.total_questions
-            });
+             availableChapterCount++;
+             let mastery = chap.consecutive_mastery || 0;
+             // Adjust weight based on mastery: lower weight if mastered
+             let weight_factor = mastery >= 6 ? 0.3 : mastery >= 3 ? 0.6 : 1.0; // More aggressive reduction
+             // Consider available questions count - chapters with fewer available shouldn't dominate
+             // let availability_factor = Math.min((chap.available_questions?.length || 0) / chap.total_questions, 1.0);
+             // Weight based on difficulty and mastery. Base weight can be difficulty score.
+             weights[chap_num] = calculateDifficulty(chap) * weight_factor;
         }
     }
 
     let sum_w = Object.values(weights).reduce((a, b) => a + b, 0);
 
-    // Fallback if no weight or no chapters
-    if (chapterDetails.length === 0) return {};
-    if (sum_w === 0) {
-        console.warn("Allocation fallback: distributing evenly due to zero total weight.");
-        const chaptersWithQuestions = chapterDetails.filter(c => c.total > 0);
-        if (chaptersWithQuestions.length === 0) return {};
-        const questionsPerChapter = Math.floor(total_test_questions / chaptersWithQuestions.length);
-        let remainder = total_test_questions % chaptersWithQuestions.length;
-        const fallbackAllocations = {};
-        let currentTotal = 0;
-        chaptersWithQuestions.forEach((c, index) => {
-            let num = questionsPerChapter + (index < remainder ? 1 : 0);
-             num = Math.min(num, c.available); // Cap at available questions
-            fallbackAllocations[c.chap_num] = num;
-            currentTotal += num;
-        });
-         // Simple redistribution if capping caused shortfall (may not be perfect)
+    // Handle edge cases: no chapters or zero total weight
+    if (availableChapterCount === 0 || sum_w === 0) {
+        // Cannot allocate if no chapters available or all have zero weight (e.g., all mastered heavily)
+        // Fallback: distribute evenly among chapters that *have* questions, ignoring weight/mastery
+        const chaptersWithQuestions = Object.keys(chaptersToConsider).filter(c => chaptersToConsider[c].total_questions > 0);
+         if (chaptersWithQuestions.length === 0) return {}; // Truly no chapters
+         const questionsPerChapter = Math.floor(total_test_questions / chaptersWithQuestions.length);
+         let remainder = total_test_questions % chaptersWithQuestions.length;
+         const fallbackAllocations = {};
+         chaptersWithQuestions.forEach((c, index) => {
+             fallbackAllocations[c] = questionsPerChapter + (index < remainder ? 1 : 0);
+             // Ensure allocation doesn't exceed total questions in chapter
+             fallbackAllocations[c] = Math.min(fallbackAllocations[c], chaptersToConsider[c].total_questions);
+         });
+         // Redistribute if capping caused total to be less than requested
+         let currentTotal = Object.values(fallbackAllocations).reduce((a, b) => a + b, 0);
          let deficit = total_test_questions - currentTotal;
-         for (let i = 0; deficit > 0 && i < chaptersWithQuestions.length; i++) {
-            const c = chaptersWithQuestions[i];
-             if (fallbackAllocations[c.chap_num] < c.available) {
-                 fallbackAllocations[c.chap_num]++;
-                 deficit--;
+         while (deficit > 0 && chaptersWithQuestions.some(c => fallbackAllocations[c] < chaptersToConsider[c].total_questions)) {
+             for (const c of chaptersWithQuestions) {
+                 if (deficit <= 0) break;
+                 if (fallbackAllocations[c] < chaptersToConsider[c].total_questions) {
+                     fallbackAllocations[c]++;
+                     deficit--;
+                 }
              }
          }
-        return fallbackAllocations;
+         console.warn("Allocation fallback: distributing evenly due to zero weight or no chapters.");
+         return fallbackAllocations;
     }
 
 
     let proportions = Object.fromEntries(Object.entries(weights).map(([k, w]) => [k, w / sum_w]));
     let expected = Object.fromEntries(Object.entries(proportions).map(([k, p]) => [k, total_test_questions * p]));
 
-    // Initial allocation (floor)
+    // Initial allocation (floor) + ensure min 1 question if weight > 0 and chapter has questions
     let allocations = {};
-     chapterDetails.forEach(c => {
-         allocations[c.chap_num] = Math.floor(expected[c.chap_num] || 0);
-          // Cap initial allocation at available questions
-         allocations[c.chap_num] = Math.min(allocations[c.chap_num], c.available);
-     });
+    for (const k in expected) {
+         allocations[k] = Math.floor(expected[k]);
+         if (weights[k] > 0 && chaptersToConsider[k].total_questions > 0 && allocations[k] === 0) {
+             // Give at least one question if it has weight and questions available, unless total is already met by others
+              // This logic is tricky with the remainder distribution. Let's rely on remainder distribution first.
+             // allocations[k] = 1;
+         }
+         // Cap allocation at the total number of questions in the chapter
+         allocations[k] = Math.min(allocations[k], chaptersToConsider[k].total_questions);
+    }
 
     let total_allocated = Object.values(allocations).reduce((a, b) => a + b, 0);
     let remaining = total_test_questions - total_allocated;
 
-    // Distribute remaining based on fractional parts, respecting availability
+    // Distribute remaining based on fractional parts (remainders)
     if (remaining > 0) {
-        // Calculate remainders only for chapters with remaining capacity
-         let remainders = chapterDetails
-           .filter(c => allocations[c.chap_num] < c.available) // Only consider if not already at max available
-           .map(c => ({
-               chap_num: c.chap_num,
-               remainder_val: (expected[c.chap_num] || 0) - allocations[c.chap_num],
-               available: c.available
-           }))
-           .sort((a, b) => b.remainder_val - a.remainder_val); // Sort by descending remainder
+        let remainders = Object.fromEntries(Object.keys(chaptersToConsider)
+           .filter(c => chaptersToConsider[c].total_questions > 0) // Only consider chapters with questions
+           .map(c => [c, expected[c] - allocations[c]]));
 
-        for (let i = 0; i < remaining && remainders.length > 0; i++) {
-             // Find the chapter with the highest remainder that still has capacity
-             let allocated = false;
-             for (let j = 0; j < remainders.length; j++) {
-                 const chap_info = remainders[j];
-                 if (allocations[chap_info.chap_num] < chap_info.available) {
-                     allocations[chap_info.chap_num]++;
-                      allocated = true;
-                      // Re-sort or just cycle? Cycling is simpler and often good enough.
-                      // Move this chapter to the end for next round of allocation? Let's just cycle.
-                      break; // Allocate one and move to next remaining question
+        let sorted_chaps = Object.entries(remainders).sort((a, b) => b[1] - a[1]);
+
+        for (let i = 0; i < remaining; i++) {
+            // Cycle through sorted chapters, skipping those already at their max question count
+            let foundChapter = false;
+            for (let j = 0; j < sorted_chaps.length; j++) {
+                 const chap_num = sorted_chaps[(i + j) % sorted_chaps.length][0]; // Cycle through sorted
+                 if (allocations[chap_num] < chaptersToConsider[chap_num].total_questions) {
+                     allocations[chap_num]++;
+                     foundChapter = true;
+                     break; // Allocate one and move to next remaining question
                  }
-             }
-             if (!allocated) {
-                  // This happens if total remaining > total available slots across all chapters
-                  console.warn(`Could not allocate all remaining ${remaining - i} questions due to availability limits.`);
-                  break; // Stop if no chapter can accept more questions
+            }
+             if (!foundChapter) {
+                 // This should theoretically not happen if remaining > 0 and there are chapters below their max
+                 console.warn("Could not allocate remaining questions. Total allocated might be less than requested.");
+                 break; // Stop if no chapter can accept more questions
              }
         }
     }
 
-    // Final check: Cap at available (should be redundant but safe)
-    for (const chap_num in allocations) {
-         const chap = chaptersToConsider[chap_num];
-         allocations[chap_num] = Math.min(allocations[chap_num], chap.available_questions?.length || 0);
-    }
+     // Final check: Ensure no chapter exceeds its total questions (should be handled, but belt-and-suspenders)
+     for (const chap_num in allocations) {
+         allocations[chap_num] = Math.min(allocations[chap_num], chaptersToConsider[chap_num].total_questions);
+     }
 
-    let final_allocated_sum = Object.values(allocations).reduce((a, b) => a + b, 0);
-    if (final_allocated_sum < total_test_questions) {
-         console.warn(`Final allocation (${final_allocated_sum}) is less than requested (${total_test_questions}) due to limits in chapter question counts or availability.`);
-    }
+     // Final check: If total allocated is still less than requested (due to capping), log it.
+     let final_allocated_sum = Object.values(allocations).reduce((a, b) => a + b, 0);
+     if (final_allocated_sum < total_test_questions) {
+          console.warn(`Final allocation (${final_allocated_sum}) is less than requested (${total_test_questions}) due to limits in chapter question counts.`);
+     }
+
 
     return allocations;
 }
 
-// --- Question Selection (No change needed from previous working version) ---
+
+// --- Question Selection ---
 
 function selectQuestions(available, n, totalChapterQuestions) {
-    if (n <= 0) return [];
-    if (available.length === 0) return [];
-    const numAvailable = available.length;
-    const actualN = Math.min(n, numAvailable);
-    if (actualN === 0) return [];
-    if (actualN === numAvailable) return available.slice().sort((a, b) => a - b);
+    // available: array of available question numbers [2, 5, 10, ...]
+    // n: number of questions to select
+    // totalChapterQuestions: total number of questions in this chapter (e.g., 50)
 
-    const step = (totalChapterQuestions - 1) / (actualN - 1) || 1;
+    if (n <= 0) return [];
+    if (available.length === 0) {
+        console.warn("selectQuestions called with no available questions.");
+        return []; // Cannot select if none are available
+    }
+
+    const numAvailable = available.length;
+    const actualN = Math.min(n, numAvailable); // Cannot select more than available
+
+    if (actualN === 0) return [];
+    if (actualN === numAvailable) return available.slice().sort((a, b) => a - b); // Return all available if n >= available
+
+    // Strategy: Prioritize spreading out across the *entire chapter range*
+    // rather than just the available range. This avoids clustering if many
+    // early questions were answered.
+
+    // Create indices spanning the *total* question range
+    const step = (totalChapterQuestions - 1) / (actualN - 1) || 1; // Avoid division by zero if n=1
     let targetIndices = Array.from({ length: actualN }, (_, i) => Math.round(i * step));
-    targetIndices = [...new Set(targetIndices)].sort((a,b)=>a-b);
+    targetIndices = [...new Set(targetIndices)].sort((a,b)=>a-b); // Ensure unique, sorted indices
+
+    // Map target indices (0 to total-1) to target question numbers (1 to total)
     let targetQuestions = targetIndices.map(idx => idx + 1);
 
+    // Find the *closest available* question for each target question
     let selected = [];
     let usedAvailableIndices = new Set();
 
@@ -615,6 +854,7 @@ function selectQuestions(available, n, totalChapterQuestions) {
         let bestMatch = -1;
         let minDistance = Infinity;
         let bestIndex = -1;
+
         for (let i = 0; i < available.length; i++) {
             if (!usedAvailableIndices.has(i)) {
                 const dist = Math.abs(available[i] - targetQ);
@@ -622,45 +862,67 @@ function selectQuestions(available, n, totalChapterQuestions) {
                     minDistance = dist;
                     bestMatch = available[i];
                     bestIndex = i;
+                } else if (dist === minDistance) {
+                    // Tie-breaking: prefer lower question number? Or doesn't matter?
+                    // Let's stick with the first one found for simplicity.
                 }
             }
         }
+
         if (bestIndex !== -1) {
             selected.push(bestMatch);
             usedAvailableIndices.add(bestIndex);
         }
     }
 
-    let currentSelectedCount = selected.length;
-    if (currentSelectedCount < actualN) {
-        const remainingAvailable = available.filter((_, index) => !usedAvailableIndices.has(index));
-        // Shuffle remaining available to avoid always picking lowest numbers
-        for (let i = remainingAvailable.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [remainingAvailable[i], remainingAvailable[j]] = [remainingAvailable[j], remainingAvailable[i]];
-        }
-        selected.push(...remainingAvailable.slice(0, actualN - currentSelectedCount));
-    }
+     // If we selected fewer than actualN (due to duplicates or weird distribution)
+     // fill the remainder greedily from unused available questions.
+     let currentSelectedCount = selected.length;
+     if (currentSelectedCount < actualN) {
+         const remainingAvailable = available.filter((_, index) => !usedAvailableIndices.has(index));
+         selected.push(...remainingAvailable.slice(0, actualN - currentSelectedCount));
+     }
+
 
     return selected.sort((a, b) => a - b);
 }
 
 function selectNewQuestionsAndUpdate(chap, n) {
+    // Selects n questions AND updates chap.available_questions
     if (n <= 0) return [];
+
+    // Ensure available_questions is initialized and valid
     if (!chap.available_questions || !Array.isArray(chap.available_questions)) {
         chap.available_questions = Array.from({ length: chap.total_questions }, (_, i) => i + 1);
     }
-    chap.available_questions = [...new Set(chap.available_questions)].sort((a,b) => a-b);
+     // Clean up available_questions: remove duplicates and sort
+     chap.available_questions = [...new Set(chap.available_questions)].sort((a,b) => a-b);
 
-    let available = chap.available_questions.slice();
-    let selected = selectQuestions(available, n, chap.total_questions); // Use the selection logic
+    let available = chap.available_questions.slice(); // Work with a copy
+    let selected = [];
 
-    // Update the chapter's actual available list
-    chap.available_questions = chap.available_questions.filter(q => !selected.includes(q));
+    if (available.length >= n) {
+        // Use the improved selection logic
+        selected = selectQuestions(available, n, chap.total_questions);
+        // Update the chapter's actual available list
+        chap.available_questions = available.filter(q => !selected.includes(q));
+    } else {
+        // Not enough available, select all available and maybe recycle?
+        console.warn(`Chapter ${chap.number || 'Unknown'}: Not enough unique available questions (${available.length}) for request (${n}). Selecting all available.`);
+        selected = available.slice(); // Select all available
+        chap.available_questions = []; // Mark all as used for this round
 
-     if (selected.length < n) {
-         console.warn(`Chapter ${chap.number || 'Unknown'}: Selected only ${selected.length} questions out of requested ${n} due to availability.`);
-     }
+        // --- Recycling Strategy (Optional) ---
+        // If you *must* return 'n' questions, you need to recycle previously answered ones.
+        // This is complex: which ones to recycle? Least recently wrong? Randomly?
+        // For now, let's just return fewer than requested if not enough unique are available.
+        // let remainingNeeded = n - selected.length;
+        // if (remainingNeeded > 0) {
+        //    // Implement recycling logic here if needed
+        //    // e.g., pick from all questions minus the 'selected' ones
+        //    console.log(`Need to recycle ${remainingNeeded} questions.`);
+        // }
+    }
 
     return selected.sort((a, b) => a - b);
 }
@@ -669,28 +931,25 @@ function selectNewQuestionsAndUpdate(chap, n) {
 // --- UI Functions ---
 
 function updateSubjectInfo() {
-    const infoEl = document.getElementById('subject-info');
-    if (infoEl) {
-        if (currentSubject) {
-            infoEl.innerHTML = `<p class="text-lg">Current Subject: ${currentSubject.name}</p>`;
-        } else {
-            infoEl.innerHTML = `<p class="text-lg text-red-500">No Subject Selected</p>`;
-        }
+    if (currentSubject) {
+        document.getElementById('subject-info').innerHTML = `<p class="text-lg">Current Subject: ${currentSubject.name}</p>`;
+    } else {
+         document.getElementById('subject-info').innerHTML = `<p class="text-lg text-red-500">No Subject Selected</p>`;
     }
 }
 
 function displayContent(html) {
     document.getElementById('content').innerHTML = html;
-    // Attempt to render LaTeX after content is injected
-    requestAnimationFrame(() => renderLatexInElement(document.getElementById('content')));
+    // Attempt to render LaTeX if content might contain it
+    requestAnimationFrame(renderLatex);
 }
 
 function clearContent() {
     document.getElementById('content').innerHTML = '';
-    document.getElementById('online-test-area').classList.add('hidden');
-    document.getElementById('online-test-area').innerHTML = '';
-    document.getElementById('menu').classList.remove('hidden');
-    document.getElementById('dashboard').classList.add('hidden');
+     document.getElementById('online-test-area').classList.add('hidden');
+     document.getElementById('online-test-area').innerHTML = ''; // Clear test area too
+     document.getElementById('menu').classList.remove('hidden'); // Ensure main menu is visible
+     document.getElementById('dashboard').classList.add('hidden'); // Hide progress dashboard
 }
 
 // --- Test Generation ---
@@ -717,10 +976,10 @@ function showTestGenerationDashboard() {
 
 function promptChapterSelectionForTest() {
     const chapters = currentSubject.chapters;
-    const chapterNumbers = Object.keys(chapters).filter(num => chapters[num].total_questions > 0).sort((a, b) => parseInt(a) - parseInt(b));
+    const chapterNumbers = Object.keys(chapters).sort((a, b) => parseInt(a) - parseInt(b));
 
     if (chapterNumbers.length === 0) {
-        displayContent('<p class="text-red-500">No chapters with questions available in this subject to select from.</p>');
+        displayContent('<p class="text-red-500">No chapters available in this subject to select from.</p>');
         return;
     }
 
@@ -728,7 +987,7 @@ function promptChapterSelectionForTest() {
         <div class="flex items-center">
             <input id="test-chap-${num}" type="checkbox" value="${num}" class="h-4 w-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600">
             <label for="test-chap-${num}" class="ml-2 block text-sm text-gray-900 dark:text-gray-300">
-                Chapter ${num} (${chapters[num].available_questions?.length || 0} available / ${chapters[num].total_questions} total)
+                Chapter ${num} (${chapters[num].total_questions} questions)
             </label>
         </div>
     `).join('');
@@ -771,8 +1030,6 @@ function promptTestType(mode, selectedChapters = null) {
     let chapterScopeDescription = "";
     let relevantChapters = {};
     let chapterCount = 0;
-    let totalAvailableInScope = 0;
-
 
     if (mode === 'studied') {
         const studied = currentSubject.studied_chapters || [];
@@ -781,36 +1038,29 @@ function promptTestType(mode, selectedChapters = null) {
             return;
         }
         studied.forEach(chapNum => {
-            if (currentSubject.chapters[chapNum] && currentSubject.chapters[chapNum].total_questions > 0) {
+            if (currentSubject.chapters[chapNum]) {
                 relevantChapters[chapNum] = currentSubject.chapters[chapNum];
-                 totalAvailableInScope += currentSubject.chapters[chapNum].available_questions?.length || 0;
             }
         });
-        chapterCount = Object.keys(relevantChapters).length;
-        chapterScopeDescription = `Based on your ${chapterCount} studied chapter(s) (${totalAvailableInScope} questions available).`;
+        chapterCount = studied.length;
+        chapterScopeDescription = `Based on your ${chapterCount} studied chapter(s).`;
     } else if (mode === 'specific' && selectedChapters) {
         selectedChapters.forEach(chapNum => {
-            if (currentSubject.chapters[chapNum] && currentSubject.chapters[chapNum].total_questions > 0) {
+            if (currentSubject.chapters[chapNum]) {
                 relevantChapters[chapNum] = currentSubject.chapters[chapNum];
-                 totalAvailableInScope += currentSubject.chapters[chapNum].available_questions?.length || 0;
             }
         });
-        chapterCount = Object.keys(relevantChapters).length;
-        chapterScopeDescription = `Based on the ${chapterCount} selected chapter(s) (${totalAvailableInScope} questions available).`;
+        chapterCount = selectedChapters.length;
+        chapterScopeDescription = `Based on the ${chapterCount} selected chapter(s).`;
     } else {
          displayContent('<p class="text-red-500">Invalid test mode or chapter selection.</p>');
          return;
     }
 
-     if (chapterCount === 0) {
-          displayContent('<p class="text-red-500">Could not find data for the selected/studied chapters, or they contain no questions.</p>');
+     if (Object.keys(relevantChapters).length === 0) {
+          displayContent('<p class="text-red-500">Could not find data for the selected/studied chapters.</p>');
          return;
      }
-     if (totalAvailableInScope === 0) {
-        displayContent('<p class="text-yellow-500">The selected/studied chapters currently have no available questions to generate a test from.</p>');
-        return;
-     }
-
 
     const html = `
         <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-4">
@@ -821,431 +1071,233 @@ function promptTestType(mode, selectedChapters = null) {
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
                     Online Test (MCQ Only)
                 </button>
-                 <button onclick='startTestGeneration(${JSON.stringify(mode)}, ${JSON.stringify(selectedChapters)}, "pdf")' class="w-full btn-primary">
+                <button onclick='startTestGeneration(${JSON.stringify(mode)}, ${JSON.stringify(selectedChapters)}, "pdf")' class="w-full btn-secondary">
                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
-                     PDF Test (Download PDF / .tex)
+                    PDF Test (Download .tex)
                 </button>
             </div>
-             <button onclick="${mode === 'specific' ? 'promptChapterSelectionForTest()' : 'showTestGenerationDashboard()'}" class="w-full btn-secondary mt-4">
+             <button onclick="showTestGenerationDashboard()" class="w-full btn-secondary mt-4">
                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" /></svg>
-                 Back
-             </button>
+                Back to Scope Selection
+            </button>
         </div>
     `;
     displayContent(html);
 }
 
-// Helper function to generate styled HTML for PDF conversion
-function generatePdfHtml(examId, questions) {
-    let questionHtml = '';
-    let solutionHtml = '';
-    let questionCounter = 0;
-
-    // Define some basic CSS styles directly in the HTML string
-    const styles = `
-        <style>
-            @import url('https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css'); /* Import KaTeX CSS */
-            body { font-family: sans-serif; line-height: 1.4; font-size: 11pt; margin: 0; padding: 0;}
-            .container { padding: 1.5cm; }
-            .exam-header { text-align: center; margin-bottom: 1.5em; font-size: 14pt; font-weight: bold; border-bottom: 1px solid #ccc; padding-bottom: 0.5em; }
-            .question-list { list-style-type: none; padding-left: 0; margin-left: 0; }
-            .question-item { margin-bottom: 1.2em; padding-left: 0; page-break-inside: avoid; display: flex; }
-            .question-number { font-weight: bold; width: 2em; flex-shrink: 0; } /* Fixed width for number */
-            .question-content { flex-grow: 1; }
-            .question-text { margin-bottom: 0.8em; }
-            .options-list { list-style-type: none; padding-left: 0; margin-top: 0.5em; margin-bottom: 0.5em; }
-            .option-item { margin-bottom: 0.3em; display: flex; align-items: baseline;}
-            .option-letter { font-weight: bold; margin-right: 0.5em; width: 1.5em; display: inline-block; text-align: right; flex-shrink: 0; }
-            .option-text { flex-grow: 1; }
-            .question-image { max-width: 90%; max-height: 150px; height: auto; display: block; margin: 0.8em 0; border: 1px solid #eee; padding: 2px; }
-            .solution { color: #006400; font-weight: bold; margin-top: 0.5em; padding-top: 0.3em; border-top: 1px dashed #ddd;}
-            .katex-display > .katex { text-align: left !important; } /* Force left align display math */
-            .katex { font-size: 1em !important; } /* Ensure KaTeX size matches body */
-            /* Ensure lists inside prose don't interfere */
-            .prose ul, .prose ol { margin-left: 0; padding-left: 0; list-style-type: none; }
-             /* Handle multi-line options reasonably */
-             .option-text p { margin: 0; } /* Remove default paragraph margins if options contain them */
-        </style>
-    `;
-
-    // Sort questions by chapter then number for consistent order
-    questions.sort((a, b) => {
-        const chapDiff = parseInt(a.chapter) - parseInt(b.chapter);
-        if (chapDiff !== 0) return chapDiff;
-        return a.number - b.number;
-    });
-
-    questions.forEach(q => {
-        questionCounter++;
-        // Sanitize HTML within text/options - basic example, needs robust library for security if source is untrusted
-        let qTextForHtml = q.text.replace(/</g, "<").replace(/>/g, ">");
-        let optionsForHtml = (q.options || []).map(opt => {
-            let optTextForHtml = opt.text.replace(/</g, "<").replace(/>/g, ">");
-             // Replace markdown newlines with <br> for HTML display
-             optTextForHtml = optTextForHtml.replace(/\n/g, '<br>');
-            return `<li class="option-item"><span class="option-letter">${opt.letter}.</span><span class="option-text">${optTextForHtml}</span></li>`;
-        }).join('');
-        let imageHtml = q.image ? `<img src="${q.image}" alt="Question Image - Ch ${q.chapter} Q ${q.number}" class="question-image">` : '';
-
-        // Question HTML Item
-        questionHtml += `
-            <li class="question-item">
-                <div class="question-number">${questionCounter}.</div>
-                <div class="question-content">
-                    <div class="question-text prose">${qTextForHtml}</div>
-                    ${imageHtml}
-                    ${optionsForHtml ? `<ul class="options-list">${optionsForHtml}</ul>` : ''}
-                 </div>
-            </li>
-        `;
-
-        // Solution HTML Item
-         solutionHtml += `
-            <li class="question-item">
-                 <div class="question-number">${questionCounter}.</div>
-                 <div class="question-content">
-                    <div class="question-text prose">${qTextForHtml}</div>
-                    ${imageHtml}
-                    ${optionsForHtml ? `<ul class="options-list">${optionsForHtml}</ul>` : ''}
-                    <div class="solution">Answer: ${q.answer || 'N/A'}</div>
-                </div>
-            </li>
-         `;
-    });
-
-    // We need KaTeX CSS linked in the generated HTML for html2pdf to render math correctly
-    const katexCSSLink = `<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" integrity="sha384-Xi8rHCmBmhbuyyhbI88391ZKP2dmfnOl4rT9ZfRI7mLTdk1wblIUnrIq35nqwEvC" crossorigin="anonymous">`;
-
-    const fullQuestionHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8">${katexCSSLink}${styles}</head><body><div class="container"><div class="exam-header">Exam: ${examId}</div><ol class="question-list">${questionHtml}</ol></div></body></html>`;
-    const fullSolutionHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8">${katexCSSLink}${styles}</head><body><div class="container"><div class="exam-header">Solutions: ${examId}</div><ol class="question-list">${solutionHtml}</ol></div></body></html>`;
-
-    return { questionHtml: fullQuestionHtml, solutionHtml: fullSolutionHtml };
-}
-
-
-// Modified function to trigger PDF generation
-async function generateAndDownloadPdf(htmlContent, baseFilename) {
-    showLoading(`Generating ${baseFilename}...`);
-    await new Promise(resolve => setTimeout(resolve, 100)); // Allow UI update
-
-    // Create a temporary, hidden iframe to isolate rendering (safer)
-    const iframe = document.createElement('iframe');
-    iframe.style.position = 'fixed';
-    iframe.style.width = '210mm'; // A4 width
-    iframe.style.height = '1px'; // Minimal height
-    iframe.style.left = '-9999px';
-    iframe.style.border = 'none';
-    document.body.appendChild(iframe);
-
-    // Write the HTML content to the iframe
-    iframe.contentDocument.open();
-    iframe.contentDocument.write(htmlContent);
-    iframe.contentDocument.close();
-
-    // Add KaTeX script to the iframe's head to render math within it
-     const katexScript = iframe.contentDocument.createElement('script');
-     katexScript.src = "https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js";
-     katexScript.defer = true;
-     const renderScript = iframe.contentDocument.createElement('script');
-     renderScript.defer = true;
-     renderScript.textContent = `
-         document.addEventListener("DOMContentLoaded", function() {
-             // Include the auto-render script dynamically if needed, or call manually
-              const autoRenderScript = document.createElement('script');
-              autoRenderScript.src = "https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js";
-              autoRenderScript.defer = true;
-              autoRenderScript.onload = () => {
-                  try {
-                     renderMathInElement(document.body, {
-                         delimiters: [
-                             {left: "$$", right: "$$", display: true}, {left: "$", right: "$", display: false},
-                             {left: "\\\\(", right: "\\\\)", display: false}, {left: "\\\\[", right: "\\\\]", display: true}
-                         ],
-                         throwOnError: false
-                     });
-                     console.log('KaTeX rendered inside iframe.');
-                      // Notify parent window that rendering is done (optional but good)
-                      window.parent.postMessage('katexRendered', '*');
-                  } catch(e) {
-                      console.error('Error rendering KaTeX in iframe:', e);
-                      window.parent.postMessage('katexError', '*');
-                  }
-              };
-              document.head.appendChild(autoRenderScript);
-         });
-     `;
-
-     iframe.contentDocument.head.appendChild(katexScript);
-     iframe.contentDocument.head.appendChild(renderScript);
-
-
-    // Wait for KaTeX to render (use postMessage or a timeout)
-     await new Promise(resolve => {
-         const timeout = setTimeout(() => {
-             console.warn("KaTeX rendering timeout in iframe.");
-             resolve(); // Proceed even if timeout occurs
-         }, 5000); // 5 second timeout
-
-          const messageHandler = (event) => {
-             if (event.source === iframe.contentWindow && (event.data === 'katexRendered' || event.data === 'katexError')) {
-                 clearTimeout(timeout);
-                 window.removeEventListener('message', messageHandler);
-                 resolve();
-             }
-         };
-         window.addEventListener('message', messageHandler);
-         // Fallback if postMessage fails or isn't received
-         // setTimeout(resolve, 3000); // Wait ~3 seconds as fallback
-     });
-
-
-    // Configure html2pdf
-    const options = { ...PDF_GENERATION_OPTIONS };
-    options.filename = `${baseFilename}.pdf`;
-
-    // Generate PDF from the iframe's content
-    try {
-        console.log(`Starting html2pdf generation for ${options.filename} from iframe`);
-        // Target the body of the iframe's document
-        const pdfWorker = html2pdf().set(options).from(iframe.contentDocument.body);
-        await pdfWorker.save(); // Triggers download
-        console.log(`PDF generation likely successful for ${options.filename}`);
-    } catch (error) {
-        console.error(`Error generating PDF ${options.filename}:`, error);
-        alert(`Failed to generate PDF: ${options.filename}. Error: ${error.message}. Please try downloading the .tex source instead.`);
-    } finally {
-        // Clean up the iframe
-        document.body.removeChild(iframe);
-        hideLoading();
-    }
-}
-
-
-
 async function startTestGeneration(mode, selectedChapters, testType) { // Make async
     showLoading(`Generating ${testType === 'online' ? 'Online' : 'Test Files'}...`);
-    await new Promise(resolve => setTimeout(resolve, 100)); // Allow UI update
+    // Use setTimeout to allow loading UI to render before potentially heavy processing
+    await new Promise(resolve => setTimeout(resolve, 100));
 
     let relevantChapters = {};
     if (mode === 'studied') {
         const studied = currentSubject.studied_chapters || [];
         studied.forEach(chapNum => {
-            if (currentSubject.chapters[chapNum] && currentSubject.chapters[chapNum].total_questions > 0) {
-                relevantChapters[chapNum] = currentSubject.chapters[chapNum];
-            }
+            if (currentSubject.chapters[chapNum]) relevantChapters[chapNum] = currentSubject.chapters[chapNum];
         });
     } else if (mode === 'specific' && selectedChapters) {
         selectedChapters.forEach(chapNum => {
-             if (currentSubject.chapters[chapNum] && currentSubject.chapters[chapNum].total_questions > 0) {
-                relevantChapters[chapNum] = currentSubject.chapters[chapNum];
-            }
+            if (currentSubject.chapters[chapNum]) relevantChapters[chapNum] = currentSubject.chapters[chapNum];
         });
     }
 
     if (Object.keys(relevantChapters).length === 0) {
         hideLoading();
-        displayContent('<p class="text-red-500">Error: No relevant chapters with questions found.</p>');
+        displayContent('<p class="text-red-500">Error: No relevant chapters found for test generation.</p>');
         return;
     }
 
-     const totalQuestionsForTest = currentSubject.max_questions_per_test || 42;
-     const allocationCounts = allocateQuestions(relevantChapters, totalQuestionsForTest); // Returns {chapNum: count}
-     const totalAllocatedCount = Object.values(allocationCounts).reduce((a, b) => a + b, 0);
+    const totalQuestionsForTest = currentSubject.max_questions_per_test || 42;
+    const allocation = allocateQuestions(relevantChapters, totalQuestionsForTest);
+    const totalAllocated = Object.values(allocation).reduce((a,b) => a+b, 0);
 
-     if (totalAllocatedCount === 0) {
+    if (totalAllocated === 0) {
+        hideLoading();
+        displayContent(`<p class="text-red-500">Error: Could not allocate any questions based on the selected chapters and difficulty. There might be no questions available or all chapters have zero weight.</p>`);
+        return;
+    }
+
+    console.log("Allocation:", allocation);
+
+    const selectedQuestionsMap = {}; // { chapNum: [q1, q2], ... }
+    let allocationDetails = "";
+    for (const chapNum in allocation) {
+        const n = allocation[chapNum];
+        if (n > 0) {
+            // Select questions AND update chapter's available list
+            const questionsSelected = selectNewQuestionsAndUpdate(currentSubject.chapters[chapNum], n);
+            if (questionsSelected.length > 0) {
+                selectedQuestionsMap[chapNum] = questionsSelected;
+                allocationDetails += `<p>Chapter ${chapNum}: ${questionsSelected.length} questions selected.</p>`; // IDs removed for brevity
+            } else {
+                allocationDetails += `<p>Chapter ${chapNum}: 0 questions selected (requested ${n}, none available/selected).</p>`;
+            }
+        }
+    }
+
+    // Re-check total actually selected, could be less if chapters ran out
+    const actualTotalSelected = Object.values(selectedQuestionsMap).reduce((sum, arr) => sum + arr.length, 0);
+    if (actualTotalSelected === 0) {
          hideLoading();
-         displayContent(`<p class="text-yellow-500">Warning: Could not allocate any questions based on the selected chapters and difficulty/availability.</p>`);
+         displayContent(`<p class="text-red-500">Error: No questions could be selected from the available pool for the allocated chapters.</p>`);
+         // NOTE: Should we revert the changes made by selectNewQuestionsAndUpdate?
+         // This is complex. For now, the state reflects the *attempt* to select.
+         saveData(data); // Save the (potentially emptied) available_questions lists
          return;
-     }
-
-     console.log("Allocation Counts:", allocationCounts);
-
-     // Select actual questions and get the map { chapNum: [q1, q2], ... }
-     const selectedQuestionsMap = {};
-     let allocationDetails = "";
-     let actualTotalSelected = 0;
-     for (const chapNum in allocationCounts) {
-         const n = allocationCounts[chapNum];
-         if (n > 0) {
-             const questionsSelected = selectNewQuestionsAndUpdate(currentSubject.chapters[chapNum], n);
-             if (questionsSelected.length > 0) {
-                 selectedQuestionsMap[chapNum] = questionsSelected;
-                 actualTotalSelected += questionsSelected.length;
-                 allocationDetails += `<p>Chapter ${chapNum}: ${questionsSelected.length} questions selected.</p>`;
-             } else {
-                  allocationDetails += `<p>Chapter ${chapNum}: 0 questions selected (requested ${n}, none available/selected).</p>`;
-             }
-         }
-     }
+    }
 
 
-     if (actualTotalSelected === 0) {
-          hideLoading();
-          displayContent(`<p class="text-red-500">Error: No questions could be selected from the available pool for the allocated chapters.</p>`);
-          saveData(data); // Save updated available_questions lists
-          return;
-     }
-     if (actualTotalSelected < totalAllocatedCount) {
-         console.warn(`Requested ${totalAllocatedCount} questions, but only selected ${actualTotalSelected} due to availability limits.`);
-     }
+    const examId = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 16);
 
-     const examId = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 16);
+    // Extract full question data using the improved parser
+    if (!markdownContentCache) {
+        hideLoading();
+        displayContent('<p class="text-red-500">Error: Markdown content cache is empty, cannot extract questions.</p>');
+        return;
+    }
+    const { questions: extractedQuestionsData, answers } = extractQuestionsFromMarkdown(markdownContentCache, selectedQuestionsMap);
 
-     // Extract full question data using the improved parser
-     if (!markdownContentCache) {
-         hideLoading();
-         displayContent('<p class="text-red-500">Error: Markdown content cache is empty, cannot extract questions.</p>');
-         return;
-     }
-     const { questions: extractedQuestionsData, answers } = extractQuestionsFromMarkdown(markdownContentCache, selectedQuestionsMap);
-
-     if (extractedQuestionsData.length !== actualTotalSelected) {
-          console.warn(`Selection resulted in ${actualTotalSelected} questions, but extraction found ${extractedQuestionsData.length}. Check parsing.`);
-          if (extractedQuestionsData.length === 0) {
-              hideLoading();
-              displayContent('<p class="text-red-500">Error: Failed to extract any questions from the Markdown file based on the selection. Check parsing logic and Markdown format.</p>');
-              saveData(data); // Save state
-              return;
-          }
-     }
+    if (extractedQuestionsData.length !== actualTotalSelected) {
+         console.warn(`Allocation resulted in ${actualTotalSelected} questions, but extraction found ${extractedQuestionsData.length}. There might be parsing issues.`);
+         // Proceed with extracted data, but log the warning.
+    }
+    if (extractedQuestionsData.length === 0) {
+        hideLoading();
+        displayContent('<p class="text-red-500">Error: Failed to extract any questions from the Markdown file based on the allocation. Check parsing logic and Markdown format.</p>');
+        saveData(data); // Save updated availability even if extraction failed? Or revert? Let's save.
+        return;
+    }
 
 
-     if (testType === 'online') {
-         // --- Generate Online Test ---
-         const allMcq = extractedQuestionsData.every(q => answers[q.id] && q.options && q.options.length > 0); // Check for answers AND options
-         if (!allMcq) {
-             hideLoading();
-             displayContent('<p class="text-red-500">Error: Online testing requires questions to have both options (A, B, C...) and a clear answer (e.g., "ans: A"). Some selected questions are missing one or both.</p>');
-             saveData(data); // Save state
-             return;
-         }
+    if (testType === 'online') {
+        // --- Generate Online Test ---
+        const allMcq = extractedQuestionsData.every(q => answers[q.id]); // Check if all have answers
+        if (!allMcq) {
+            hideLoading();
+            displayContent('<p class="text-red-500">Error: Online testing currently only supports questions with clear answers (e.g., "ans: A"). Some selected questions seem to be missing answers.</p>');
+            // Consider reverting available questions here if needed.
+            saveData(data); // Save state
+            return;
+        }
 
-         currentOnlineTestState = {
-             examId: examId,
-             questions: extractedQuestionsData,
-             correctAnswers: answers,
-             userAnswers: {},
-             allocation: selectedQuestionsMap, // Store the *actual* selection map
-             startTime: Date.now(),
-             timerInterval: null,
-             currentQuestionIndex: 0
-         };
+        currentOnlineTestState = {
+            examId: examId,
+            questions: extractedQuestionsData, // Array of {id, chapter, number, text, options, image}
+            correctAnswers: answers, // { "c1q5": "A", ... }
+            userAnswers: {},
+            allocation: allocation, // Original allocation plan
+            startTime: Date.now(),
+            timerInterval: null,
+            currentQuestionIndex: 0
+        };
 
-         saveData(data); // Save updated available_questions
-         hideLoading();
-         launchOnlineTestUI();
+        saveData(data); // Save updated available_questions
+        hideLoading();
+        launchOnlineTestUI();
 
-     } else {
-         // --- Generate PDF Test ---
+    } else {
+        // --- Generate PDF Test ---
 
-         // 1. Generate HTML content for PDF
-         const { questionHtml, solutionHtml } = generatePdfHtml(examId, extractedQuestionsData);
+        // 1. Generate HTML content for PDF
+        const { questionHtml, solutionHtml } = generatePdfHtml(examId, extractedQuestionsData);
 
-         // 2. Add to pending exams in data structure
-         currentSubject.pending_exams.push({
-             id: examId,
-             allocation: selectedQuestionsMap, // Store the *actual* selected map
-             results_entered: false
-         });
+        // 2. Add to pending exams in data structure
+        currentSubject.pending_exams.push({
+            id: examId,
+            allocation: selectedQuestionsMap, // Store the *actual* selected map, not just counts
+            results_entered: false
+        });
 
-         // 3. Save updated data
-         saveData(data);
+        // 3. Save updated data (available_questions removal and pending exam)
+        saveData(data);
 
-         // 4. Display download buttons
-         const questionsPdfFilename = `Exam_${examId}`;
-         const solutionsPdfFilename = `SolutionManual_${examId}`;
-         const questionsTexFilename = `Exam_${examId}.tex`;
-         const solutionsTexFilename = `SolutionManual_${examId}.tex`;
+        // 4. Display download buttons and trigger PDF generation
+        const questionsPdfFilename = `Exam_${examId}`;
+        const solutionsPdfFilename = `SolutionManual_${examId}`;
+        const questionsTexFilename = `Exam_${examId}.tex`;
+        const solutionsTexFilename = `SolutionManual_${examId}.tex`;
 
          // Generate .tex source as fallback/option
-         const { questionsTex, solutionsTex } = generateTexSource(examId, extractedQuestionsData);
+        const { questionsTex, solutionsTex } = generateTexSource(examId, extractedQuestionsData); // You need to create this function if you keep .tex option
 
-         displayContent(`
-            <div class="bg-blue-100 dark:bg-blue-900/30 border-l-4 border-blue-500 text-blue-700 dark:text-blue-300 p-4 rounded-md mb-4">
-                <p class="font-medium">PDF Test Files Ready</p>
-                <p>Exam ID: ${examId}</p>
-                <p>Total Questions: ${actualTotalSelected}</p>
-            </div>
-             <div class="space-y-3">
-                 <button id="download-pdf-q" class="w-full btn-primary">
-                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
-                     Download Questions PDF
-                 </button>
-                 <button id="download-pdf-s" class="w-full btn-primary">
-                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
-                     Download Solutions PDF
-                 </button>
-                 <button onclick="downloadTexFile('${questionsTexFilename}', \`${btoa(unescape(encodeURIComponent(questionsTex)))}\`)" class="w-full btn-secondary">
-                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>
-                     Download Questions .tex (Source)
-                 </button>
-                  <button onclick="downloadTexFile('${solutionsTexFilename}', \`${btoa(unescape(encodeURIComponent(solutionsTex)))}\`)" class="w-full btn-secondary">
-                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>
-                     Download Solutions .tex (Source)
-                 </button>
-             </div>
-             <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">This exam has been added to the pending exams list. Enter results manually once completed using the Exams Dashboard.</p>
-             <div class="mt-4 text-sm text-gray-600 dark:text-gray-400">${allocationDetails}</div>
-         `);
+        displayContent(`
+           <div class="bg-blue-100 dark:bg-blue-900/30 border-l-4 border-blue-500 text-blue-700 dark:text-blue-300 p-4 rounded-md mb-4">
+               <p class="font-medium">PDF Test Files Ready</p>
+               <p>Exam ID: ${examId}</p>
+               <p>Total Questions: ${actualTotalSelected}</p>
+           </div>
+           <div class="space-y-3">
+               <button id="download-pdf-q" class="w-full btn-primary">
+                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
+                   Download Questions PDF
+               </button>
+               <button id="download-pdf-s" class="w-full btn-primary">
+                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
+                   Download Solutions PDF
+               </button>
+               <button onclick="downloadTexFile('${questionsTexFilename}', \`${btoa(unescape(encodeURIComponent(questionsTex)))}\`)" class="w-full btn-secondary">
+                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>
+                   Download Questions .tex (Source)
+               </button>
+                <button onclick="downloadTexFile('${solutionsTexFilename}', \`${btoa(unescape(encodeURIComponent(solutionsTex)))}\`)" class="w-full btn-secondary">
+                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>
+                   Download Solutions .tex (Source)
+               </button>
+           </div>
+           <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">This exam has been added to the pending exams list. Enter results manually once completed using the Exams Dashboard.</p>
+           <div class="mt-4 text-sm text-gray-600 dark:text-gray-400">${allocationDetails}</div>
+        `);
 
-         // Add event listeners AFTER the buttons are in the DOM
-         document.getElementById('download-pdf-q')?.addEventListener('click', () => generateAndDownloadPdf(questionHtml, questionsPdfFilename));
-         document.getElementById('download-pdf-s')?.addEventListener('click', () => generateAndDownloadPdf(solutionHtml, solutionsPdfFilename));
+        // Add event listeners to trigger PDF generation *after* the buttons are in the DOM
+        document.getElementById('download-pdf-q').addEventListener('click', () => generateAndDownloadPdf(questionHtml, questionsPdfFilename));
+        document.getElementById('download-pdf-s').addEventListener('click', () => generateAndDownloadPdf(solutionHtml, solutionsPdfFilename));
 
-         hideLoading(); // Hide loading indicator AFTER setting up the UI
-     }
+        hideLoading(); // Hide loading indicator *after* setting up the UI
+    }
 }
 
-
-// Function to generate basic .tex source (Reconstructing from parsed data)
 function generateTexSource(examId, questions) {
     let questionsTex = `${LATEX_PDF_HEADER}\\section*{Exam: ${examId.replace(/_/g, '\\_')}}\n\\begin{enumerate}[label=\\arabic*.]\n`;
     let solutionsTex = `${LATEX_PDF_HEADER}\\section*{Solutions: ${examId.replace(/_/g, '\\_')}}\n\\begin{enumerate}[label=\\arabic*.]\n`;
     let questionCounter = 0;
 
     // Sort questions by chapter then number for consistent order
-    questions.sort((a, b) => {
-        const chapDiff = parseInt(a.chapter) - parseInt(b.chapter);
-        if (chapDiff !== 0) return chapDiff;
-        return a.number - b.number;
-    });
+     questions.sort((a, b) => {
+         const chapDiff = parseInt(a.chapter) - parseInt(b.chapter);
+         if (chapDiff !== 0) return chapDiff;
+         return a.number - b.number;
+     });
 
     for (const q of questions) {
         questionCounter++;
-
-        // Reconstruct the question text for TeX source
-        let qTextForTex = q.text; // Start with parsed text
-        if (q.image) {
-             // Add image command if needed, adjust path/options as necessary
-             qTextForTex += `\n\\begin{center}\\includegraphics[width=0.6\\textwidth]{${q.image}}\\end{center}\n`;
-        }
-
-        // Add options
-        let optionsText = (q.options || []).map(opt => `\\item[${opt.letter}.] ${opt.text}`).join('\n');
-        if (optionsText) {
-             qTextForTex += `\n\\begin{enumerate}[label=\\Alph*., itemsep=0pt, parsep=0pt]\n${optionsText}\n\\end{enumerate}\n`;
-        }
-
-        // Basic LaTeX escaping (very simplistic, needs improvement for complex content)
-        const escapeLatex = (str) => str
-            .replace(/\\/g, '\\textbackslash{}') // Must escape backslashes first
-            .replace(/([{}&%$#_])/g, '\\$1') // Escape special characters
-            .replace(/~/g, '\\textasciitilde{}')
-            .replace(/\^/g, '\\textasciicircum{}');
-
-         let processedQText = escapeLatex(qTextForTex);
-         // Note: This simplistic escaping will break existing LaTeX commands ($...$, \command, etc.)
-         // A more sophisticated Markdown-to-LaTeX converter is needed for robust TeX generation.
-         // For now, we assume the parsed text *doesn't* contain raw LaTeX that needs preserving.
+        // Extract *full* raw text including options and answer for TeX source
+        // This requires fetching the original block from markdown cache again.
+        // Simpler approach for now: Reconstruct from parsed data (might lose original formatting)
+        let rawQuestionText = `${q.number}. ${q.text}\n`;
+        if (q.image) rawQuestionText += `![Image](${q.image})\n`; // Basic image representation
+        (q.options || []).forEach(opt => {
+            rawQuestionText += `${opt.letter}. ${opt.text}\n`;
+        });
+        if (q.answer) rawQuestionText += `ans: ${q.answer}\n`;
 
 
-        // Add answer for solutions file
-        let solutionText = processedQText;
-        if (q.answer) {
-            solutionText += `\n\n\\textbf{Answer: ${q.answer}}`;
-        }
+        // Basic processing for LaTeX compatibility (very simplistic)
+        let processedQText = rawQuestionText
+           .replace(/&/g, '\\&')
+           .replace(/%/g, '\\%')
+           .replace(/_/g, '\\_')
+           .replace(/#/g, '\\#')
+           .replace(/\*\*(.*?)\*\*/g, '\\textbf{$1}') // Bold
+           .replace(/\*(.*?)\*/g, '\\textit{$1}')   // Italic
+           .replace(/!\[.*?\]\((.*?)\)/g, '\n\\begin{center}\\includegraphics[width=0.6\\textwidth]{$1}\\end{center}\n'); // Image
 
-        questionsTex += `\\item ${processedQText}\n\n`;
+        // Find and separate the answer part for the questions file
+        const answerRegexPdf = /(\n\s*(?:ans|answer)[:\s]+[a-zA-Z\d]+\s*)$/im; // Multi-line flag
+        let questionOnlyText = processedQText.replace(answerRegexPdf, '');
+        let solutionText = processedQText; // Keep answer for solutions
+
+        questionsTex += `\\item ${questionOnlyText}\n\n`;
         solutionsTex += `\\item ${solutionText}\n\n`;
     }
 
@@ -1253,7 +1305,6 @@ function generateTexSource(examId, questions) {
     solutionsTex += `\\end{enumerate}\n${LATEX_PDF_FOOTER}`;
     return { questionsTex, solutionsTex };
 }
-
 
 function downloadTexFile(filename, base64Content) {
      try {
@@ -1273,29 +1324,106 @@ function downloadTexFile(filename, base64Content) {
      }
 }
 
+// Helper function to generate styled HTML for PDF conversion
+function generatePdfHtml(examId, questions) {
+    let questionHtml = '';
+    let solutionHtml = '';
+    let questionCounter = 0;
+
+    // Define some basic CSS styles directly in the HTML string
+    const styles = `
+        <style>
+            body { font-family: sans-serif; line-height: 1.4; font-size: 11pt; margin: 0; padding: 0;} /* Reduced font size */
+            .container { padding: 1.5cm; } /* Matches PDF margin */
+            .exam-header { text-align: center; margin-bottom: 1.5em; font-size: 14pt; font-weight: bold; border-bottom: 1px solid #ccc; padding-bottom: 0.5em; }
+            .question-list { list-style-type: none; padding-left: 0; }
+            .question-item { margin-bottom: 1.2em; padding-left: 0; page-break-inside: avoid; } /* Avoid breaking question */
+            .question-number { font-weight: bold; margin-right: 0.5em; display: inline-block; }
+            .question-content { margin-left: 2em; } /* Indent content slightly */
+            .question-text { margin-bottom: 0.8em; }
+            .options-list { list-style-type: none; padding-left: 0; margin-top: 0.5em; margin-bottom: 0.5em; }
+            .option-item { margin-bottom: 0.3em; display: flex; align-items: baseline;}
+            .option-letter { font-weight: bold; margin-right: 0.5em; width: 1.5em; /* Fixed width for alignment */ display: inline-block; text-align: right; }
+            .option-text { flex-grow: 1; }
+            .question-image { max-width: 80%; height: auto; display: block; margin: 0.5em 0; border: 1px solid #eee; padding: 2px; }
+            .solution { color: #006400; /* DarkGreen */ font-weight: bold; margin-top: 0.5em; padding-top: 0.3em; border-top: 1px dashed #ddd;}
+            .katex-display { margin: 0.5em 0; } /* Adjust display math spacing */
+            /* Add more styles as needed */
+        </style>
+    `;
+
+    // Sort questions by chapter then number for consistent order
+    questions.sort((a, b) => {
+        const chapDiff = parseInt(a.chapter) - parseInt(b.chapter);
+        if (chapDiff !== 0) return chapDiff;
+        return a.number - b.number;
+    });
+
+
+    questions.forEach(q => {
+        questionCounter++;
+        let qTextForHtml = q.text; // Render math in text
+        let optionsForHtml = (q.options || []).map(opt =>
+             `<li class="option-item"><span class="option-letter">${opt.letter}.</span><span class="option-text">${opt.text}</span></li>` // Render math in options
+        ).join('');
+        let imageHtml = q.image ? `<img src="${q.image}" alt="Question Image" class="question-image">` : '';
+
+        // --- Question HTML ---
+        questionHtml += `
+            <li class="question-item">
+                <div class="question-number">${questionCounter}.</div>
+                <div class="question-content">
+                    <div class="question-text">${qTextForHtml}</div>
+                    ${imageHtml}
+                    ${optionsForHtml ? `<ul class="options-list">${optionsForHtml}</ul>` : ''}
+                 </div>
+            </li>
+        `;
+
+        // --- Solution HTML (includes answer) ---
+         solutionHtml += `
+            <li class="question-item">
+                 <div class="question-number">${questionCounter}.</div>
+                 <div class="question-content">
+                    <div class="question-text">${qTextForHtml}</div>
+                    ${imageHtml}
+                    ${optionsForHtml ? `<ul class="options-list">${optionsForHtml}</ul>` : ''}
+                    <div class="solution">Answer: ${q.answer || 'N/A'}</div>
+                </div>
+            </li>
+         `;
+    });
+
+    const fullQuestionHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8">${styles}</head><body><div class="container"><div class="exam-header">Exam: ${examId}</div><ol class="question-list">${questionHtml}</ol></div></body></html>`;
+    const fullSolutionHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8">${styles}</head><body><div class="container"><div class="exam-header">Solutions: ${examId}</div><ol class="question-list">${solutionHtml}</ol></div></body></html>`;
+
+    return { questionHtml: fullQuestionHtml, solutionHtml: fullSolutionHtml };
+}
+
+
+
 // --- Online Test UI & Logic ---
 
 function launchOnlineTestUI() {
-    document.getElementById('menu').classList.add('hidden');
+    document.getElementById('menu').classList.add('hidden'); // Hide main menu
     const testArea = document.getElementById('online-test-area');
-    testArea.innerHTML = ''; // Clear previous test
-    testArea.classList.remove('hidden');
+    testArea.classList.remove('hidden'); // Show test container
 
     const totalQuestions = currentOnlineTestState.questions.length;
     const durationMillis = ONLINE_TEST_DURATION_MINUTES * 60 * 1000;
     currentOnlineTestState.endTime = currentOnlineTestState.startTime + durationMillis;
 
     testArea.innerHTML = `
-        <div class="fixed top-0 left-0 right-0 bg-white dark:bg-gray-800 p-3 shadow z-40 border-b dark:border-gray-700">
+        <div class="fixed top-0 left-0 right-0 bg-white dark:bg-gray-800 p-3 shadow z-10 border-b dark:border-gray-700">
             <div class="container mx-auto flex justify-between items-center">
                 <span class="text-lg font-semibold text-primary-600 dark:text-primary-400">Online Test</span>
                 <div id="timer" class="text-lg font-mono px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded">--:--:--</div>
                  <button id="force-submit-btn" onclick="confirmForceSubmit()" class="btn-danger-small hidden">Submit Now</button>
             </div>
         </div>
-        <div id="question-container" class="pt-20 pb-24 container mx-auto px-4"> {/* Increased bottom padding */}
+        <div id="question-container" class="pt-20 pb-20 container mx-auto px-4">
             </div>
-        <div class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 p-3 shadow-up z-40 border-t dark:border-gray-700">
+        <div class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 p-3 shadow-up z-10 border-t dark:border-gray-700">
              <div class="container mx-auto flex justify-between items-center">
                  <button id="prev-btn" onclick="navigateQuestion(-1)" class="btn-secondary" disabled>
                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-1"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" /></svg>
@@ -1320,16 +1448,11 @@ function launchOnlineTestUI() {
 
 function startTimer() {
     const timerElement = document.getElementById('timer');
-    if (!timerElement) return; // Exit if element not found
     if (currentOnlineTestState.timerInterval) {
         clearInterval(currentOnlineTestState.timerInterval);
     }
 
     function updateTimerDisplay() {
-        if (!currentOnlineTestState || !currentOnlineTestState.endTime) {
-             clearInterval(currentOnlineTestState?.timerInterval);
-             return;
-        }
         const now = Date.now();
         const remaining = currentOnlineTestState.endTime - now;
 
@@ -1337,28 +1460,19 @@ function startTimer() {
             clearInterval(currentOnlineTestState.timerInterval);
             timerElement.textContent = "00:00:00";
             timerElement.classList.add('text-red-500');
-            // Avoid alert loops if submit fails or takes time
-            if (currentOnlineTestState.status !== 'submitting') {
-                 currentOnlineTestState.status = 'submitting'; // Mark as submitting
-                 alert("Time's up! Submitting your test automatically.");
-                 submitOnlineTest(); // Will hide loading overlay
-            }
+            alert("Time's up! Submitting your test automatically.");
+            submitOnlineTest();
         } else {
-            const hours = Math.floor(remaining / (1000 * 60 * 60));
-            const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+            const hours = Math.floor((remaining / (1000 * 60 * 60)) % 24);
+            const minutes = Math.floor((remaining / (1000 * 60)) % 60);
+            const seconds = Math.floor((remaining / 1000) % 60);
              timerElement.textContent =
                 `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 
-             const forceSubmitBtn = document.getElementById('force-submit-btn');
-              if (forceSubmitBtn) {
-                   if (remaining < 5 * 60 * 1000) {
-                     forceSubmitBtn.classList.remove('hidden');
-                 } else {
-                     forceSubmitBtn.classList.add('hidden');
-                 }
-              }
-
+             // Show force submit button in the last 5 minutes or so
+             if (remaining < 5 * 60 * 1000) {
+                 document.getElementById('force-submit-btn')?.classList.remove('hidden');
+             }
         }
     }
 
@@ -1366,380 +1480,25 @@ function startTimer() {
     currentOnlineTestState.timerInterval = setInterval(updateTimerDisplay, 1000);
 }
 
-function displayCurrentQuestion() {
-     if (!currentOnlineTestState) return; // Safety check
-
-    const index = currentOnlineTestState.currentQuestionIndex;
-    const question = currentOnlineTestState.questions[index];
-    const container = document.getElementById('question-container');
-    const totalQuestions = currentOnlineTestState.questions.length;
-
-     if (!question || !container) {
-         console.error("Could not display question - missing question data or container element.");
-         return;
-     }
-
-    // Generate options HTML dynamically from the parsed options
-    let optionsHtml = (question.options || []).map(opt => {
-         // Replace markdown newlines with <br> for HTML display in options
-         const optionTextHtml = opt.text.replace(/\n/g, '<br>');
-        return `
-        <label class="flex items-start space-x-3 p-3 border dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
-            <input type="radio" name="mcqOption" value="${opt.letter}" class="h-5 w-5 text-primary-600 focus:ring-primary-500 border-gray-300 dark:bg-gray-700 dark:border-gray-600 mt-1 shrink-0"
-                   ${currentOnlineTestState.userAnswers[question.id] === opt.letter ? 'checked' : ''}
-                   onchange="recordAnswer('${question.id}', this.value)">
-             <div class="flex items-baseline">
-                <span class="font-medium w-6 text-right mr-2">${opt.letter}.</span>
-                 {/* Use a div for option text to allow block elements like <br> */}
-                 <div class="flex-1 option-text-container" id="option-text-${opt.letter}">${optionTextHtml}</div> {/* Render LaTeX here */}
-             </div>
-        </label>
-        `
-    }).join('');
-
-     if (!question.options || question.options.length === 0) {
-         optionsHtml = '<p class="text-sm text-yellow-600 dark:text-yellow-400">(No multiple choice options found for this question)</p>';
-     }
-
-    container.innerHTML = `
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg mb-4 animate-fade-in">
-            <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">Chapter ${question.chapter} - Question ${question.number}</p>
-            {/* Use prose for question text formatting */}
-            <div class="prose dark:prose-invert max-w-none mb-6" id="question-text-area">
-                 ${question.text} {/* KaTeX will render this */}
-                 ${question.image ? `<img src="${question.image}" alt="Question Image" class="max-w-full h-auto mx-auto my-4 border dark:border-gray-600 rounded">` : ''}
-            </div>
-            <div class="space-y-3">
-                ${optionsHtml}
-            </div>
-        </div>
-    `;
-
-    // Update navigation buttons and counter
-    document.getElementById('question-counter').textContent = `Question ${index + 1} / ${totalQuestions}`;
-    document.getElementById('prev-btn').disabled = (index === 0);
-    if (index === totalQuestions - 1) {
-        document.getElementById('next-btn').classList.add('hidden');
-        document.getElementById('submit-btn').classList.remove('hidden');
-    } else {
-        document.getElementById('next-btn').classList.remove('hidden');
-        document.getElementById('submit-btn').classList.add('hidden');
-    }
-
-    // Render LaTeX after content update
-    requestAnimationFrame(() => {
-         renderLatexInElement(document.getElementById('question-text-area'));
-         (question.options || []).forEach(opt => {
-             const optElement = document.getElementById(`option-text-${opt.letter}`);
-             if (optElement) {
-                 renderLatexInElement(optElement);
-             }
-         });
-    });
-}
-
-
-function navigateQuestion(direction) {
-    if (!currentOnlineTestState) return;
-    const newIndex = currentOnlineTestState.currentQuestionIndex + direction;
-    const totalQuestions = currentOnlineTestState.questions.length;
-
-    if (newIndex >= 0 && newIndex < totalQuestions) {
-        currentOnlineTestState.currentQuestionIndex = newIndex;
-        displayCurrentQuestion();
-    }
-}
-
-function recordAnswer(questionId, answer) {
-    if (!currentOnlineTestState) return;
-    currentOnlineTestState.userAnswers[questionId] = answer;
-    // Optional: Save interim progress to localStorage? Could be complex.
-}
-
-function confirmSubmitOnlineTest() {
-     if (!currentOnlineTestState) return;
-    const unanswered = currentOnlineTestState.questions.filter(q => !currentOnlineTestState.userAnswers[q.id]).length;
-    let confirmationMessage = "Are you sure you want to submit your test?";
-    if (unanswered > 0) {
-        confirmationMessage += `\n\nYou have ${unanswered} unanswered question(s).`;
-    }
-
-    if (confirm(confirmationMessage)) {
-        submitOnlineTest();
-    }
-}
-function confirmForceSubmit() {
-     if (confirm("Are you sure you want to submit the test now?")) {
-         submitOnlineTest();
-     }
-}
-
-function submitOnlineTest() {
-    if (!currentOnlineTestState) return; // Prevent multiple submissions
-    showLoading("Submitting and Grading...");
-    currentOnlineTestState.status = 'submitting'; // Mark status
-
-    if (currentOnlineTestState.timerInterval) {
-        clearInterval(currentOnlineTestState.timerInterval);
-        currentOnlineTestState.timerInterval = null;
-    }
-    document.getElementById('online-test-area').classList.add('hidden'); // Hide test UI immediately
-
-    setTimeout(() => { // Use timeout to allow UI to hide before processing
-        try {
-            const results = {
-                examId: currentOnlineTestState.examId,
-                subjectId: currentSubject.id,
-                timestamp: new Date().toISOString(),
-                durationMinutes: Math.round((Date.now() - currentOnlineTestState.startTime) / 60000),
-                type: 'online', // Add type
-                questions: [], // { id, chapter, number, text, image, userAnswer, correctAnswer, isCorrect }
-                score: 0,
-                totalQuestions: currentOnlineTestState.questions.length,
-                resultsByChapter: {} // { chapNum: { attempted, correct, wrong } }
-            };
-
-            let totalCorrect = 0;
-
-            // Initialize resultsByChapter based on the *actual questions* in the test
-            currentOnlineTestState.questions.forEach(q => {
-                 if (!results.resultsByChapter[q.chapter]) {
-                     results.resultsByChapter[q.chapter] = { attempted: 0, correct: 0, wrong: 0 };
-                 }
-            });
-
-
-            currentOnlineTestState.questions.forEach(q => {
-                const userAnswer = currentOnlineTestState.userAnswers[q.id] || null;
-                const correctAnswer = currentOnlineTestState.correctAnswers[q.id];
-                // Be lenient with case for answers? Maybe not for standard tests.
-                const isCorrect = userAnswer === correctAnswer;
-
-                // Record question-level result
-                results.questions.push({
-                    id: q.id,
-                    chapter: q.chapter,
-                    number: q.number,
-                    text: q.text,
-                    options: q.options, // Include options for review
-                    image: q.image,
-                    userAnswer: userAnswer,
-                    correctAnswer: correctAnswer,
-                    isCorrect: isCorrect
-                });
-
-                // Update chapter-level results
-                const chapResult = results.resultsByChapter[q.chapter];
-                if (chapResult) {
-                    chapResult.attempted++;
-                    if (isCorrect) {
-                        chapResult.correct++;
-                        totalCorrect++;
-                    } else {
-                        chapResult.wrong++;
-                    }
-                } else {
-                    console.error(`Chapter ${q.chapter} not found in exam results structure.`);
-                }
-
-                // --- Update Global Chapter Statistics ---
-                const globalChap = currentSubject.chapters[q.chapter];
-                if (globalChap) {
-                    globalChap.total_attempted = (globalChap.total_attempted || 0) + 1;
-                    if (!isCorrect) {
-                        globalChap.total_wrong = (globalChap.total_wrong || 0) + 1;
-                    }
-                    // Note: Mistake history & mastery are updated based on chapter performance below
-                } else {
-                    console.error(`Chapter ${q.chapter} not found in global data during statistics update.`);
-                }
-            });
-
-            // --- Finalize Global Chapter Stats (Mistake History & Mastery) ---
-            for (const chapNum in results.resultsByChapter) {
-                 const globalChap = currentSubject.chapters[chapNum];
-                 const chapResult = results.resultsByChapter[chapNum];
-                 if (globalChap && chapResult) {
-                     const numWrongInChapter = chapResult.wrong;
-                     globalChap.mistake_history = globalChap.mistake_history || [];
-                     globalChap.mistake_history.push(numWrongInChapter);
-                     if (globalChap.mistake_history.length > 20) {
-                          globalChap.mistake_history.shift();
-                     }
-                     // Update mastery based on this session's chapter performance
-                     globalChap.consecutive_mastery = (numWrongInChapter === 0)
-                         ? (globalChap.consecutive_mastery || 0) + 1
-                         : 0;
-                 }
-            }
-
-
-            results.score = totalCorrect;
-            currentSubject.exam_history = currentSubject.exam_history || [];
-            currentSubject.exam_history.push(results);
-
-            saveData(data); // Save updated chapter stats and exam history
-            hideLoading();
-            displayOnlineTestResults(results);
-             currentOnlineTestState = null; // Clear test state *after* successful processing
-
-        } catch (error) {
-             console.error("Error during online test submission processing:", error);
-             hideLoading();
-             displayContent(`<p class="text-red-500">An error occurred while submitting your test results. Please try again or check the console. Your answers might not have been saved.</p>`);
-             // Optionally try to preserve currentOnlineTestState for retry? Difficult.
-             currentOnlineTestState = null; // Clear state on error too? Or allow retry? Let's clear.
-        }
-
-    }, 300); // Short delay
-}
-
-
-function displayOnlineTestResults(results) {
-    clearContent(); // Clear main content area first
-    document.getElementById('menu').classList.remove('hidden'); // Show menu again
-
-    const percentage = results.totalQuestions > 0 ? ((results.score / results.totalQuestions) * 100).toFixed(1) : 0;
-
-    let chapterSummaryHtml = Object.entries(results.resultsByChapter).sort((a,b) => parseInt(a[0]) - parseInt(b[0])).map(([chapNum, chapRes]) => {
-        const chapPercentage = chapRes.attempted > 0 ? ((chapRes.correct / chapRes.attempted) * 100).toFixed(1) : 0;
-        return `
-            <li class="flex justify-between items-center p-2 bg-gray-50 dark:bg-gray-700 rounded">
-                <span>Chapter ${chapNum}</span>
-                <span class="font-medium ${chapRes.wrong > 0 ? 'text-red-500' : 'text-green-500'}">
-                    ${chapRes.correct} / ${chapRes.attempted} (${chapPercentage}%)
-                </span>
-            </li>`;
-    }).join('');
-
-     // Basic review section (can be expanded)
-     let reviewHtml = results.questions.slice(0, 5).map((q, index) => `
-         <div class="p-3 border dark:border-gray-600 rounded mb-2">
-             <p class="text-sm font-medium">Q${index + 1} (Ch.${q.chapter}-${q.number}): Your Answer: ${q.userAnswer || 'N/A'}, Correct: ${q.correctAnswer}
-                <span class="${q.isCorrect ? 'text-green-500' : 'text-red-500'}">${q.isCorrect ? '✔' : '✘'}</span>
-             </p>
-             {/* Add button to see full question text here if needed */}
-         </div>
-     `).join('');
-     if (results.questions.length > 5) {
-         reviewHtml += `<p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Showing first 5 questions. Full details available in Exams Dashboard.</p>`
-     }
-      if (results.questions.length === 0) {
-          reviewHtml = `<p class="text-xs text-gray-500 dark:text-gray-400 mt-1">No individual question details available for this exam type.</p>`
-      }
-
-    const html = `
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-4 animate-fade-in">
-            <h2 class="text-2xl font-semibold mb-4 text-center text-primary-600 dark:text-primary-400">Test Results: ${results.examId}</h2>
-            <div class="text-center mb-6">
-                 <p class="text-4xl font-bold ${percentage >= 70 ? 'text-green-500' : percentage >= 50 ? 'text-yellow-500' : 'text-red-500'}">
-                    ${results.score} / ${results.totalQuestions} (${percentage}%)
-                 </p>
-                 ${results.durationMinutes !== null ? `<p class="text-gray-600 dark:text-gray-400">Duration: ${results.durationMinutes} minutes</p>`: ''}
-            </div>
-
-            ${chapterSummaryHtml ? `
-             <div class="mb-6">
-                 <h3 class="text-lg font-semibold mb-2">Chapter Performance</h3>
-                 <ul class="space-y-1">
-                     ${chapterSummaryHtml}
-                 </ul>
-             </div>` : ''}
-
-            <div class="mb-6">
-                <h3 class="text-lg font-semibold mb-2">Quick Review</h3>
-                 ${reviewHtml}
-            </div>
-
-             <button onclick="showExamsDashboard()" class="w-full btn-secondary">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2"> <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08H4.123a.878.878 0 0 0-.878.878V18a2.25 2.25 0 0 0 2.25 2.25h3.879a.75.75 0 0 1 0 1.5H6.75a3.75 3.75 0 0 1-3.75-3.75V5.625a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 5.625V16.5a2.25 2.25 0 0 1-2.25 2.25h-3.879a.75.75 0 0 1 0-1.5Z" /></svg>
-                View All Exams
-            </button>
-        </div>
-    `;
-    displayContent(html);
-}
-
-// --- PDF Exam Result Entry ---
-
-function showEnterResults() {
-    const pending_exams = (currentSubject.pending_exams || []).filter(exam => !exam.results_entered); // Filter just in case
-    if (pending_exams.length === 0) {
-        return '<p class="text-sm text-gray-500 dark:text-gray-400 mt-4">No pending PDF exams to enter results for.</p>';
-    }
-
-    let output = '<h3 class="text-lg font-semibold mb-3 mt-6 text-yellow-600 dark:text-yellow-400">Pending PDF Exams</h3><div class="space-y-2">';
-    pending_exams.forEach((exam) => {
-        // Find the index relative to the original array for correct deletion/update
-        const originalIndex = (currentSubject.pending_exams || []).findIndex(p => p.id === exam.id);
-        if (originalIndex === -1) return;
-
-        output += `
-        <div class="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200 flex justify-between items-center">
-             <span class="text-sm font-medium">${exam.id}</span>
-             <div>
-                 <button onclick="enterResultsForm(${originalIndex})" title="Enter Results" class="btn-primary-small mr-2">
-                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" /></svg>
-                    Enter Results
-                 </button>
-                  <button onclick="confirmDeletePendingExam(${originalIndex})" title="Delete Pending Exam" class="btn-danger-small">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
-                     Delete
-                  </button>
-            </div>
-        </div>`;
-    });
-    output += '</div>';
-    return output;
-}
-
-function enterResultsForm(index) {
-    const exam = currentSubject.pending_exams[index];
-    // allocation is now { chapNum: [q1, q2], ... }
-    const detailedAllocation = exam.allocation;
-    if (!detailedAllocation || typeof detailedAllocation !== 'object') {
-         displayContent('<p class="text-red-500">Error: Invalid allocation data for this pending exam.</p>');
-         return;
-    }
-
-    let formHtml = `<p class="font-bold mb-4">Entering results for PDF exam ${exam.id}:</p><div class="space-y-4">`;
-    let chaptersWithInputs = []; // Store chapters that actually have inputs
-
-    const sortedChaps = Object.keys(detailedAllocation).sort((a, b) => parseInt(a) - parseInt(b));
-
-    for (let chap_num of sortedChaps) {
-        const questionsInChapter = detailedAllocation[chap_num];
-        const n = questionsInChapter?.length || 0; // Actual number of questions for this chapter
-        if (n > 0) { // Only show input if questions were allocated
-             chaptersWithInputs.push(chap_num); // Add to list of chapters needing input
-            formHtml += `
-            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                <label for="wrong-${chap_num}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Chapter ${chap_num}: Number of WRONG answers (out of ${n})
-                </label>
-                <input id="wrong-${chap_num}" type="number" min="0" max="${n}" value="0" required
-                    class="border rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white">
-            </div>`;
-        }
-    }
-
-     if (chaptersWithInputs.length === 0) {
-         formHtml += '<p class="text-yellow-500">No questions seem to have been allocated to chapters for this exam record.</p>';
-     }
-
-    formHtml += `</div>
-    <div class="mt-6 flex space-x-3">
-        <button onclick="submitPendingResults(${index}, ${JSON.stringify(chaptersWithInputs)})" ${chaptersWithInputs.length === 0 ? 'disabled' : ''}
-            class="flex-1 btn-primary ${chaptersWithInputs.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
-            Submit Results
-        </button>
-         <button onclick="showExamsDashboard()" class="flex-1 btn-secondary">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" /></svg>
-             Cancel
-         </button>
-    </div>`;
-    displayContent(formHtml);
+function renderLatexInElement(element) {
+    if (!element) return;
+    if (window.renderMathInElement) {
+       try {
+           window.renderMathInElement(element, {
+                delimiters: [
+                   { left: '$$', right: '$$', display: true },
+                   { left: '$', right: '$', display: false },
+                   { left: '\\(', right: '\\)', display: false },
+                   { left: '\\[', right: '\\]', display: true }
+               ],
+               throwOnError: false
+           });
+       } catch (error) {
+           console.error("KaTeX rendering error:", error);
+       }
+   } else {
+       console.warn("KaTeX auto-render not loaded yet.");
+   }
 }
 
 // --- PDF Exam Result Entry (Needs Modification) ---
@@ -3104,55 +2863,58 @@ async function generateAndDownloadPdf(htmlContent, baseFilename) {
 
 
 async function initializeApp() {
-    showLoading("Initializing and loading chapters...");
-    data = await loadData(); // loadData now handles fetch & parse
+     showLoading("Initializing and loading chapters...");
+     data = await loadData();
 
-    if (data && data.subjects) {
-        // Set the first subject as current initially, or create default if needed
-        let firstSubjectId = Object.keys(data.subjects)[0];
-        if (!firstSubjectId) {
-            console.warn("Loaded data has no subjects. Re-initializing default.");
-            data = JSON.parse(JSON.stringify(initialData));
-            // Try to populate chapters for the new default subject if MD is available
-            if (markdownContentCache) {
-                updateChaptersFromMarkdown(data.subjects["1"], markdownContentCache);
-            } else {
-                 console.warn("Cannot populate initial chapters - Markdown cache empty.");
-            }
-            saveData(data);
-            firstSubjectId = "1";
-        }
-        currentSubject = data.subjects[firstSubjectId];
-        updateSubjectInfo();
-        clearContent();
-        console.log("Initialization complete. Current Subject:", currentSubject?.name);
-    } else {
-        console.error("Initialization failed: loadData returned invalid data.");
-        displayContent('<p class="text-red-500 font-bold p-4 text-center">Application failed to initialize. Please check the console for errors and ensure the Markdown file URL is correct.</p>');
-        // No subject info to update
-    }
-    hideLoading();
+     if (data) {
+         // Set the first subject as current initially
+         const firstSubjectId = Object.keys(data.subjects)[0];
+         if (firstSubjectId) {
+             currentSubject = data.subjects[firstSubjectId];
+         } else {
+              // Handle case where data exists but has no subjects (e.g., after deletion)
+             console.warn("Loaded data has no subjects. Creating default.");
+              data = JSON.parse(JSON.stringify(initialData));
+              // Try to populate chapters for the new default subject if MD is available
+               if (markdownContentCache) {
+                   updateChaptersFromMarkdown(data.subjects["1"], markdownContentCache);
+               }
+              saveData(data);
+               currentSubject = data.subjects["1"];
+         }
+         updateSubjectInfo();
+         clearContent(); // Clear any previous state/content
+         console.log("Initialization complete. Current Subject:", currentSubject?.name);
+     } else {
+         // loadData handled the fatal error alert
+         console.error("Initialization failed: loadData returned null.");
+          displayContent('<p class="text-red-500 font-bold p-4 text-center">Application failed to initialize. Please check the console for errors and ensure the Markdown file URL is correct.</p>');
+     }
+     hideLoading();
 
-    // Set up theme toggle listener once
-    const themeToggle = document.getElementById('theme-toggle');
-    if (themeToggle && !themeToggle.dataset.listenerAttached) {
-        themeToggle.addEventListener('click', () => {
-            document.documentElement.classList.toggle('dark');
-            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
-            if (!document.getElementById('dashboard').classList.contains('hidden')) {
-                 renderCharts(); // Re-render charts with new theme colors
-            }
-        });
-        themeToggle.dataset.listenerAttached = 'true';
-    }
+     // Set up theme toggle listener once
+     const themeToggle = document.getElementById('theme-toggle');
+     if (themeToggle && !themeToggle.dataset.listenerAttached) {
+         themeToggle.addEventListener('click', () => {
+             document.documentElement.classList.toggle('dark');
+             localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+             // Re-render charts if dashboard is visible, as grid/tick colors might change
+             if (!document.getElementById('dashboard').classList.contains('hidden')) {
+                  renderCharts();
+             }
+         });
+         themeToggle.dataset.listenerAttached = 'true'; // Prevent multiple listeners
+     }
 
-    // Apply initial theme
-    if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.classList.add('dark');
-    } else {
-        document.documentElement.classList.remove('dark');
-    }
+     // Apply initial theme
+     if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+         document.documentElement.classList.add('dark');
+     } else {
+         document.documentElement.classList.remove('dark');
+     }
 }
 
 // --- Global Event Listeners / Startup ---
+
+// Use DOMContentLoaded to ensure HTML is ready before interacting with it
 document.addEventListener('DOMContentLoaded', initializeApp);
