@@ -17,7 +17,7 @@ D. $10^{-10}$ s
 E. $10^{-12}$ s
 ans: B
 
-3.The SI standard of length is based on:
+3. The SI standard of length is based on:
 A.the distance from the north pole to the equator along a meridian passing through Paris
 B.wavelength of light emitted by $\mathrm{Hg}^{198}$
 C.wavelength of light emitted by $Kr^{86}$
