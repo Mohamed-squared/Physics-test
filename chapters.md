@@ -729,22 +729,27 @@ E. of 3m/ $s^{2}$
 ans: A
 
 63. The coordinate-time graph of an object is a straight line with a positive slope.The object has
+A. PLACEHOLDER
 ans: D
 
 64. Which of the following five coordinate versus time graphs represents the motion of an object moving with a constant nonzero speed?
 ![](./images/fwkg1l3WNSdbvyY54cz6Yi6cdR6oqcckP.png)
+A. PLACEHOLDER
 ans: B
 
 65. Which of the following five acceleration versus time graphs is correct for an object moving in a straight line at a constant velocity of 20m/s'
 ![](./images/fXYFp7cPn2EqqORkQWCusEP85P9tQd948.png)
+A. PLACEHOLDER
 ans: E
 
 66. Which of the following five coordinate versus time graphs represents the motion of an object whose speed is increasing?
 ![](./images/fbVltFgtiSMMFa2vhuUfnymDXEnxYaIRl.png)
+A. PLACEHOLDER
 ans: A
 
 67. A car accelerates from rest on a straight road.A short time later, the car decelerates to a stop and then returns to its original position in a similar manner,by speeding up and then slowing to a stop.Which of the following five coordinate versus time graphsbest describes the motion
 ![](./images/fYQFPybSMCTtaDLA14TaXVGgaA4zW7pOl.png)
+A. PLACEHOLDER
 ans: E
 
 68. The acceleration of an object,starting from rest,is shown in the graph below.Other than at $t=0$ ，when is the velocity of the object equal to zero?
@@ -758,6 +763,7 @@ ans: E
 
 69. An elevator is moving upward with constant acceleration.The dashed curve shows the position $y$ of the ceiling of the elevator as a function of the time $t$ .At the instant indicated by the dot, a bolt breaks loose and drops from the ceiling.Which curve best represents the position of the bolt asafunction of time?
 ![](./images/ffdow7l0gpKoUMZvFfDBhKwYgSRlItAS1.png)
+A. PLACEHOLDER
 ans: B
 
 70. The diagram shows a velocity-time graph for a car moving in a straight line.At point Q the car must be:
@@ -775,15 +781,13 @@ ans: C
 
 72. The graph represents the straight line motion of a car.How far does the car travelbetween $t=2$ s and $t=5$ s?
 ![](./images/fBLPgYGlBSLk9BKy81kMELMQk63mfmHUk.png)
-#. 4m
+A. PLACEHOLDER
 D. 36 m
 ans: D
 
 73. The diagram represents the straight line motion of a car.Which of the following statements is true?
 ![](./images/f4DZcQN4dgqytWKEFZi4R2xr0U2gUWSGg.png)
-6m/s$^2$
-三12 m/s$^2$
-电$t=9$
+A. PLACEHOLDER
 ans: B
 
 74. Consider the following five graphs (note the axes carefully).Which of these represents motior at constant speed?
@@ -797,14 +801,17 @@ ans: E
 
 75. An object is dropped from rest. Which of the following five graphs correctly represents its motion? The positive direction is taken to be downward
 ![](./images/f6zIZWm2GLBV8tehpA93q3Fwk8PAw6Y3X.png)
+A. PLACEHOLDER
 ans: B
 
 76. A stone is dropped from a cliff. The graph (carefully note the axes)which best represents its motion while it falls is:
 ![](./images/fGaKZhfiG34zq1GCn40VaQo35lXgWk6sE.png)
+A. PLACEHOLDER
 ans: C
 
 77. An object is thrown vertically into the air.Which of the following five graphs represents the velocity (v) of the object as a function of the time (t)? The positive direction is taken to be upward.
 ![](./images/fGKiyxKyRTB1SUSwcyIYk0efAgN2TXNlp.png)
+A. PLACEHOLDER
 ans: C
 
 
