@@ -2,11 +2,11 @@
 ### Chapter 1:MEASUREMENT
 
 1. The SI standard of time is based on:
-A. the daily rotation of the earth
+A.The daily rotation of the earth
 B.the frequency of light emitted by $\mathrm{Kr}^{86}$
-C. the yearly revolution of the earth about the sun
-D. a precision pendulum clock
-E. none of these
+C.the yearly revolution of the earth about the sun
+D.a precision pendulum clock
+E.none of these
 ans: E
 
 2. A nanosecond is:
