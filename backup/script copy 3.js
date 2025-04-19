@@ -1397,7 +1397,8 @@ function displayCurrentQuestion() {
             <div class="flex items-baseline">
                <span class="font-medium w-6 text-right mr-2">${opt.letter}.</span>
                 {/* Use a div for option text to allow block elements like <br> */}
-                <div class="flex-1 option-text-container" id="option-text-${opt.letter}">${optionTextHtml}</div> {/* <-- REMOVED COMMENT */}
+                {/* REMOVED COMMENT PLACEHOLDER FROM HERE vvv */}
+                <div class="flex-1 option-text-container" id="option-text-${opt.letter}">${optionTextHtml}</div>
             </div>
        </label>
        `
@@ -1412,7 +1413,8 @@ function displayCurrentQuestion() {
            <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">Chapter ${question.chapter} - Question ${question.number}</p>
            {/* Use prose for question text formatting */}
            <div class="prose dark:prose-invert max-w-none mb-6" id="question-text-area">
-                ${question.text} {/* <-- REMOVED COMMENT */}
+                {/* REMOVED COMMENT PLACEHOLDER FROM HERE vvv */}
+                ${question.text}
                 ${question.image ? `<img src="${question.image}" alt="Question Image" class="max-w-full h-auto mx-auto my-4 border dark:border-gray-600 rounded">` : ''}
            </div>
            <div class="space-y-3">
@@ -1845,6 +1847,433 @@ function submitPendingResults(index, chap_nums) {
        displayContent(successMsg + dashboardContent);
 
    }, 500);
+}
+
+function displayCurrentQuestion() {
+    const index = currentOnlineTestState.currentQuestionIndex;
+    const question = currentOnlineTestState.questions[index];
+    const container = document.getElementById('question-container');
+    const totalQuestions = currentOnlineTestState.questions.length;
+
+    // Generate options HTML dynamically from the parsed options
+    let optionsHtml = (question.options || []).map(opt => `
+        <label class="flex items-start space-x-3 p-3 border dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
+            <input type="radio" name="mcqOption" value="${opt.letter}" class="h-5 w-5 text-primary-600 focus:ring-primary-500 border-gray-300 dark:bg-gray-700 dark:border-gray-600 mt-1 shrink-0"
+                   ${currentOnlineTestState.userAnswers[question.id] === opt.letter ? 'checked' : ''}
+                   onchange="recordAnswer('${question.id}', this.value)">
+             <div class="flex items-baseline">
+                <span class="font-medium w-6 text-right mr-2">${opt.letter}.</span>
+                <span class="flex-1" id="option-text-${opt.letter}">${opt.text}</span> {/* Render LaTeX here */}
+             </div>
+        </label>
+    `).join('');
+
+     if (!question.options || question.options.length === 0) {
+         optionsHtml = '<p class="text-sm text-yellow-600 dark:text-yellow-400">(No multiple choice options found for this question)</p>';
+     }
+
+
+    container.innerHTML = `
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg mb-4">
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">Chapter ${question.chapter} - Question ${question.number}</p>
+            <div class="prose dark:prose-invert max-w-none mb-6" id="question-text-area">
+                 ${question.text} {/* Render LaTeX here */}
+                 ${question.image ? `<img src="${question.image}" alt="Question Image" class="max-w-full h-auto mx-auto my-4 border dark:border-gray-600 rounded">` : ''}
+            </div>
+            <div class="space-y-3">
+                ${optionsHtml}
+            </div>
+        </div>
+    `;
+
+    // Update navigation buttons and counter
+    document.getElementById('question-counter').textContent = `Question ${index + 1} / ${totalQuestions}`;
+    document.getElementById('prev-btn').disabled = (index === 0);
+    if (index === totalQuestions - 1) {
+        document.getElementById('next-btn').classList.add('hidden');
+        document.getElementById('submit-btn').classList.remove('hidden');
+    } else {
+        document.getElementById('next-btn').classList.remove('hidden');
+        document.getElementById('submit-btn').classList.add('hidden');
+    }
+
+    // Render LaTeX after content update (including question text and options)
+    requestAnimationFrame(() => {
+         renderLatexInElement(document.getElementById('question-text-area'));
+         (question.options || []).forEach(opt => {
+             const optElement = document.getElementById(`option-text-${opt.letter}`);
+             if (optElement) {
+                 renderLatexInElement(optElement);
+             }
+         });
+    });
+}
+
+function navigateQuestion(direction) {
+    const newIndex = currentOnlineTestState.currentQuestionIndex + direction;
+    const totalQuestions = currentOnlineTestState.questions.length;
+
+    if (newIndex >= 0 && newIndex < totalQuestions) {
+        currentOnlineTestState.currentQuestionIndex = newIndex;
+        displayCurrentQuestion();
+    }
+}
+
+function recordAnswer(questionId, answer) {
+    currentOnlineTestState.userAnswers[questionId] = answer;
+    // No need to save to localStorage here, only on final submit
+}
+
+function confirmSubmitOnlineTest() {
+    const unanswered = currentOnlineTestState.questions.filter(q => !currentOnlineTestState.userAnswers[q.id]).length;
+    let confirmationMessage = "Are you sure you want to submit your test?";
+    if (unanswered > 0) {
+        confirmationMessage += `\n\nYou have ${unanswered} unanswered question(s).`;
+    }
+
+    if (confirm(confirmationMessage)) {
+        submitOnlineTest();
+    }
+}
+function confirmForceSubmit() {
+     if (confirm("Are you sure you want to submit the test now?")) {
+         submitOnlineTest();
+     }
+}
+
+
+function submitOnlineTest() {
+    showLoading("Submitting and Grading...");
+    if (currentOnlineTestState.timerInterval) {
+        clearInterval(currentOnlineTestState.timerInterval);
+    }
+     document.getElementById('online-test-area').classList.add('hidden'); // Hide test UI
+
+    setTimeout(() => {
+        const results = {
+            examId: currentOnlineTestState.examId,
+            subjectId: currentSubject.id,
+            timestamp: new Date().toISOString(),
+            durationMinutes: Math.round((Date.now() - currentOnlineTestState.startTime) / 60000),
+            questions: [], // { id, chapter, number, text, image, userAnswer, correctAnswer, isCorrect }
+            score: 0,
+            totalQuestions: currentOnlineTestState.questions.length,
+            resultsByChapter: {} // { chapNum: { attempted, correct, wrong } }
+        };
+
+        let totalCorrect = 0;
+
+        // Initialize resultsByChapter
+         for (const chapNum in currentOnlineTestState.allocation) {
+             results.resultsByChapter[chapNum] = { attempted: 0, correct: 0, wrong: 0 };
+         }
+
+
+        currentOnlineTestState.questions.forEach(q => {
+            const userAnswer = currentOnlineTestState.userAnswers[q.id] || null;
+            const correctAnswer = currentOnlineTestState.correctAnswers[q.id];
+            const isCorrect = userAnswer === correctAnswer;
+
+             // Record question-level result
+            results.questions.push({
+                id: q.id,
+                chapter: q.chapter,
+                number: q.number,
+                text: q.text, // Keep text for review
+                 image: q.image,
+                userAnswer: userAnswer,
+                correctAnswer: correctAnswer,
+                isCorrect: isCorrect
+            });
+
+             // Update chapter-level results
+             const chapResult = results.resultsByChapter[q.chapter];
+             if (chapResult) { // Should always exist if allocation was correct
+                chapResult.attempted++; // Count every question in the test as attempted for this exam's scope
+                if (isCorrect) {
+                    chapResult.correct++;
+                    totalCorrect++;
+                } else {
+                    chapResult.wrong++;
+                }
+             } else {
+                  console.error(`Chapter ${q.chapter} not found in exam allocation during result processing.`);
+             }
+
+            // --- Update Global Chapter Statistics ---
+            const globalChap = currentSubject.chapters[q.chapter];
+            if (globalChap) {
+                globalChap.total_attempted = (globalChap.total_attempted || 0) + 1;
+                const questionWrong = isCorrect ? 0 : 1;
+                globalChap.total_wrong = (globalChap.total_wrong || 0) + questionWrong;
+
+                 // Update mistake history for the *chapter*, recording if *this specific question* was wrong
+                 // This is tricky. The current mistake_history tracks *number wrong in a test session for that chapter*.
+                 // Maybe change mistake_history to track correctness per attempt?
+                 // Let's stick to the original logic: push the number wrong *for this chapter in this test*.
+                 // We need to calculate this *after* iterating all questions for the chapter.
+
+                // Update consecutive mastery based on *this specific question*?
+                 // No, consecutive mastery should be based on the *entire chapter's performance in a test session*.
+                 // We'll update this after processing all results.
+
+                 // Remove the question from available_questions if it wasn't already removed during selection
+                 // (It should have been removed by selectNewQuestionsAndUpdate)
+                 if (globalChap.available_questions) {
+                     const qIndex = globalChap.available_questions.indexOf(q.number);
+                     if (qIndex > -1) {
+                          console.warn(`Question ${q.chapter}-${q.number} was still in available_questions after test.`);
+                          globalChap.available_questions.splice(qIndex, 1);
+                     }
+                 }
+
+            } else {
+                 console.error(`Chapter ${q.chapter} not found in global data during statistics update.`);
+            }
+        });
+
+         // --- Finalize Global Chapter Stats (Mistake History & Mastery) ---
+         for (const chapNum in results.resultsByChapter) {
+              const globalChap = currentSubject.chapters[chapNum];
+              const chapResult = results.resultsByChapter[chapNum];
+              if (globalChap && chapResult) {
+                  const numWrongInChapter = chapResult.wrong;
+                  globalChap.mistake_history = globalChap.mistake_history || [];
+                  globalChap.mistake_history.push(numWrongInChapter);
+                  // Keep history length reasonable (e.g., last 20 sessions)
+                   if (globalChap.mistake_history.length > 20) {
+                        globalChap.mistake_history.shift();
+                   }
+
+                  // Update consecutive mastery
+                  globalChap.consecutive_mastery = (numWrongInChapter === 0)
+                      ? (globalChap.consecutive_mastery || 0) + 1
+                      : 0;
+              }
+         }
+
+
+        results.score = totalCorrect;
+        currentSubject.exam_history = currentSubject.exam_history || [];
+        currentSubject.exam_history.push(results);
+        // Limit history size?
+        // if (currentSubject.exam_history.length > 50) {
+        //     currentSubject.exam_history.shift();
+        // }
+
+        saveData(data); // Save updated chapter stats and exam history
+        hideLoading();
+        displayOnlineTestResults(results);
+        currentOnlineTestState = null; // Clear test state
+
+    }, 500);
+}
+
+
+function displayOnlineTestResults(results) {
+    clearContent(); // Clear main content area first
+    document.getElementById('menu').classList.remove('hidden'); // Show menu again
+
+    const percentage = results.totalQuestions > 0 ? ((results.score / results.totalQuestions) * 100).toFixed(1) : 0;
+
+    let chapterSummaryHtml = Object.entries(results.resultsByChapter).map(([chapNum, chapRes]) => {
+        const chapPercentage = chapRes.attempted > 0 ? ((chapRes.correct / chapRes.attempted) * 100).toFixed(1) : 0;
+        return `
+            <li class="flex justify-between items-center p-2 bg-gray-50 dark:bg-gray-700 rounded">
+                <span>Chapter ${chapNum}</span>
+                <span class="font-medium ${chapRes.wrong > 0 ? 'text-red-500' : 'text-green-500'}">
+                    ${chapRes.correct} / ${chapRes.attempted} (${chapPercentage}%)
+                </span>
+            </li>`;
+    }).join('');
+
+     // Basic review section (can be expanded)
+     let reviewHtml = results.questions.slice(0, 5).map((q, index) => `
+         <div class="p-3 border dark:border-gray-600 rounded mb-2">
+             <p class="text-sm font-medium">Q${index + 1} (Ch.${q.chapter}-${q.number}): Your Answer: ${q.userAnswer || 'N/A'}, Correct: ${q.correctAnswer}
+                <span class="${q.isCorrect ? 'text-green-500' : 'text-red-500'}">${q.isCorrect ? '✔' : '✘'}</span>
+             </p>
+             </div>
+     `).join('');
+     if (results.questions.length > 5) {
+         reviewHtml += `<p class="text-sm text-gray-500 dark:text-gray-400">Showing first 5 questions. Full details available in Exams Dashboard.</p>`
+     }
+
+    const html = `
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-4 animate-fade-in">
+            <h2 class="text-2xl font-semibold mb-4 text-center text-primary-600 dark:text-primary-400">Test Results: ${results.examId}</h2>
+            <div class="text-center mb-6">
+                 <p class="text-4xl font-bold ${percentage >= 70 ? 'text-green-500' : percentage >= 50 ? 'text-yellow-500' : 'text-red-500'}">
+                    ${results.score} / ${results.totalQuestions} (${percentage}%)
+                 </p>
+                 <p class="text-gray-600 dark:text-gray-400">Duration: ${results.durationMinutes} minutes</p>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold mb-2">Chapter Performance</h3>
+                <ul class="space-y-1">
+                    ${chapterSummaryHtml}
+                </ul>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold mb-2">Quick Review (First 5 Questions)</h3>
+                 ${reviewHtml}
+            </div>
+
+             <button onclick="showExamsDashboard()" class="w-full btn-secondary">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2"> <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08H4.123a.878.878 0 0 0-.878.878V18a2.25 2.25 0 0 0 2.25 2.25h3.879a.75.75 0 0 1 0 1.5H6.75a3.75 3.75 0 0 1-3.75-3.75V5.625a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 5.625V16.5a2.25 2.25 0 0 1-2.25 2.25h-3.879a.75.75 0 0 1 0-1.5Z" /></svg>
+                View All Exams
+            </button>
+        </div>
+    `;
+    displayContent(html);
+}
+
+
+// --- PDF Exam Result Entry (Largely unchanged, but adapted) ---
+
+function showEnterResults() { // Now part of Exams Dashboard, but can be called directly
+    const pending_exams = currentSubject.pending_exams || [];
+    if (pending_exams.length === 0) {
+        return '<p class="text-sm text-gray-500 dark:text-gray-400 mt-4">No pending PDF exams to enter results for.</p>';
+    }
+
+    let output = '<h3 class="text-lg font-semibold mb-3 mt-6 text-yellow-600 dark:text-yellow-400">Pending PDF Exams</h3><div class="space-y-2">';
+    pending_exams.forEach((exam, i) => {
+        // Find the index relative to the original array for correct deletion/update
+        const originalIndex = (currentSubject.pending_exams || []).findIndex(p => p.id === exam.id);
+        if (originalIndex === -1) return; // Should not happen
+
+        output += `
+        <div class="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200 flex justify-between items-center">
+             <span class="text-sm font-medium">${exam.id}</span>
+             <div>
+                 <button onclick="enterResultsForm(${originalIndex})" class="btn-primary-small mr-2">
+                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" /></svg>
+                    Enter Results
+                 </button>
+                  <button onclick="confirmDeletePendingExam(${originalIndex})" class="btn-danger-small">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
+                     Delete
+                  </button>
+            </div>
+        </div>`;
+    });
+    output += '</div>';
+    return output;
+}
+
+function enterResultsForm(index) {
+    const exam = currentSubject.pending_exams[index];
+    const allocation = exam.allocation; // {chapNum: count, ...}
+    let formHtml = `<p class="font-bold mb-4">Entering results for PDF exam ${exam.id}:</p><div class="space-y-4">`;
+    let inputs = [];
+
+    const sortedChaps = Object.keys(allocation).sort((a, b) => parseInt(a) - parseInt(b));
+
+    for (let chap_num of sortedChaps) {
+        let n = allocation[chap_num];
+        if (n > 0) {
+            formHtml += `
+            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                <label for="wrong-${chap_num}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Chapter ${chap_num}: Number of WRONG answers (0 to ${n})
+                </label>
+                <input id="wrong-${chap_num}" type="number" min="0" max="${n}" value="0" required
+                    class="border rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white">
+            </div>`;
+            inputs.push(chap_num);
+        }
+    }
+    formHtml += `</div>
+    <div class="mt-6 flex space-x-3">
+        <button onclick="submitPendingResults(${index}, ${JSON.stringify(inputs)})"
+            class="flex-1 btn-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+            Submit Results
+        </button>
+         <button onclick="showExamsDashboard()" class="flex-1 btn-secondary">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" /></svg>
+             Cancel
+         </button>
+    </div>`;
+    displayContent(formHtml);
+}
+
+function submitPendingResults(index, chap_nums) {
+    showLoading("Saving PDF Results...");
+    setTimeout(() => {
+        const exam = currentSubject.pending_exams[index];
+        const chapters = currentSubject.chapters;
+        let allInputsValid = true;
+        let chapterResults = {}; // To calculate mastery based on whole chapter session
+
+        for (let chap_num of chap_nums) {
+            const n = exam.allocation[chap_num]; // Number of questions attempted in this chapter
+             if (n === 0) continue; // Skip if no questions allocated
+
+            const inputElement = document.getElementById(`wrong-${chap_num}`);
+            let wrong = parseInt(inputElement.value);
+
+            if (isNaN(wrong) || wrong < 0 || wrong > n) {
+                hideLoading();
+                alert(`Invalid input for Chapter ${chap_num}. Must be between 0 and ${n}.`);
+                // Add visual indicator to the invalid field
+                 inputElement.classList.add('border-red-500', 'ring-red-500');
+                 inputElement.focus();
+                allInputsValid = false;
+                break; // Stop processing on first error
+            } else {
+                 inputElement.classList.remove('border-red-500', 'ring-red-500'); // Clear error style if valid
+                 chapterResults[chap_num] = { attempted: n, wrong: wrong };
+             }
+        }
+
+         if (!allInputsValid) {
+            hideLoading();
+            return; // Don't proceed if any input was invalid
+         }
+
+        // If all inputs are valid, update global stats
+        for (let chap_num in chapterResults) {
+             const result = chapterResults[chap_num];
+             const chap = chapters[chap_num];
+
+             if (chap) {
+                chap.total_attempted = (chap.total_attempted || 0) + result.attempted;
+                chap.total_wrong = (chap.total_wrong || 0) + result.wrong;
+                chap.mistake_history = chap.mistake_history || [];
+                chap.mistake_history.push(result.wrong);
+                 // Limit history size
+                if (chap.mistake_history.length > 20) {
+                     chap.mistake_history.shift();
+                }
+                // Update mastery based on whether *any* were wrong in this chapter session
+                chap.consecutive_mastery = (result.wrong === 0)
+                    ? (chap.consecutive_mastery || 0) + 1
+                    : 0;
+             } else {
+                 console.error(`Chapter ${chap_num} not found in global data when submitting PDF results.`);
+             }
+        }
+
+        // Remove exam from pending list
+        currentSubject.pending_exams.splice(index, 1);
+        saveData(data);
+        hideLoading();
+        showExamsDashboard(); // Show the updated dashboard
+         // Add a success message at the top of the dashboard?
+         const successMsg = `
+            <div class="bg-green-100 dark:bg-green-900 border-l-4 border-green-500 text-green-700 dark:text-green-200 p-4 rounded-md mb-4 animate-fade-in">
+                <p class="font-medium">Results for exam ${exam.id} entered successfully!</p>
+             </div>`;
+         // Prepend success message to dashboard content
+         const dashboardContent = document.getElementById('content').innerHTML;
+         displayContent(successMsg + dashboardContent);
+
+
+    }, 500);
 }
 
 
@@ -2642,27 +3071,22 @@ async function generateAndDownloadPdf(htmlContent, baseFilename) {
 
     // Render KaTeX within the temporary element
     try {
-        if (window.renderMathInElement) { // Check if function exists
-             renderMathInElement(tempElement, { // Just call, don't await unless it returns a Promise
-                delimiters: [
-                    { left: '$$', right: '$$', display: true },
-                    { left: '$', right: '$', display: false },
-                    { left: '\\(', right: '\\)', display: false },
-                    { left: '\\[', right: '\\]', display: true }
-                ],
-                throwOnError: false
-            });
-            console.log("KaTeX rendered for PDF generation.");
-        } else {
-            console.warn("renderMathInElement not available for PDF generation.");
-        }
-
+        await renderMathInElement(tempElement, { // Use await if renderMathInElement is async or returns a promise
+             delimiters: [
+                { left: '$$', right: '$$', display: true },
+                { left: '$', right: '$', display: false },
+                { left: '\\(', right: '\\)', display: false },
+                { left: '\\[', right: '\\]', display: true }
+            ],
+            throwOnError: false
+        });
+         console.log("KaTeX rendered for PDF generation.");
     } catch (error) {
         console.error("KaTeX rendering error during PDF generation:", error);
         // Continue anyway, math might just look bad
     }
 
-     // Allow a short time for rendering to settle (especially images and KaTeX)
+     // Allow a short time for rendering to settle (especially images)
      await new Promise(resolve => setTimeout(resolve, 500));
 
 
