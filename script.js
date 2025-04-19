@@ -310,11 +310,13 @@ function extractQuestionsFromMarkdown(mdContent, selectedQuestionsMap) {
     let processingState = 'seeking_chapter'; // 'seeking_chapter', 'seeking_question', 'in_question_text', 'in_options', 'found_answer'
 
     const chapterRegex = /^###\s+Chapter\s+(\d+):?.*?$/i;
+    // Question Regex: Matches start of line, optional space, number, dot/paren, optional space, captures rest of line.
     const questionStartRegex = /^\s*(\d+)\s*[\.\)]\s*(.*)/;
-    const optionRegex = /^\s*([A-Ea-e])[\.\)]\s+(.*)/;
-    // More specific answer regex: Must be at end of line, allows optional space before letter
-    const answerRegex = /(?:ans|answer)\s*:\s*([a-zA-Z\d])\s*$/i;
-    const imageRegex = /!\[(.*?)\]\((.*?)\)/; // Basic Markdown image
+    // Option Regex: Matches start of line, optional space, A-E, dot/paren, OPTIONAL space (\s*), captures rest of line.
+    const optionRegex = /^\s*([A-Ea-e])[\.\)]\s*(.*)/; // Made space OPTIONAL
+     // Answer Regex: Matches 'ans:' or 'answer:' at the end of a trimmed line.
+     const answerRegex = /(?:ans|answer)\s*:\s*([a-zA-Z\d])\s*$/i;
+    const imageRegex = /!\[(.*?)\]\((.*?)\)/;
 
     function finalizeQuestion() {
         if (currentQuestion && currentChapter) {
@@ -322,68 +324,64 @@ function extractQuestionsFromMarkdown(mdContent, selectedQuestionsMap) {
             let fullText = currentQuestion.textLines.join('\n').trim();
             let answer = null;
 
-             // Extract answer from the stored answer line if it exists
             if (currentQuestion.answerLine) {
-                 const answerMatch = currentQuestion.answerLine.match(answerRegex);
-                 if (answerMatch) {
-                     answer = answerMatch[1].toUpperCase(); // Group 1 is the letter/digit
-                 }
+                const answerMatch = currentQuestion.answerLine.match(answerRegex);
+                if (answerMatch) {
+                    answer = answerMatch[1].toUpperCase();
+                }
             }
 
-            // Remove the answer line from the full text if it was accidentally included
-            // Need to be careful here, only remove if it's the *exact* last line
-            if (currentQuestion.answerLine && currentQuestion.textLines.length > 0 && currentQuestion.textLines[currentQuestion.textLines.length - 1] === currentQuestion.answerLine) {
-                 currentQuestion.textLines.pop(); // Remove last line if it was the answer line
-                 fullText = currentQuestion.textLines.join('\n').trim(); // Re-join
+            // Remove answer line from text if necessary (check last element)
+            if (currentQuestion.answerLine && currentQuestion.textLines.length > 0 &&
+                currentQuestion.textLines[currentQuestion.textLines.length - 1].trim() === currentQuestion.answerLine) {
+                 currentQuestion.textLines.pop();
+                 fullText = currentQuestion.textLines.join('\n').trim();
             }
 
-            // Extract image and optionally remove from text
+
             const imageMatch = fullText.match(imageRegex);
             const imageUrl = imageMatch ? imageMatch[2] : null;
-            if (imageUrl) {
-                 // Decide whether to keep the ![alt](url) in the text or remove it
-                 // Let's remove it for cleaner display if image property is used
-                 // fullText = fullText.replace(imageRegex, '').trim();
-            }
+            // Remove image markdown from text for cleaner display?
+            // if (imageUrl) fullText = fullText.replace(imageRegex, '').trim();
 
-             // Format options: ensure text is trimmed
-             const formattedOptions = currentQuestion.options.map(opt => ({
-                 letter: opt.letter,
-                 text: opt.text.trim() // Trim final option text
-             }));
-
+            const formattedOptions = currentQuestion.options.map(opt => ({
+                letter: opt.letter,
+                text: opt.text.trim()
+            }));
 
             extracted.questions.push({
                 id: questionId,
                 chapter: currentChapter,
                 number: currentQuestion.number,
                 text: fullText,
-                options: formattedOptions, // Use trimmed options
+                options: formattedOptions,
                 image: imageUrl,
-                answer: answer // Store answer found via regex
+                answer: answer
             });
-             // console.log(`Finalized Q: ${questionId}`, {text: fullText.substring(0,50), options: formattedOptions, answer});
 
-            // Store answer separately as well
             if (answer) {
-                 extracted.answers[questionId] = answer;
+                extracted.answers[questionId] = answer;
             }
         }
-        currentQuestion = null; // Reset for next question
+        currentQuestion = null;
     }
 
-    for (const line of lines) {
-        // Don't trim line here yet, preserve indentation for potential code blocks within questions/options
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i]; // Process raw line
         const trimmedLine = line.trim();
+
         const chapterMatch = trimmedLine.match(chapterRegex);
-        const questionMatch = line.match(questionStartRegex); // Match on raw line
-        const optionMatch = trimmedLine.match(optionRegex); // Match on trimmed line for options
-        const answerMatch = trimmedLine.match(answerRegex); // Match on trimmed line for answer
+        // Match question start on the raw line to preserve potential initial indent
+        const questionMatch = line.match(questionStartRegex);
+         // Match options and answers on the trimmed line
+        const optionMatch = trimmedLine.match(optionRegex);
+        const answerMatch = trimmedLine.match(answerRegex);
 
         if (chapterMatch) {
             finalizeQuestion();
             currentChapter = chapterMatch[1];
             processingState = 'seeking_question';
+            // console.log(`Switched to Chapter ${currentChapter}`);
             continue;
         }
 
@@ -392,69 +390,77 @@ function extractQuestionsFromMarkdown(mdContent, selectedQuestionsMap) {
         if (questionMatch) {
             finalizeQuestion();
             const qNum = parseInt(questionMatch[1], 10);
-            const firstLineText = questionMatch[2]; // Keep potential leading space from original line
+             // Capture text AFTER the number/dot/space pattern from the raw line
+            const firstLineText = questionMatch[2];
 
             const chapterKey = String(currentChapter);
             if (selectedQuestionsMap[chapterKey] && selectedQuestionsMap[chapterKey].includes(qNum)) {
                 currentQuestion = {
                     number: qNum,
-                    textLines: [firstLineText], // Store first line's text
+                    textLines: [firstLineText], // Start with captured text
                     options: [],
                     answerLine: null
                 };
                 processingState = 'in_question_text';
-                // console.log(`--> Starting selected Q: Ch ${chapterKey} Q ${qNum}`);
+                // console.log(`Starting selected Q: Ch ${chapterKey} Q ${qNum}`);
             } else {
-                processingState = 'seeking_question';
+                processingState = 'seeking_question'; // Skip lines until next selected Q
                 currentQuestion = null;
             }
-            continue;
+            continue; // Move to next line
         }
 
+        // --- Processing lines *within* a selected question ---
         if (currentQuestion) {
-            // Check for answer line FIRST, as it definitively ends the question content
-            if (answerMatch) {
-                 currentQuestion.answerLine = trimmedLine; // Store the line where answer was found
+             // Check answer line FIRST
+             if (answerMatch) {
+                 currentQuestion.answerLine = trimmedLine;
                  processingState = 'found_answer';
-                  // Don't 'continue' here, let subsequent lines be ignored until next question/chapter
-            } else if (optionMatch && processingState !== 'found_answer') {
-                // Found a new option
-                processingState = 'in_options';
-                currentQuestion.options.push({
-                    letter: optionMatch[1].toUpperCase(),
-                    text: optionMatch[2] // Store initial text, might be multi-line
-                });
-                 // console.log(`  Added option ${optionMatch[1]}`);
-            } else if (trimmedLine.length === 0 && processingState !== 'found_answer') {
-                 // Handle blank lines: Append to question text if in that state, otherwise ignore or append to option?
-                 if (processingState === 'in_question_text') {
-                     currentQuestion.textLines.push(''); // Preserve blank line in question text
-                 } else if (processingState === 'in_options' && currentQuestion.options.length > 0) {
-                     // Append blank line to the current option text
-                     currentQuestion.options[currentQuestion.options.length - 1].text += '\n';
-                 }
-            } else if (processingState !== 'found_answer') {
-                 // It's a continuation line (neither blank, nor option start, nor answer)
+                  // console.log(`Found answer line: ${trimmedLine}`);
+             } else if (optionMatch && processingState !== 'found_answer') {
+                 // Found an option line (check on trimmed line)
+                 processingState = 'in_options';
+                 currentQuestion.options.push({
+                     letter: optionMatch[1].toUpperCase(),
+                     text: optionMatch[2] // Store captured text, might be multi-line
+                 });
+                 // console.log(`Added option ${optionMatch[1]}`);
+             } else if (trimmedLine.length === 0 && processingState !== 'found_answer') {
+                  // Handle blank lines within the question block (before answer)
+                  if (processingState === 'in_question_text') {
+                      currentQuestion.textLines.push(''); // Add blank line to question text
+                  } else if (processingState === 'in_options' && currentQuestion.options.length > 0) {
+                      // Add blank line to the current option's text
+                      currentQuestion.options[currentQuestion.options.length - 1].text += '\n';
+                  }
+             } else if (trimmedLine.length > 0 && processingState !== 'found_answer') {
+                 // It's a continuation line (part of question or option)
                  if (processingState === 'in_options' && currentQuestion.options.length > 0) {
-                     // Append to the *last* option's text
-                     currentQuestion.options[currentQuestion.options.length - 1].text += '\n' + line; // Append raw line
+                     // Append raw line to the *last* option's text
+                     currentQuestion.options[currentQuestion.options.length - 1].text += '\n' + line;
                  } else {
-                     // Append to question text (default)
+                     // Append raw line to question text
                      processingState = 'in_question_text'; // Ensure state
-                     currentQuestion.textLines.push(line); // Append raw line
+                     currentQuestion.textLines.push(line);
                  }
-            }
-             // If state is 'found_answer', we simply ignore subsequent lines until a new question/chapter starts
+             }
+             // Ignore lines if state is 'found_answer'
         }
     }
     finalizeQuestion(); // Finalize the very last question
 
     console.log(`Extraction finished. Found ${extracted.questions.length} questions.`);
-    // console.log("Sample Extracted Question:", JSON.stringify(extracted.questions[0], null, 2));
-    // console.log("Answers Map:", extracted.answers);
-    if (extracted.questions.length === 0 && Object.keys(selectedQuestionsMap).reduce((sum, key) => sum + selectedQuestionsMap[key].length, 0) > 0) {
-        console.error("Extraction Error: Selected questions but extracted none. Check Regex and MD format near selected questions.");
+    // Add more detailed logging if errors persist:
+    if (extracted.questions.length > 0) {
+         // console.log("Sample Extracted Q1:", JSON.stringify(extracted.questions[0], null, 2));
     }
+     const totalSelectedCount = Object.values(selectedQuestionsMap).reduce((sum, arr) => sum + arr.length, 0);
+     if (extracted.questions.length === 0 && totalSelectedCount > 0) {
+         console.error("Extraction Error: Selected questions but extracted none. Check Regex and MD format near selected questions. Common issues: incorrect spacing after number/letter, answer line format.");
+     } else if (extracted.questions.length < totalSelectedCount) {
+          console.warn(`Extraction Warning: Selected ${totalSelectedCount} questions but only extracted ${extracted.questions.length}. Some questions might have formatting issues.`);
+     }
+
     return extracted;
 }
 

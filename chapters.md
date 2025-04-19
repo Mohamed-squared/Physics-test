@@ -18,11 +18,11 @@ E. $10^{-12}$ s
 ans: B
 
 3. The SI standard of length is based on:
-A. the distance from the north pole to the equator along a meridian passing through Paris
-B. wavelength of light emitted by $\mathrm{Hg}^{198}$
-C. wavelength of light emitted by $Kr^{86}$
-D. a precision meter stick in Paris
-E. the speed of light
+A.the distance from the north pole to the equator along a meridian passing through Paris
+B.wavelength of light emitted by $\mathrm{Hg}^{198}$
+C.wavelength of light emitted by $Kr^{86}$
+D.a precision meter stick in Paris
+E.the speed of light
 ans: E
 
 4. In 1866, the U. S. Congress defined the U. S.yard as exactly 3600/3937 international meter. This was done primarily because:
