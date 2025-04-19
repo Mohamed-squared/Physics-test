@@ -669,11 +669,33 @@ function displayContent(html) {
 }
 
 function clearContent() {
-    document.getElementById('content').innerHTML = '';
-    document.getElementById('online-test-area').classList.add('hidden');
-    document.getElementById('online-test-area').innerHTML = '';
-    document.getElementById('menu').classList.remove('hidden');
-    document.getElementById('dashboard').classList.add('hidden');
+    const contentEl = document.getElementById('content');
+    const testAreaEl = document.getElementById('online-test-area');
+    const dashboardEl = document.getElementById('dashboard');
+
+    if (contentEl) {
+        contentEl.innerHTML = ''; // Clear main dynamic content
+    } else {
+        console.warn("clearContent: Could not find #content element");
+    }
+
+    if (testAreaEl) {
+        testAreaEl.classList.add('hidden');
+        testAreaEl.innerHTML = ''; // Clear test area content too
+    } else {
+         console.warn("clearContent: Could not find #online-test-area element");
+    }
+
+    if (dashboardEl) {
+        dashboardEl.classList.add('hidden'); // Hide separate dashboard view
+        // Optionally clear dashboard content if needed:
+        // const dashboardContent = document.getElementById('dashboard-content');
+        // if (dashboardContent) dashboardContent.innerHTML = '';
+    } else {
+        console.warn("clearContent: Could not find #dashboard element");
+    }
+
+    // REMOVED: document.getElementById('menu').classList.remove('hidden');
 }
 
 // --- Test Generation ---
