@@ -1279,44 +1279,57 @@ function downloadTexFile(filename, base64Content) {
 }
 
 // --- Online Test UI & Logic ---
-
 function launchOnlineTestUI() {
-    document.getElementById('menu').classList.add('hidden');
+    // Potentially hide other areas if needed (be careful)
+    // document.getElementById('content').classList.add('hidden'); // Or clear it
+
     const testArea = document.getElementById('online-test-area');
+
+    // --- ADD THIS CHECK ---
+    if (!testArea) {
+        console.error("launchOnlineTestUI Error: Could not find #online-test-area element in the HTML!");
+        // Display an error message to the user instead of crashing
+        displayContent("<p class='text-red-500 p-4'>Error: Failed to initialize the test interface. Required HTML element is missing.</p>");
+        hideLoading(); // Make sure loading indicator is hidden
+        return; // Stop the function execution
+    }
+    // --- END CHECK ---
+
     testArea.innerHTML = ''; // Clear previous test
-    testArea.classList.remove('hidden');
+    testArea.classList.remove('hidden'); // Now this line is safe
 
     const totalQuestions = currentOnlineTestState.questions.length;
     const durationMillis = ONLINE_TEST_DURATION_MINUTES * 60 * 1000;
     currentOnlineTestState.endTime = currentOnlineTestState.startTime + durationMillis;
 
-    testArea.innerHTML = `
-        <div class="fixed top-0 left-0 right-0 bg-white dark:bg-gray-800 p-3 shadow z-40 border-b dark:border-gray-700">
-            <div class="container mx-auto flex justify-between items-center">
-                <span class="text-lg font-semibold text-primary-600 dark:text-primary-400">Online Test</span>
-                <div id="timer" class="text-lg font-mono px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded">--:--:--</div>
-                 <button id="force-submit-btn" onclick="confirmForceSubmit()" class="btn-danger-small hidden">Submit Now</button>
-            </div>
+    // --- Rest of the function setting innerHTML, calling startTimer, etc. ---
+    testArea.innerHTML =  `
+    <div class="fixed top-0 left-0 right-0 bg-white dark:bg-gray-800 p-3 shadow z-40 border-b dark:border-gray-700">
+        <div class="container mx-auto flex justify-between items-center">
+            <span class="text-lg font-semibold text-primary-600 dark:text-primary-400">Online Test</span>
+            <div id="timer" class="text-lg font-mono px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded">--:--:--</div>
+             <button id="force-submit-btn" onclick="confirmForceSubmit()" class="btn-danger-small hidden">Submit Now</button>
         </div>
-        <div id="question-container" class="pt-20 pb-24 container mx-auto px-4"> {/* Increased bottom padding */}
-            </div>
-        <div class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 p-3 shadow-up z-40 border-t dark:border-gray-700">
-             <div class="container mx-auto flex justify-between items-center">
-                 <button id="prev-btn" onclick="navigateQuestion(-1)" class="btn-secondary" disabled>
-                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-1"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" /></svg>
-                     Previous
-                 </button>
-                <span id="question-counter" class="text-sm text-gray-600 dark:text-gray-400">Question 1 / ${totalQuestions}</span>
-                 <button id="next-btn" onclick="navigateQuestion(1)" class="btn-primary">
-                     Next
-                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 ml-1"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" /></svg>
-                 </button>
-                 <button id="submit-btn" onclick="confirmSubmitOnlineTest()" class="btn-success hidden">
-                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-1"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
-                     Submit Test
-                 </button>
-            </div>
+    </div>
+    <div id="question-container" class="pt-20 pb-24 container mx-auto px-4"> {/* Increased bottom padding */}
         </div>
+    <div class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 p-3 shadow-up z-40 border-t dark:border-gray-700">
+         <div class="container mx-auto flex justify-between items-center">
+             <button id="prev-btn" onclick="navigateQuestion(-1)" class="btn-secondary" disabled>
+                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-1"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" /></svg>
+                 Previous
+             </button>
+            <span id="question-counter" class="text-sm text-gray-600 dark:text-gray-400">Question 1 / ${totalQuestions}</span>
+             <button id="next-btn" onclick="navigateQuestion(1)" class="btn-primary">
+                 Next
+                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 ml-1"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" /></svg>
+             </button>
+             <button id="submit-btn" onclick="confirmSubmitOnlineTest()" class="btn-success hidden">
+                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-1"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+                 Submit Test
+             </button>
+        </div>
+    </div>
     `;
 
     startTimer();
