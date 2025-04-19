@@ -44,7 +44,9 @@ ans: C
 A. an area has no thickness; hence no physical standard can be built
 B. we live in a three (not a two) dimensional world
 C. it is impossible to express square feet in terms of meters
-D. areanexped ts quare Ans: D
+D. area can be expressed in terms of square meters
+E. area is not an important physical quantity
+Ans: D
 
 7. The SI base unit for mass is:
 A. gram
@@ -67,7 +69,8 @@ A. 0.05 kg
 B. 0.5 kg
 C. 5kg
 D. 50 kg
-E. 500kg Ans: D
+E. 500kg 
+Ans: D
 
 10. $(5.0\times10^{4})\times(3.0\times10^{6})=$
 A. $1.5\times10^{9}$
@@ -78,9 +81,10 @@ E. $1.5\times10^{13}$
 ans: C
 
 11. $(5.0\times10^{4})\times(3.0\times10^{-6})=$ A. $1.5\times10^{-3}$
-B. $1.5\times10^{-1}$
-C. $1.5\times10^{1}$
-D. $1.5\times10^{3}$
+A. $1.5\times10^{-3}$ \\
+B. $1.5\times10^{-1}$ \\
+C. $1.5\times10^{1}$ \\
+D. $1.5\times10^{3}$ \\
 E. $1.5\times10^{5}$
 ans: B
 
@@ -93,9 +97,10 @@ E. $3.5\times10^{68}$
 ans: E
 
 13. $(7.0\times10^{6})/(2.0\times10^{-6})=$ A. $3.5\times10^{-12}$
+B. $3.5\times10^{-12}$
 B. $3.5\times10^{-6}$
 C. 3.5
-D. $3.5\times10^{68}$
+D. $3.5\times10^{6}$
 E. $3.5\times10^{12}$
 ans: E
 
@@ -108,7 +113,8 @@ E. 6
 ans: B
 
 15. The number of significant figures in 15.0 is:
-A. 2
+A. 1
+B. 2
 C. 3
 D. 4
 E. 5
@@ -119,14 +125,16 @@ A. 9
 B. 8
 C. 8.6
 D. 8.64
-E. 8.640 Ans: C
+E. 8.640 
+Ans: C
 
 17. 1.513+27.3=
 A. 29
 B. 28.8
 C. 28.9
 D. 28.81
-E. 28.813 ()Ans: B
+E. 28.813 
+Ans: B
 
 18. 1 mi is equivalent to 1609 m so 55 mph is:
 A. 15 m/s
@@ -157,14 +165,16 @@ A. 0.20 $m^{3}$
 B. 0.14 $m^{3}$
 C. $9.3\times10^{-3}\mathrm{~m}^{3}$
 D. $2.3\times10^{-3}\mathrm{~m}^{3}$
-E. $7. 4\times 10^{- 4}$ $\mathrm{m} ^{3}$ Ans: D
+E. $7. 4\times 10^{- 4}$ $\mathrm{m} ^{3}$ 
+Ans: D
 
 22. A right circular cylinder with a radius of 2.3 cm and a height of 1.4 cm has a total surface area of:
 A. $1. 7\times 10^{- 3}$ $m^{2}$
 B. $3.2\times10^{-3}~\mathrm{m}^{2}$
 C. $2.0\times10^{-3}\mathrm{~m}^{3}$
 D. $5. 3\times 10^{- 3}$ $m^{2}$
-E. $7.4\times10^{-3}~\mathrm{m}^{2}$ Ans: D
+E. $7.4\times10^{-3}~\mathrm{m}^{2}$ 
+Ans: D
 
 23. A cubicbox with an edge of exactly 1cmhas a volume of
 A. $10^{-9}\mathrm{m}^{3}$
@@ -195,14 +205,24 @@ A. m$\cdot s^{2}$ ： m$\cdot s^{c}$
 B. $\mathrm{s}^{3}/$m : $\mathrm{s} ^{4}/$m
 C. m/ $s^{2}$ m/ $s^{3}$
 D. m/ $s^{3}$ m/ $s^{4}$
-E. m/ $s^{4}$ m/ $s^5$ Ans: D
+E. m/ $s^{4}$ m/ $s^5$ 
+Ans: D
 
-27. Suppose $A=BC$ ，where $A$ has the dimension L/M and $C$ has the dimension L/T. Then $B$ has the dimension:
+27. Suppose $A=BC$, where $A$ has the dimension L/M and $C$ has the dimension L/T. Then $B$ has the dimension:
 A. T/M
-B. $L^{2}$/ TM 1 $\mathrm{M/L^{2}}^{r}.$ Ans: A
+B. $L^{2}/TM$
+C. $TM/L^{2}$
+D. $L^{2}/TM$
+E. $M/L^{2}T$
+ans: A
 
-28. Suppose $A$ = $B^{n}C^{m}$ ，where $A$ has dimensions LT, $B$ has dimensions $\mathrm{L}^{2}\mathrm{T}^{-1}$ ，and $U$ has dimensions $LT^{2}$ .Then the exponents 772 and 711 have the values:
-A. 2/3; 1/3 Ce游-1/5 Ans: D
+28. Suppose $A = B^{n}C^{m}$, where $A$ has dimensions LT, $B$ has dimensions $\mathrm{L}^{2}\mathrm{T}^{-1}$, and $C$ has dimensions $LT^{2}$. Then the exponents $n$ and $m$ have the values:
+A. 2/3; 1/3
+B. 2; 3
+C. 4/5; -1/5
+D. 1/5; 3/5
+E. 1/2; 1/2
+ans: D
 
 
 ### Chapter 2: MOTION ALONG A STRAIGHT LINE
