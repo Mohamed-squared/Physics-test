@@ -1367,75 +1367,77 @@ function startTimer() {
 }
 
 function displayCurrentQuestion() {
-     if (!currentOnlineTestState) return; // Safety check
+    if (!currentOnlineTestState) return; // Safety check
 
     const index = currentOnlineTestState.currentQuestionIndex;
     const question = currentOnlineTestState.questions[index];
     const container = document.getElementById('question-container');
     const totalQuestions = currentOnlineTestState.questions.length;
 
-     if (!question || !container) {
-         console.error("Could not display question - missing question data or container element.");
-         return;
-     }
+    if (!question || !container) {
+        console.error("Could not display question - missing question data or container element.");
+        return;
+    }
 
     // Generate options HTML dynamically from the parsed options
     let optionsHtml = (question.options || []).map(opt => {
-         // Replace markdown newlines with <br> for HTML display in options
-         const optionTextHtml = opt.text.replace(/\n/g, '<br>');
-        return `
-        <label class="flex items-start space-x-3 p-3 border dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
-            <input type="radio" name="mcqOption" value="${opt.letter}" class="h-5 w-5 text-primary-600 focus:ring-primary-500 border-gray-300 dark:bg-gray-700 dark:border-gray-600 mt-1 shrink-0"
-                   ${currentOnlineTestState.userAnswers[question.id] === opt.letter ? 'checked' : ''}
-                   onchange="recordAnswer('${question.id}', this.value)">
-             <div class="flex items-baseline">
-                <span class="font-medium w-6 text-right mr-2">${opt.letter}.</span>
-                 {/* Use a div for option text to allow block elements like <br> */}
-                 <div class="flex-1 option-text-container" id="option-text-${opt.letter}">${optionTextHtml}</div> {/* Render LaTeX here */}
-             </div>
-        </label>
-        `
-    }).join('');
-
-     if (!question.options || question.options.length === 0) {
-         optionsHtml = '<p class="text-sm text-yellow-600 dark:text-yellow-400">(No multiple choice options found for this question)</p>';
-     }
-
-    container.innerHTML = `
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg mb-4 animate-fade-in">
-            <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">Chapter ${question.chapter} - Question ${question.number}</p>
-            {/* Use prose for question text formatting */}
-            <div class="prose dark:prose-invert max-w-none mb-6" id="question-text-area">
-                 ${question.text} {/* KaTeX will render this */}
-                 ${question.image ? `<img src="${question.image}" alt="Question Image" class="max-w-full h-auto mx-auto my-4 border dark:border-gray-600 rounded">` : ''}
+        // Replace markdown newlines with <br> for HTML display in options
+        const optionTextHtml = opt.text.replace(/\n/g, '<br>');
+       return `
+       <label class="flex items-start space-x-3 p-3 border dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
+           <input type="radio" name="mcqOption" value="${opt.letter}" class="h-5 w-5 text-primary-600 focus:ring-primary-500 border-gray-300 dark:bg-gray-700 dark:border-gray-600 mt-1 shrink-0"
+                  ${currentOnlineTestState.userAnswers[question.id] === opt.letter ? 'checked' : ''}
+                  onchange="recordAnswer('${question.id}', this.value)">
+            <div class="flex items-baseline">
+               <span class="font-medium w-6 text-right mr-2">${opt.letter}.</span>
+                {/* Use a div for option text to allow block elements like <br> */}
+                {/* REMOVED COMMENT PLACEHOLDER FROM HERE vvv */}
+                <div class="flex-1 option-text-container" id="option-text-${opt.letter}">${optionTextHtml}</div>
             </div>
-            <div class="space-y-3">
-                ${optionsHtml}
-            </div>
-        </div>
-    `;
+       </label>
+       `
+   }).join('');
 
-    // Update navigation buttons and counter
-    document.getElementById('question-counter').textContent = `Question ${index + 1} / ${totalQuestions}`;
-    document.getElementById('prev-btn').disabled = (index === 0);
-    if (index === totalQuestions - 1) {
-        document.getElementById('next-btn').classList.add('hidden');
-        document.getElementById('submit-btn').classList.remove('hidden');
-    } else {
-        document.getElementById('next-btn').classList.remove('hidden');
-        document.getElementById('submit-btn').classList.add('hidden');
+    if (!question.options || question.options.length === 0) {
+        optionsHtml = '<p class="text-sm text-yellow-600 dark:text-yellow-400">(No multiple choice options found for this question)</p>';
     }
 
-    // Render LaTeX after content update
-    requestAnimationFrame(() => {
-         renderLatexInElement(document.getElementById('question-text-area'));
-         (question.options || []).forEach(opt => {
-             const optElement = document.getElementById(`option-text-${opt.letter}`);
-             if (optElement) {
-                 renderLatexInElement(optElement);
-             }
-         });
-    });
+   container.innerHTML = `
+       <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg mb-4 animate-fade-in">
+           <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">Chapter ${question.chapter} - Question ${question.number}</p>
+           {/* Use prose for question text formatting */}
+           <div class="prose dark:prose-invert max-w-none mb-6" id="question-text-area">
+                {/* REMOVED COMMENT PLACEHOLDER FROM HERE vvv */}
+                ${question.text}
+                ${question.image ? `<img src="${question.image}" alt="Question Image" class="max-w-full h-auto mx-auto my-4 border dark:border-gray-600 rounded">` : ''}
+           </div>
+           <div class="space-y-3">
+               ${optionsHtml}
+           </div>
+       </div>
+   `;
+
+   // Update navigation buttons and counter
+   document.getElementById('question-counter').textContent = `Question ${index + 1} / ${totalQuestions}`;
+   document.getElementById('prev-btn').disabled = (index === 0);
+   if (index === totalQuestions - 1) {
+       document.getElementById('next-btn').classList.add('hidden');
+       document.getElementById('submit-btn').classList.remove('hidden');
+   } else {
+       document.getElementById('next-btn').classList.remove('hidden');
+       document.getElementById('submit-btn').classList.add('hidden');
+   }
+
+   // Render LaTeX after content update
+   requestAnimationFrame(() => {
+        renderLatexInElement(document.getElementById('question-text-area'));
+        (question.options || []).forEach(opt => {
+            const optElement = document.getElementById(`option-text-${opt.letter}`);
+            if (optElement) {
+                renderLatexInElement(optElement);
+            }
+        });
+   });
 }
 
 
