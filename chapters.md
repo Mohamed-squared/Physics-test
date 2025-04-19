@@ -1,14 +1,15 @@
+
 ### Chapter 1:MEASUREMENT
 
-1.The SI standard of time is based on:
-A.the daily rotation of the earth
-B.the frequency of light emitted by $\mathrm{Kr}^{86}$
-C.the yearly revolution of the earth about the sun
-D.a precision pendulum clock
-E.none of these
+1. The SI standard of time is based on:
+A. the daily rotation of the earth
+B. the frequency of light emitted by $\mathrm{Kr}^{86}$
+C. the yearly revolution of the earth about the sun
+D. a precision pendulum clock
+E. none of these
 ans: E
 
-2.A nanosecond is:
+2. A nanosecond is:
 A. $10^{9}$ s
 B. $10^{-9}$ s
 C. $10^{-10}$ s
@@ -16,12 +17,12 @@ D. $10^{-10}$ s
 E. $10^{-12}$ s
 ans: B
 
-3.The SI standard of length is based on:
-A.the distance from the north pole to the equator along a meridian passing through Paris
-B.wavelength of light emitted by $\mathrm{Hg}^{198}$
-C.wavelength of light emitted by $Kr^{86}$
-D.a precision meter stick in Paris
-E.the speed of light
+3. The SI standard of length is based on:
+A. the distance from the north pole to the equator along a meridian passing through Paris
+B. wavelength of light emitted by $\mathrm{Hg}^{198}$
+C. wavelength of light emitted by $Kr^{86}$
+D. a precision meter stick in Paris
+E. the speed of light
 ans: E
 
 4.In 1866, the U. S. Congress defined the U. S.yard as exactly 3600/3937 international meter. This was done primarily because:
