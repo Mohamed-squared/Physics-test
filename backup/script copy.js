@@ -1,12 +1,9 @@
 const DATA_KEY = 'test_generator_data_v2'; // Changed key for new structure
-const PDF_GENERATION_OPTIONS = {
-    margin:       1.5, // Margin in cm
-    filename:     'exam.pdf', // Default filename, will be updated
-    image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2, useCORS: true, logging: false }, // Improve quality, allow cross-origin images if needed
-    jsPDF:        { unit: 'cm', format: 'a4', orientation: 'portrait' },
-    pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] } // Better page breaking
-};
+// Remove usedQuestions - selection logic will handle this
+// const usedQuestions = { ... };
+
+// --- Configuration ---
+// REPLACE WITH THE RAW URL OF YOUR MARKDOWN FILE ON GITHUB
 const MARKDOWN_FILE_URL = 'chapters.md';
 const LATEX_PDF_HEADER = `\\documentclass[12pt]{article}
 \\usepackage{enumitem} % For customizing list labels
@@ -465,12 +462,17 @@ function parseChaptersFromMarkdown(mdContent) {
 // --- (updateChaptersFromMarkdown remains the same as before) ---
 
 function extractQuestionsFromMarkdown(mdContent, selectedQuestionsMap) {
+    // selectedQuestionsMap = { "chapterNumString": [qNumInt1, qNumInt2], ... }
     const extracted = {
-        questions: [], // { id, chapter, number, text, options: [{letter: 'A', text: '...'}], image, answer }
+        questions: [], // { id, chapter, number, text, image, answer } <- Storing answer here temporarily
         answers: {}    // { "c<chapter>q<question>": "A", ... }
     };
-    if (!markdownContentCache || !selectedQuestionsMap || Object.keys(selectedQuestionsMap).length === 0) {
-        console.error("Markdown content or selection map invalid for extraction.");
+    if (!markdownContentCache) { // Use the global cache
+        console.error("Markdown content cache is empty in extractQuestionsFromMarkdown");
+        return extracted;
+    }
+    if (!selectedQuestionsMap || Object.keys(selectedQuestionsMap).length === 0) {
+         console.error("selectedQuestionsMap is empty or invalid");
         return extracted;
     }
 
@@ -478,145 +480,117 @@ function extractQuestionsFromMarkdown(mdContent, selectedQuestionsMap) {
 
     const lines = markdownContentCache.split('\n');
     let currentChapter = null;
-    let currentQuestion = null; // Holds { number, textLines: [], options: [], answerLine: null }
-    let processingState = 'seeking_chapter'; // 'seeking_chapter', 'seeking_question', 'in_question_text', 'in_options', 'found_answer'
+    let currentQuestionNumber = null;
+    let currentQuestionLines = [];
+    let inQuestion = false;
 
+    // Regex needs to match the actual chapter headings in *this* file
     const chapterRegex = /^###\s+Chapter\s+(\d+):?.*?$/i;
-    const questionStartRegex = /^\s*(\d+)\s*[\.\)]\s*(.*)/;
-    // Regex for options: Optional leading space, A-E (case-insensitive), . or ), space, then text. Captures letter and text.
-    const optionRegex = /^\s*([A-Ea-e])[\.\)]\s+(.*)/;
-     // Regex for answer: Flexible, looks for "ans:" or "answer:" potentially at the end of a line. Captures preceding text and answer letter.
-     const answerRegex = /^(.*?(?:ans|answer)\s*:\s*([a-zA-Z\d]))(?:\s+.*)?$/i;
-    const imageRegex = /!\[(.*?)\]\((.*?)\)/; // Basic Markdown image
+     // Regex to find the start of a question (number. or number) )
+     const questionStartRegex = /^\s*(\d+)\s*[\.\)]\s*(.*)/;
+     // Regex to find the answer line - more robust to capture only the letter/number
+     // Allows optional leading/trailing text as long as "ans:" or "answer:" is present
+     const answerRegex = /^(.*?)(?:ans|answer)\s*:\s*([a-zA-Z\d])(?:\s+.*)?$/i;
+     const imageRegex = /!\[(.*?)\]\((.*?)\)/; // Basic Markdown image
 
     function finalizeQuestion() {
-        if (currentQuestion && currentChapter) {
-            const questionId = `c${currentChapter}q${currentQuestion.number}`;
-            let fullText = currentQuestion.textLines.join('\n').trim();
+        if (inQuestion && currentChapter && currentQuestionNumber) {
+            let combinedText = currentQuestionLines.join('\n').trim();
             let answer = null;
+            let cleanText = combinedText; // Start with full text
 
-             // Extract answer from the stored answer line if it exists
-            if (currentQuestion.answerLine) {
-                 const answerMatch = currentQuestion.answerLine.match(answerRegex);
-                 if (answerMatch) {
-                     answer = answerMatch[2].toUpperCase();
-                 }
-             }
-
-            // Remove answer line from the main text if it was appended there accidentally
-            if (currentQuestion.answerLine && fullText.endsWith(currentQuestion.answerLine)) {
-                 fullText = fullText.substring(0, fullText.length - currentQuestion.answerLine.length).trim();
+            // Check if the *last line* contains the answer pattern
+            if (currentQuestionLines.length > 0) {
+                const lastLine = currentQuestionLines[currentQuestionLines.length - 1].trim();
+                const answerMatch = lastLine.match(answerRegex);
+                if (answerMatch) {
+                    // Extract the answer letter/digit
+                    answer = answerMatch[2].toUpperCase();
+                    // Remove the matched answer part (and potentially preceding text on the same line)
+                    // from the *last line* before rejoining.
+                    // This is safer than removing the whole last line.
+                    currentQuestionLines[currentQuestionLines.length - 1] = answerMatch[1].trim(); // Keep text before "ans:"
+                    cleanText = currentQuestionLines.join('\n').trim();
+                }
             }
 
-            // Extract image
-            const imageMatch = fullText.match(imageRegex);
+            const questionId = `c${currentChapter}q${currentQuestionNumber}`;
+            const imageMatch = cleanText.match(imageRegex);
             const imageUrl = imageMatch ? imageMatch[2] : null;
-            // Optional: Remove image markdown from text if you only want to display it via the image property
-            // fullText = fullText.replace(imageRegex, '').trim();
 
             extracted.questions.push({
                 id: questionId,
-                chapter: currentChapter,
-                number: currentQuestion.number,
-                text: fullText,
-                options: currentQuestion.options, // Array of {letter: 'A', text: '...'}
+                chapter: currentChapter, // string
+                number: currentQuestionNumber, // number
+                text: cleanText,
                 image: imageUrl,
-                answer: answer // Store answer found via regex
+                answer: answer // Temporarily store answer with question data
             });
-            // console.log(`Finalized Q: ${questionId}`, currentQuestion);
-
-            // Store answer separately as well
-            if (answer) {
-                 extracted.answers[questionId] = answer;
-            }
+            // console.log(`Extracted Q: ${questionId} (Ch: ${currentChapter}, Num: ${currentQuestionNumber}), Answer: ${answer}`);
         }
-        currentQuestion = null; // Reset for next question
+        // Reset for next potential question
+        inQuestion = false;
+        currentQuestionLines = [];
+        // Keep currentChapter, reset currentQuestionNumber
+        currentQuestionNumber = null;
     }
 
-    for (const line of lines) {
-        const trimmedLine = line.trim();
+
+    for (let i = 0; i < lines.length; i++) {
+         const line = lines[i];
+         const trimmedLine = line.trim();
+
         const chapterMatch = trimmedLine.match(chapterRegex);
-        const questionMatch = line.match(questionStartRegex); // Use original line for question start
-        const optionMatch = trimmedLine.match(optionRegex);
-        const answerMatch = trimmedLine.match(answerRegex); // Check every line for the answer pattern
-
         if (chapterMatch) {
-            finalizeQuestion(); // Finalize previous question before switching chapter
-            currentChapter = chapterMatch[1];
-            processingState = 'seeking_question';
+            finalizeQuestion(); // Finalize any question from the previous chapter
+            currentChapter = chapterMatch[1]; // This is a string
             // console.log(`--> Switched to Chapter ${currentChapter}`);
-            continue;
+            continue; // Move to next line, don't process chapter header as question content
         }
 
-        if (processingState === 'seeking_chapter') continue; // Skip lines before first chapter
+         if (currentChapter === null) continue; // Skip lines before the first chapter header
 
+        const questionMatch = line.match(questionStartRegex); // Match against original line to preserve indentation maybe?
         if (questionMatch) {
-            finalizeQuestion(); // Finalize previous question
+            // Found a potential start of a new question
+            finalizeQuestion(); // Finalize the previous question first
+
             const qNum = parseInt(questionMatch[1], 10);
-            const firstLineText = questionMatch[2].trim(); // Text on the first line of the question
+            const firstLineText = questionMatch[2].trim();
 
-            const chapterKey = String(currentChapter);
+            // Check if this chapter and question number are needed
+            const chapterKey = String(currentChapter); // Ensure we use string key for lookup
             if (selectedQuestionsMap[chapterKey] && selectedQuestionsMap[chapterKey].includes(qNum)) {
-                // Start processing this selected question
-                currentQuestion = {
-                    number: qNum,
-                    textLines: [firstLineText], // Start with text from the first line
-                    options: [],
-                    answerLine: null // Reset answer line
-                };
-                processingState = 'in_question_text'; // Assume text first, then options
-                // console.log(`--> Starting selected question: Ch ${chapterKey} Q ${qNum}`);
+                 // console.log(`--> Starting selected question: Ch ${chapterKey} Q ${qNum}`);
+                 inQuestion = true;
+                 currentQuestionNumber = qNum;
+                 currentQuestionLines.push(line.trim()); // Add the first line (already trimmed somewhat)
             } else {
-                // It's a question, but not one we need, ignore until next question/chapter
-                processingState = 'seeking_question';
-                currentQuestion = null;
+                 // This line starts a question, but not one we selected
+                 inQuestion = false;
             }
-            continue; // Move to next line
-        }
-
-        // --- Processing lines *within* a selected question ---
-        if (currentQuestion) {
-             if (answerMatch && !optionMatch) { // Make sure it's not an option line formatted like 'Ans: A...'
-                 // Found the answer line, store it and stop adding lines to text/options
-                 currentQuestion.answerLine = trimmedLine;
-                 processingState = 'found_answer';
-                 // console.log(`Found answer line for Q${currentQuestion.number}: ${trimmedLine}`);
-                 // Don't continue yet, let finalizeQuestion handle it later
-                 // If the answer is the *very last* thing for the question, it will be finalized
-                 // when the next question or chapter starts, or at the end of the file.
-             } else if (optionMatch && processingState !== 'found_answer') {
-                // Found an option line
-                processingState = 'in_options'; // Switch state
-                currentQuestion.options.push({
-                    letter: optionMatch[1].toUpperCase(),
-                    text: optionMatch[2].trim()
-                });
-                 // console.log(`  Added option ${optionMatch[1]} for Q${currentQuestion.number}`);
-             } else if (trimmedLine.length > 0 && processingState !== 'found_answer') {
-                // Regular line of text belonging to the question or potentially multi-line option
-                if (processingState === 'in_options' && currentQuestion.options.length > 0) {
-                     // Append to the *last* option's text (for multi-line options)
-                     const lastOption = currentQuestion.options[currentQuestion.options.length - 1];
-                     lastOption.text += '\n' + line; // Preserve original spacing if needed? Or just trimmed? Let's try raw line.
-                 } else {
-                     // Append to question text
-                     processingState = 'in_question_text'; // Ensure state is correct
-                     currentQuestion.textLines.push(line); // Add raw line to preserve formatting
-                 }
-             } else if (trimmedLine.length === 0 && processingState !== 'found_answer') {
-                 // Allow blank lines within question text, but not if we found answer
-                 if (processingState === 'in_question_text') {
-                     currentQuestion.textLines.push(''); // Keep blank line
-                 }
-                 // Ignore blank lines if in options maybe? Or append to last option? Let's ignore for now.
+        } else if (inQuestion) {
+            // This line is part of the currently processed question
+            // Don't add blank lines unless intended (e.g., for code blocks)
+             if (trimmedLine.length > 0 || line.length > 0) { // Add line even if only whitespace, might be intended format
+               currentQuestionLines.push(line); // Preserve original spacing/indentation
              }
         }
     }
-    finalizeQuestion(); // Finalize the very last question
+    finalizeQuestion(); // Finalize the very last question after the loop
+
+     // Separate answers into the answers map
+     extracted.questions.forEach(q => {
+         if (q.answer) {
+             extracted.answers[q.id] = q.answer;
+         }
+         // delete q.answer; // Remove temporary answer storage from question object
+     });
 
     console.log(`Extraction finished. Found ${extracted.questions.length} questions.`);
-    // console.log("Sample Extracted Question:", JSON.stringify(extracted.questions[0], null, 2));
-    // console.log("Answers Map:", extracted.answers);
+    if (extracted.questions.length === 0 && Object.keys(selectedQuestionsMap).length > 0) {
+         console.error("Extraction failed: No questions extracted despite selection map.");
+    }
     return extracted;
 }
 
@@ -1085,225 +1059,193 @@ function promptTestType(mode, selectedChapters = null) {
     displayContent(html);
 }
 
-async function startTestGeneration(mode, selectedChapters, testType) { // Make async
-    showLoading(`Generating ${testType === 'online' ? 'Online' : 'Test Files'}...`);
-    // Use setTimeout to allow loading UI to render before potentially heavy processing
-    await new Promise(resolve => setTimeout(resolve, 100));
+function startTestGeneration(mode, selectedChapters, testType) {
+     showLoading(`Generating ${testType === 'online' ? 'Online' : 'PDF'} Test...`);
+     setTimeout(async () => { // Use async for potential await inside
+         let relevantChapters = {};
+         if (mode === 'studied') {
+             const studied = currentSubject.studied_chapters || [];
+             studied.forEach(chapNum => {
+                 if (currentSubject.chapters[chapNum]) relevantChapters[chapNum] = currentSubject.chapters[chapNum];
+             });
+         } else if (mode === 'specific' && selectedChapters) {
+             selectedChapters.forEach(chapNum => {
+                 if (currentSubject.chapters[chapNum]) relevantChapters[chapNum] = currentSubject.chapters[chapNum];
+             });
+         }
 
-    let relevantChapters = {};
-    if (mode === 'studied') {
-        const studied = currentSubject.studied_chapters || [];
-        studied.forEach(chapNum => {
-            if (currentSubject.chapters[chapNum]) relevantChapters[chapNum] = currentSubject.chapters[chapNum];
-        });
-    } else if (mode === 'specific' && selectedChapters) {
-        selectedChapters.forEach(chapNum => {
-            if (currentSubject.chapters[chapNum]) relevantChapters[chapNum] = currentSubject.chapters[chapNum];
-        });
-    }
+          if (Object.keys(relevantChapters).length === 0) {
+             hideLoading();
+             displayContent('<p class="text-red-500">Error: No relevant chapters found for test generation.</p>');
+             return;
+         }
 
-    if (Object.keys(relevantChapters).length === 0) {
-        hideLoading();
-        displayContent('<p class="text-red-500">Error: No relevant chapters found for test generation.</p>');
-        return;
-    }
+         const totalQuestionsForTest = currentSubject.max_questions_per_test || 42;
+         const allocation = allocateQuestions(relevantChapters, totalQuestionsForTest);
+         const totalAllocated = Object.values(allocation).reduce((a,b) => a+b, 0);
 
-    const totalQuestionsForTest = currentSubject.max_questions_per_test || 42;
-    const allocation = allocateQuestions(relevantChapters, totalQuestionsForTest);
-    const totalAllocated = Object.values(allocation).reduce((a,b) => a+b, 0);
+          if (totalAllocated === 0) {
+              hideLoading();
+              displayContent(`<p class="text-red-500">Error: Could not allocate any questions based on the selected chapters and difficulty. There might be no questions available or all chapters have zero weight.</p>`);
+              return;
+          }
 
-    if (totalAllocated === 0) {
-        hideLoading();
-        displayContent(`<p class="text-red-500">Error: Could not allocate any questions based on the selected chapters and difficulty. There might be no questions available or all chapters have zero weight.</p>`);
-        return;
-    }
+         console.log("Allocation:", allocation);
 
-    console.log("Allocation:", allocation);
+         const selectedQuestionsMap = {}; // { chapNum: [q1, q2], ... }
+         let allocationDetails = "";
+         for (const chapNum in allocation) {
+             const n = allocation[chapNum];
+             if (n > 0) {
+                 const questions = selectNewQuestionsAndUpdate(currentSubject.chapters[chapNum], n);
+                 if (questions.length > 0) {
+                    selectedQuestionsMap[chapNum] = questions;
+                    allocationDetails += `<p>Chapter ${chapNum}: ${questions.length} questions - IDs: ${questions.join(', ')}</p>`;
+                 } else {
+                      allocationDetails += `<p>Chapter ${chapNum}: 0 questions selected (requested ${n}, none available/selected).</p>`;
+                 }
+             }
+         }
 
-    const selectedQuestionsMap = {}; // { chapNum: [q1, q2], ... }
-    let allocationDetails = "";
-    for (const chapNum in allocation) {
-        const n = allocation[chapNum];
-        if (n > 0) {
-            // Select questions AND update chapter's available list
-            const questionsSelected = selectNewQuestionsAndUpdate(currentSubject.chapters[chapNum], n);
-            if (questionsSelected.length > 0) {
-                selectedQuestionsMap[chapNum] = questionsSelected;
-                allocationDetails += `<p>Chapter ${chapNum}: ${questionsSelected.length} questions selected.</p>`; // IDs removed for brevity
-            } else {
-                allocationDetails += `<p>Chapter ${chapNum}: 0 questions selected (requested ${n}, none available/selected).</p>`;
-            }
-        }
-    }
+         const examId = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 16);
 
-    // Re-check total actually selected, could be less if chapters ran out
-    const actualTotalSelected = Object.values(selectedQuestionsMap).reduce((sum, arr) => sum + arr.length, 0);
-    if (actualTotalSelected === 0) {
-         hideLoading();
-         displayContent(`<p class="text-red-500">Error: No questions could be selected from the available pool for the allocated chapters.</p>`);
-         // NOTE: Should we revert the changes made by selectNewQuestionsAndUpdate?
-         // This is complex. For now, the state reflects the *attempt* to select.
-         saveData(data); // Save the (potentially emptied) available_questions lists
-         return;
-    }
+         if (testType === 'online') {
+             // --- Generate Online Test ---
+             if (!markdownContentCache) {
+                 hideLoading();
+                 displayContent('<p class="text-red-500">Error: Markdown content not available for online test.</p>');
+                 return;
+             }
+             const { questions, answers } = extractQuestionsFromMarkdown(markdownContentCache, selectedQuestionsMap);
 
-
-    const examId = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 16);
-
-    // Extract full question data using the improved parser
-    if (!markdownContentCache) {
-        hideLoading();
-        displayContent('<p class="text-red-500">Error: Markdown content cache is empty, cannot extract questions.</p>');
-        return;
-    }
-    const { questions: extractedQuestionsData, answers } = extractQuestionsFromMarkdown(markdownContentCache, selectedQuestionsMap);
-
-    if (extractedQuestionsData.length !== actualTotalSelected) {
-         console.warn(`Allocation resulted in ${actualTotalSelected} questions, but extraction found ${extractedQuestionsData.length}. There might be parsing issues.`);
-         // Proceed with extracted data, but log the warning.
-    }
-    if (extractedQuestionsData.length === 0) {
-        hideLoading();
-        displayContent('<p class="text-red-500">Error: Failed to extract any questions from the Markdown file based on the allocation. Check parsing logic and Markdown format.</p>');
-        saveData(data); // Save updated availability even if extraction failed? Or revert? Let's save.
-        return;
-    }
+             if (questions.length === 0) {
+                 hideLoading();
+                 displayContent('<p class="text-red-500">Error: Failed to extract any questions for the online test from the Markdown file based on the allocation.</p>');
+                 return;
+             }
+              if (questions.length !== totalAllocated) {
+                   console.warn(`Online Test: Allocated ${totalAllocated} questions, but extracted ${questions.length}. There might be issues with question parsing or selection.`);
+               }
 
 
-    if (testType === 'online') {
-        // --- Generate Online Test ---
-        const allMcq = extractedQuestionsData.every(q => answers[q.id]); // Check if all have answers
-        if (!allMcq) {
-            hideLoading();
-            displayContent('<p class="text-red-500">Error: Online testing currently only supports questions with clear answers (e.g., "ans: A"). Some selected questions seem to be missing answers.</p>');
-            // Consider reverting available questions here if needed.
-            saveData(data); // Save state
-            return;
-        }
-
-        currentOnlineTestState = {
-            examId: examId,
-            questions: extractedQuestionsData, // Array of {id, chapter, number, text, options, image}
-            correctAnswers: answers, // { "c1q5": "A", ... }
-            userAnswers: {},
-            allocation: allocation, // Original allocation plan
-            startTime: Date.now(),
-            timerInterval: null,
-            currentQuestionIndex: 0
-        };
-
-        saveData(data); // Save updated available_questions
-        hideLoading();
-        launchOnlineTestUI();
-
-    } else {
-        // --- Generate PDF Test ---
-
-        // 1. Generate HTML content for PDF
-        const { questionHtml, solutionHtml } = generatePdfHtml(examId, extractedQuestionsData);
-
-        // 2. Add to pending exams in data structure
-        currentSubject.pending_exams.push({
-            id: examId,
-            allocation: selectedQuestionsMap, // Store the *actual* selected map, not just counts
-            results_entered: false
-        });
-
-        // 3. Save updated data (available_questions removal and pending exam)
-        saveData(data);
-
-        // 4. Display download buttons and trigger PDF generation
-        const questionsPdfFilename = `Exam_${examId}`;
-        const solutionsPdfFilename = `SolutionManual_${examId}`;
-        const questionsTexFilename = `Exam_${examId}.tex`;
-        const solutionsTexFilename = `SolutionManual_${examId}.tex`;
-
-         // Generate .tex source as fallback/option
-        const { questionsTex, solutionsTex } = generateTexSource(examId, extractedQuestionsData); // You need to create this function if you keep .tex option
-
-        displayContent(`
-           <div class="bg-blue-100 dark:bg-blue-900/30 border-l-4 border-blue-500 text-blue-700 dark:text-blue-300 p-4 rounded-md mb-4">
-               <p class="font-medium">PDF Test Files Ready</p>
-               <p>Exam ID: ${examId}</p>
-               <p>Total Questions: ${actualTotalSelected}</p>
-           </div>
-           <div class="space-y-3">
-               <button id="download-pdf-q" class="w-full btn-primary">
-                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
-                   Download Questions PDF
-               </button>
-               <button id="download-pdf-s" class="w-full btn-primary">
-                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
-                   Download Solutions PDF
-               </button>
-               <button onclick="downloadTexFile('${questionsTexFilename}', \`${btoa(unescape(encodeURIComponent(questionsTex)))}\`)" class="w-full btn-secondary">
-                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>
-                   Download Questions .tex (Source)
-               </button>
-                <button onclick="downloadTexFile('${solutionsTexFilename}', \`${btoa(unescape(encodeURIComponent(solutionsTex)))}\`)" class="w-full btn-secondary">
-                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>
-                   Download Solutions .tex (Source)
-               </button>
-           </div>
-           <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">This exam has been added to the pending exams list. Enter results manually once completed using the Exams Dashboard.</p>
-           <div class="mt-4 text-sm text-gray-600 dark:text-gray-400">${allocationDetails}</div>
-        `);
-
-        // Add event listeners to trigger PDF generation *after* the buttons are in the DOM
-        document.getElementById('download-pdf-q').addEventListener('click', () => generateAndDownloadPdf(questionHtml, questionsPdfFilename));
-        document.getElementById('download-pdf-s').addEventListener('click', () => generateAndDownloadPdf(solutionHtml, solutionsPdfFilename));
-
-        hideLoading(); // Hide loading indicator *after* setting up the UI
-    }
-}
-
-function generateTexSource(examId, questions) {
-    let questionsTex = `${LATEX_PDF_HEADER}\\section*{Exam: ${examId.replace(/_/g, '\\_')}}\n\\begin{enumerate}[label=\\arabic*.]\n`;
-    let solutionsTex = `${LATEX_PDF_HEADER}\\section*{Solutions: ${examId.replace(/_/g, '\\_')}}\n\\begin{enumerate}[label=\\arabic*.]\n`;
-    let questionCounter = 0;
-
-    // Sort questions by chapter then number for consistent order
-     questions.sort((a, b) => {
-         const chapDiff = parseInt(a.chapter) - parseInt(b.chapter);
-         if (chapDiff !== 0) return chapDiff;
-         return a.number - b.number;
-     });
-
-    for (const q of questions) {
-        questionCounter++;
-        // Extract *full* raw text including options and answer for TeX source
-        // This requires fetching the original block from markdown cache again.
-        // Simpler approach for now: Reconstruct from parsed data (might lose original formatting)
-        let rawQuestionText = `${q.number}. ${q.text}\n`;
-        if (q.image) rawQuestionText += `![Image](${q.image})\n`; // Basic image representation
-        (q.options || []).forEach(opt => {
-            rawQuestionText += `${opt.letter}. ${opt.text}\n`;
-        });
-        if (q.answer) rawQuestionText += `ans: ${q.answer}\n`;
+             // Check if all extracted questions have answers (assuming MCQ)
+             const allMcq = questions.every(q => answers[q.id]);
+             if (!allMcq) {
+                  hideLoading();
+                  displayContent('<p class="text-red-500">Error: Online testing currently only supports questions with clear answers (e.g., "ans:A") in the Markdown. Some selected questions seem to be missing answers.</p>');
+                  // Optionally revert available questions? Complex.
+                  return;
+              }
 
 
-        // Basic processing for LaTeX compatibility (very simplistic)
-        let processedQText = rawQuestionText
-           .replace(/&/g, '\\&')
-           .replace(/%/g, '\\%')
-           .replace(/_/g, '\\_')
-           .replace(/#/g, '\\#')
-           .replace(/\*\*(.*?)\*\*/g, '\\textbf{$1}') // Bold
-           .replace(/\*(.*?)\*/g, '\\textit{$1}')   // Italic
-           .replace(/!\[.*?\]\((.*?)\)/g, '\n\\begin{center}\\includegraphics[width=0.6\\textwidth]{$1}\\end{center}\n'); // Image
+             currentOnlineTestState = {
+                 examId: examId,
+                 questions: questions, // Array of {id, chapter, number, text, image}
+                 correctAnswers: answers, // { "c1q5": "A", ... }
+                 userAnswers: {}, // { "c1q5": "B", ... }
+                 allocation: allocation, // Original allocation {chap: count}
+                 startTime: Date.now(),
+                 timerInterval: null,
+                 currentQuestionIndex: 0
+             };
 
-        // Find and separate the answer part for the questions file
-        const answerRegexPdf = /(\n\s*(?:ans|answer)[:\s]+[a-zA-Z\d]+\s*)$/im; // Multi-line flag
-        let questionOnlyText = processedQText.replace(answerRegexPdf, '');
-        let solutionText = processedQText; // Keep answer for solutions
+             saveData(data); // Save updated available_questions
+             hideLoading();
+             launchOnlineTestUI();
 
-        questionsTex += `\\item ${questionOnlyText}\n\n`;
-        solutionsTex += `\\item ${solutionText}\n\n`;
-    }
+         } else {
+             // --- Generate PDF Test (.tex files) ---
+              if (!markdownContentCache) {
+                 hideLoading();
+                 displayContent('<p class="text-red-500">Error: Markdown content not available for PDF generation.</p>');
+                 return;
+             }
 
-    questionsTex += `\\end{enumerate}\n${LATEX_PDF_FOOTER}`;
-    solutionsTex += `\\end{enumerate}\n${LATEX_PDF_FOOTER}`;
-    return { questionsTex, solutionsTex };
+             let questionsTex = `${LATEX_PDF_HEADER}\\section*{Exam: ${examId.replace(/_/g, '\\_')}}\n\\begin{enumerate}[label=\\arabic*.]\n`;
+             let solutionsTex = `${LATEX_PDF_HEADER}\\section*{Solutions: ${examId.replace(/_/g, '\\_')}}\n\\begin{enumerate}[label=\\arabic*.]\n`;
+             let questionCounter = 0;
+
+             // Iterate through selected questions preserving order somewhat
+            const sortedChapters = Object.keys(selectedQuestionsMap).sort((a, b) => parseInt(a) - parseInt(b));
+
+             for (const chapNum of sortedChapters) {
+                  const questionNumbers = selectedQuestionsMap[chapNum].sort((a,b) => a - b);
+                   for (const qNum of questionNumbers) {
+                       questionCounter++;
+                       const fullQText = extractFullQuestionTextForPdf(markdownContentCache, chapNum, qNum);
+
+                       if (!fullQText) {
+                           console.warn(`Could not extract text for Chapter ${chapNum}, Question ${qNum}`);
+                           questionsTex += `\\item [Question ${questionCounter} from Ch. ${chapNum}, Q.${qNum} - Error loading text]\n`;
+                           solutionsTex += `\\item [Question ${questionCounter} from Ch. ${chapNum}, Q.${qNum} - Error loading text]\n`;
+                           continue;
+                       }
+
+                       // Basic processing for LaTeX compatibility (very simplistic)
+                       // Need a more robust Markdown-to-LaTeX converter for complex content
+                       let processedQText = fullQText
+                           .replace(/&/g, '\\&')
+                           .replace(/%/g, '\\%')
+                           .replace(/_/g, '\\_')
+                           .replace(/#/g, '\\#')
+                           // Handle basic bold/italic - simplistic
+                           .replace(/\*\*(.*?)\*\*/g, '\\textbf{$1}')
+                           .replace(/\*(.*?)\*/g, '\\textit{$1}')
+                           // Handle images - assumes image URL is directly usable
+                           .replace(/!\[.*?\]\((.*?)\)/g, '\\begin{center}\\includegraphics[width=0.6\\textwidth]{$1}\\end{center}');
+
+
+                         // Find and separate the answer part for the questions file
+                        const answerRegexPdf = /(\n\s*(?:ans|answer)[:\s]+[a-zA-Z\d]+\s*)$/i;
+                        let questionOnlyText = processedQText.replace(answerRegexPdf, '');
+                        let solutionText = processedQText; // Keep answer for solutions
+
+                       questionsTex += `\\item ${questionOnlyText}\n\n`;
+                       solutionsTex += `\\item ${solutionText}\n\n`;
+                    }
+             }
+
+             questionsTex += `\\end{enumerate}\n${LATEX_PDF_FOOTER}`;
+             solutionsTex += `\\end{enumerate}\n${LATEX_PDF_FOOTER}`;
+
+             // Add to pending exams
+             currentSubject.pending_exams.push({
+                 id: examId,
+                 allocation: allocation, // Store the actual number selected per chapter
+                 results_entered: false
+             });
+
+             saveData(data); // Save updated available_questions and pending exam
+             hideLoading();
+
+             const questionsFilename = `Exam_${examId}.tex`;
+             const solutionsFilename = `SolutionManual_${examId}.tex`;
+
+             displayContent(`
+                <div class="bg-green-100 dark:bg-green-900 border-l-4 border-green-500 text-green-700 dark:text-green-200 p-4 rounded-md animate-fade-in mb-4">
+                    <p class="font-medium">PDF Test (.tex files) Generated!</p>
+                    <p>Exam ID: ${examId}</p>
+                    <p>Total Questions: ${questionCounter}</p>
+                </div>
+                 <div class="bg-yellow-100 dark:bg-yellow-900 border-l-4 border-yellow-500 text-yellow-700 dark:text-yellow-200 p-4 rounded-md mb-4">
+                    <p class="font-medium">Action Required:</p>
+                    <p>Download the .tex files below and compile them using a LaTeX distribution (like MiKTeX, TeX Live) or an online service (like Overleaf) to get the final PDFs.</p>
+                 </div>
+                <div class="space-y-3">
+                    <button onclick="downloadTexFile('${questionsFilename}', \`${btoa(unescape(encodeURIComponent(questionsTex)))}\`)" class="w-full btn-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
+                        Download Questions (${questionsFilename})
+                    </button>
+                    <button onclick="downloadTexFile('${solutionsFilename}', \`${btoa(unescape(encodeURIComponent(solutionsTex)))}\`)" class="w-full btn-secondary">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
+                        Download Solutions (${solutionsFilename})
+                    </button>
+                 </div>
+                 <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">This exam has been added to the pending exams list. Enter results manually once completed.</p>
+                 <div class="mt-4">${allocationDetails}</div>
+             `);
+         }
+     }, 500); // Timeout to allow loading indicator to show
 }
 
 function downloadTexFile(filename, base64Content) {
@@ -1323,84 +1265,6 @@ function downloadTexFile(filename, base64Content) {
          alert("Failed to prepare the download file. See console for details.");
      }
 }
-
-// Helper function to generate styled HTML for PDF conversion
-function generatePdfHtml(examId, questions) {
-    let questionHtml = '';
-    let solutionHtml = '';
-    let questionCounter = 0;
-
-    // Define some basic CSS styles directly in the HTML string
-    const styles = `
-        <style>
-            body { font-family: sans-serif; line-height: 1.4; font-size: 11pt; margin: 0; padding: 0;} /* Reduced font size */
-            .container { padding: 1.5cm; } /* Matches PDF margin */
-            .exam-header { text-align: center; margin-bottom: 1.5em; font-size: 14pt; font-weight: bold; border-bottom: 1px solid #ccc; padding-bottom: 0.5em; }
-            .question-list { list-style-type: none; padding-left: 0; }
-            .question-item { margin-bottom: 1.2em; padding-left: 0; page-break-inside: avoid; } /* Avoid breaking question */
-            .question-number { font-weight: bold; margin-right: 0.5em; display: inline-block; }
-            .question-content { margin-left: 2em; } /* Indent content slightly */
-            .question-text { margin-bottom: 0.8em; }
-            .options-list { list-style-type: none; padding-left: 0; margin-top: 0.5em; margin-bottom: 0.5em; }
-            .option-item { margin-bottom: 0.3em; display: flex; align-items: baseline;}
-            .option-letter { font-weight: bold; margin-right: 0.5em; width: 1.5em; /* Fixed width for alignment */ display: inline-block; text-align: right; }
-            .option-text { flex-grow: 1; }
-            .question-image { max-width: 80%; height: auto; display: block; margin: 0.5em 0; border: 1px solid #eee; padding: 2px; }
-            .solution { color: #006400; /* DarkGreen */ font-weight: bold; margin-top: 0.5em; padding-top: 0.3em; border-top: 1px dashed #ddd;}
-            .katex-display { margin: 0.5em 0; } /* Adjust display math spacing */
-            /* Add more styles as needed */
-        </style>
-    `;
-
-    // Sort questions by chapter then number for consistent order
-    questions.sort((a, b) => {
-        const chapDiff = parseInt(a.chapter) - parseInt(b.chapter);
-        if (chapDiff !== 0) return chapDiff;
-        return a.number - b.number;
-    });
-
-
-    questions.forEach(q => {
-        questionCounter++;
-        let qTextForHtml = q.text; // Render math in text
-        let optionsForHtml = (q.options || []).map(opt =>
-             `<li class="option-item"><span class="option-letter">${opt.letter}.</span><span class="option-text">${opt.text}</span></li>` // Render math in options
-        ).join('');
-        let imageHtml = q.image ? `<img src="${q.image}" alt="Question Image" class="question-image">` : '';
-
-        // --- Question HTML ---
-        questionHtml += `
-            <li class="question-item">
-                <div class="question-number">${questionCounter}.</div>
-                <div class="question-content">
-                    <div class="question-text">${qTextForHtml}</div>
-                    ${imageHtml}
-                    ${optionsForHtml ? `<ul class="options-list">${optionsForHtml}</ul>` : ''}
-                 </div>
-            </li>
-        `;
-
-        // --- Solution HTML (includes answer) ---
-         solutionHtml += `
-            <li class="question-item">
-                 <div class="question-number">${questionCounter}.</div>
-                 <div class="question-content">
-                    <div class="question-text">${qTextForHtml}</div>
-                    ${imageHtml}
-                    ${optionsForHtml ? `<ul class="options-list">${optionsForHtml}</ul>` : ''}
-                    <div class="solution">Answer: ${q.answer || 'N/A'}</div>
-                </div>
-            </li>
-         `;
-    });
-
-    const fullQuestionHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8">${styles}</head><body><div class="container"><div class="exam-header">Exam: ${examId}</div><ol class="question-list">${questionHtml}</ol></div></body></html>`;
-    const fullSolutionHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8">${styles}</head><body><div class="container"><div class="exam-header">Solutions: ${examId}</div><ol class="question-list">${solutionHtml}</ol></div></body></html>`;
-
-    return { questionHtml: fullQuestionHtml, solutionHtml: fullSolutionHtml };
-}
-
-
 
 // --- Online Test UI & Logic ---
 
@@ -1480,155 +1344,28 @@ function startTimer() {
     currentOnlineTestState.timerInterval = setInterval(updateTimerDisplay, 1000);
 }
 
-function renderLatexInElement(element) {
-    if (!element) return;
-    if (window.renderMathInElement) {
-       try {
-           window.renderMathInElement(element, {
-                delimiters: [
-                   { left: '$$', right: '$$', display: true },
-                   { left: '$', right: '$', display: false },
-                   { left: '\\(', right: '\\)', display: false },
-                   { left: '\\[', right: '\\]', display: true }
-               ],
-               throwOnError: false
-           });
-       } catch (error) {
-           console.error("KaTeX rendering error:", error);
-       }
-   } else {
-       console.warn("KaTeX auto-render not loaded yet.");
-   }
-}
-
-// --- PDF Exam Result Entry (Needs Modification) ---
-
-function submitPendingResults(index, chap_nums) {
-   showLoading("Saving PDF Results...");
-   setTimeout(() => {
-       const exam = currentSubject.pending_exams[index];
-       const chapters = currentSubject.chapters;
-       let allInputsValid = true;
-       let chapterResults = {}; // { chapNum: { attempted, wrong, correct } }
-       let totalAttemptedInExam = 0;
-       let totalWrongInExam = 0;
-
-       // *** CRITICAL CHANGE: Use the detailed allocation stored in pending_exams ***
-       // exam.allocation should now be { chapNum: [q1, q2, ...], ... }
-       const detailedAllocation = exam.allocation;
-
-       for (let chap_num of chap_nums) { // chap_nums is still just the list of chapter numbers with inputs
-           const questionsInChapter = detailedAllocation[chap_num];
-           if (!questionsInChapter || questionsInChapter.length === 0) continue; // Skip if no questions were actually selected
-
-           const n = questionsInChapter.length; // Actual number of questions for this chapter in this exam
-           totalAttemptedInExam += n;
-
-           const inputElement = document.getElementById(`wrong-${chap_num}`);
-           let wrong = parseInt(inputElement.value);
-
-            // Validate against the *actual* number of questions 'n' for this chapter
-           if (isNaN(wrong) || wrong < 0 || wrong > n) {
-               hideLoading();
-               alert(`Invalid input for Chapter ${chap_num}. Number wrong must be between 0 and ${n}.`);
-               inputElement.classList.add('border-red-500', 'ring-red-500');
-               inputElement.focus();
-               allInputsValid = false;
-               break;
-           } else {
-               inputElement.classList.remove('border-red-500', 'ring-red-500');
-               totalWrongInExam += wrong;
-               chapterResults[chap_num] = {
-                   attempted: n,
-                   wrong: wrong,
-                   correct: n - wrong // Calculate correct answers
-                };
-           }
-       }
-
-       if (!allInputsValid) {
-           hideLoading();
-           return;
-       }
-
-       // Update global chapter stats
-       for (let chap_num in chapterResults) {
-           const result = chapterResults[chap_num];
-           const chap = chapters[chap_num];
-
-           if (chap) {
-               chap.total_attempted = (chap.total_attempted || 0) + result.attempted;
-               chap.total_wrong = (chap.total_wrong || 0) + result.wrong;
-               chap.mistake_history = chap.mistake_history || [];
-               chap.mistake_history.push(result.wrong);
-               if (chap.mistake_history.length > 20) chap.mistake_history.shift();
-               chap.consecutive_mastery = (result.wrong === 0) ? (chap.consecutive_mastery || 0) + 1 : 0;
-           } else {
-               console.error(`Chapter ${chap_num} not found in global data when submitting PDF results.`);
-           }
-       }
-
-       // --- Create Exam History Record for PDF Test ---
-       const pdfExamResult = {
-           examId: exam.id,
-           subjectId: currentSubject.id,
-           timestamp: new Date().toISOString(),
-           durationMinutes: null, // Duration not tracked for PDF
-           type: 'pdf', // Add type field
-           questions: [], // No individual question data for PDF
-           score: totalAttemptedInExam - totalWrongInExam,
-           totalQuestions: totalAttemptedInExam,
-           resultsByChapter: chapterResults // Store the detailed breakdown
-       };
-
-       currentSubject.exam_history = currentSubject.exam_history || [];
-       currentSubject.exam_history.push(pdfExamResult); // Add to history
-
-       // Remove exam from pending list
-       currentSubject.pending_exams.splice(index, 1);
-       saveData(data);
-       hideLoading();
-       showExamsDashboard(); // Refresh dashboard
-
-       const successMsg = `
-           <div class="bg-green-100 dark:bg-green-900 border-l-4 border-green-500 text-green-700 dark:text-green-200 p-4 rounded-md mb-4 animate-fade-in">
-               <p class="font-medium">Results for PDF exam ${exam.id} entered successfully!</p>
-           </div>`;
-       const dashboardContent = document.getElementById('content').innerHTML;
-       displayContent(successMsg + dashboardContent);
-
-   }, 500);
-}
-
 function displayCurrentQuestion() {
     const index = currentOnlineTestState.currentQuestionIndex;
     const question = currentOnlineTestState.questions[index];
     const container = document.getElementById('question-container');
     const totalQuestions = currentOnlineTestState.questions.length;
 
-    // Generate options HTML dynamically from the parsed options
-    let optionsHtml = (question.options || []).map(opt => `
-        <label class="flex items-start space-x-3 p-3 border dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
-            <input type="radio" name="mcqOption" value="${opt.letter}" class="h-5 w-5 text-primary-600 focus:ring-primary-500 border-gray-300 dark:bg-gray-700 dark:border-gray-600 mt-1 shrink-0"
-                   ${currentOnlineTestState.userAnswers[question.id] === opt.letter ? 'checked' : ''}
+    // Basic structure - assumes MCQ A, B, C, D for now
+    // Needs more robust handling for different answer types if necessary
+    let optionsHtml = ['A', 'B', 'C', 'D'].map(opt => `
+        <label class="flex items-center space-x-3 p-3 border dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
+            <input type="radio" name="mcqOption" value="${opt}" class="h-5 w-5 text-primary-600 focus:ring-primary-500 border-gray-300 dark:bg-gray-700 dark:border-gray-600"
+                   ${currentOnlineTestState.userAnswers[question.id] === opt ? 'checked' : ''}
                    onchange="recordAnswer('${question.id}', this.value)">
-             <div class="flex items-baseline">
-                <span class="font-medium w-6 text-right mr-2">${opt.letter}.</span>
-                <span class="flex-1" id="option-text-${opt.letter}">${opt.text}</span> {/* Render LaTeX here */}
-             </div>
+            <span class="font-medium">${opt}</span>
         </label>
     `).join('');
-
-     if (!question.options || question.options.length === 0) {
-         optionsHtml = '<p class="text-sm text-yellow-600 dark:text-yellow-400">(No multiple choice options found for this question)</p>';
-     }
-
 
     container.innerHTML = `
         <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg mb-4">
             <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">Chapter ${question.chapter} - Question ${question.number}</p>
             <div class="prose dark:prose-invert max-w-none mb-6" id="question-text-area">
-                 ${question.text} {/* Render LaTeX here */}
+                ${question.text}
                  ${question.image ? `<img src="${question.image}" alt="Question Image" class="max-w-full h-auto mx-auto my-4 border dark:border-gray-600 rounded">` : ''}
             </div>
             <div class="space-y-3">
@@ -1648,16 +1385,7 @@ function displayCurrentQuestion() {
         document.getElementById('submit-btn').classList.add('hidden');
     }
 
-    // Render LaTeX after content update (including question text and options)
-    requestAnimationFrame(() => {
-         renderLatexInElement(document.getElementById('question-text-area'));
-         (question.options || []).forEach(opt => {
-             const optElement = document.getElementById(`option-text-${opt.letter}`);
-             if (optElement) {
-                 renderLatexInElement(optElement);
-             }
-         });
-    });
+    requestAnimationFrame(renderLatex); // Render LaTeX after content update
 }
 
 function navigateQuestion(direction) {
@@ -2099,25 +1827,22 @@ function showCompletedExams() {
     const completed_exams = (currentSubject.exam_history || []).slice().reverse(); // Show newest first
 
     if (completed_exams.length === 0) {
-        return '<p class="text-sm text-gray-500 dark:text-gray-400 mt-4">No completed test history found.</p>';
+        return '<p class="text-sm text-gray-500 dark:text-gray-400 mt-4">No completed online test history.</p>';
     }
 
-    let output = '<h3 class="text-lg font-semibold mb-3 mt-6 text-green-600 dark:text-green-400">Completed Exam History</h3><div class="space-y-2">';
+    let output = '<h3 class="text-lg font-semibold mb-3 mt-6 text-green-600 dark:text-green-400">Completed Online Exams</h3><div class="space-y-2">';
     completed_exams.forEach((exam, revIndex) => {
-        const originalIndex = (currentSubject.exam_history || []).length - 1 - revIndex;
-        if (originalIndex < 0) return;
+         // Find the index in the original non-reversed array for correct deletion/update
+         const originalIndex = (currentSubject.exam_history || []).length - 1 - revIndex;
+         if (originalIndex < 0) return; // Should not happen
 
         const percentage = exam.totalQuestions > 0 ? ((exam.score / exam.totalQuestions) * 100).toFixed(1) : 0;
         const date = new Date(exam.timestamp).toLocaleString();
-        const isPdfExam = exam.type === 'pdf' || !exam.questions || exam.questions.length === 0; // Identify PDF exams
 
         output += `
         <div class="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200">
              <div class="flex justify-between items-center mb-1">
-                <span class="text-sm font-medium flex items-center">
-                     ${exam.examId}
-                     ${isPdfExam ? '<span class="ml-2 text-xs bg-purple-200 text-purple-800 dark:bg-purple-700 dark:text-purple-200 px-1.5 py-0.5 rounded">PDF</span>' : '<span class="ml-2 text-xs bg-blue-200 text-blue-800 dark:bg-blue-700 dark:text-blue-200 px-1.5 py-0.5 rounded">Online</span>'}
-                </span>
+                <span class="text-sm font-medium">${exam.examId}</span>
                  <span class="text-xs text-gray-500 dark:text-gray-400">${date}</span>
              </div>
              <div class="flex justify-between items-center">
@@ -2125,17 +1850,19 @@ function showCompletedExams() {
                     ${exam.score} / ${exam.totalQuestions} (${percentage}%)
                  </span>
                  <div>
-                      <button onclick="showExamDetails(${originalIndex})" title="View Details" class="btn-secondary-small mr-2 ${isPdfExam ? 'opacity-70' : ''}"> {/* Slightly dim PDF details button */}
+                     <button onclick="showExamDetails(${originalIndex})" class="btn-secondary-small mr-2">
                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639l4.458-4.458a1.012 1.012 0 0 1 1.414 0l4.458 4.458a1.012 1.012 0 0 1 0 .639l-4.458 4.458a1.012 1.012 0 0 1-1.414 0l-4.458-4.458Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
                          Details
                     </button>
-                    <button onclick="confirmDeleteCompletedExam(${originalIndex})" title="Delete History Entry" class="btn-danger-small">
+                    <button onclick="confirmDeleteCompletedExam(${originalIndex})" class="btn-danger-small">
                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
                          Delete
                     </button>
                     </div>
             </div>
         </div>`;
+        // Add Edit button later if needed:
+        // <button onclick="editExamResults(${originalIndex})" class="btn-secondary-small mr-2">Edit</button>
     });
     output += '</div>';
     return output;
@@ -2147,64 +1874,30 @@ function showExamDetails(index) {
 
     const percentage = exam.totalQuestions > 0 ? ((exam.score / exam.totalQuestions) * 100).toFixed(1) : 0;
     const date = new Date(exam.timestamp).toLocaleString();
-    const isPdfExam = exam.type === 'pdf' || !exam.questions || exam.questions.length === 0;
 
-    let questionsHtml = '';
-    if (isPdfExam) {
-        questionsHtml = '<p class="text-sm text-gray-600 dark:text-gray-400 italic p-4 text-center bg-gray-100 dark:bg-gray-700 rounded">Detailed question breakdown is not available for manually entered PDF exam results.</p>';
-    } else {
-        // Generate HTML for online test questions (as before)
-        questionsHtml = exam.questions.map((q, i) => `
-            <div class="p-4 border dark:border-gray-600 rounded-lg mb-3 bg-white dark:bg-gray-800 shadow-sm">
-                 <p class="font-semibold mb-2">Question ${i + 1} (Chapter ${q.chapter} - ${q.number})</p>
-                <div class="prose dark:prose-invert max-w-none text-sm mb-3" id="details-q-${i}-text">
-                    ${q.text}
-                    ${q.image ? `<img src="${q.image}" alt="Question Image" class="max-w-xs h-auto my-2 border dark:border-gray-600 rounded">` : ''}
-                 </div>
-                 <div class="text-sm space-y-1">
-                     <p>Your Answer: <span class="font-medium">${q.userAnswer || 'N/A'}</span></p>
-                     <p>Correct Answer: <span class="font-medium">${q.correctAnswer}</span></p>
-                     <p>Result: <span class="font-bold ${q.isCorrect ? 'text-green-500' : 'text-red-500'}">${q.isCorrect ? 'Correct ✔' : 'Incorrect ✘'}</span></p>
-                 </div>
-             </div>
-        `).join('');
-    }
-
-     // Display Chapter Summary (useful for both types)
-     let chapterSummaryHtml = '';
-     if (exam.resultsByChapter) {
-         chapterSummaryHtml = Object.entries(exam.resultsByChapter).map(([chapNum, chapRes]) => {
-             const chapPercentage = chapRes.attempted > 0 ? ((chapRes.correct / chapRes.attempted) * 100).toFixed(1) : 0;
-             return `
-                 <li class="flex justify-between items-center p-2 bg-gray-100 dark:bg-gray-700 rounded text-sm">
-                     <span>Chapter ${chapNum}</span>
-                     <span class="font-medium ${chapRes.wrong > 0 ? 'text-red-500' : 'text-green-500'}">
-                         ${chapRes.correct} / ${chapRes.attempted} (${chapPercentage}%)
-                     </span>
-                 </li>`;
-         }).join('');
-     }
-
+    let questionsHtml = exam.questions.map((q, i) => `
+        <div class="p-4 border dark:border-gray-600 rounded-lg mb-3 bg-white dark:bg-gray-800 shadow-sm">
+            <p class="font-semibold mb-2">Question ${i + 1} (Chapter ${q.chapter} - ${q.number})</p>
+            <div class="prose dark:prose-invert max-w-none text-sm mb-3" id="details-q-${i}-text">
+                 ${q.text}
+                 ${q.image ? `<img src="${q.image}" alt="Question Image" class="max-w-xs h-auto my-2 border dark:border-gray-600 rounded">` : ''}
+            </div>
+            <div class="text-sm space-y-1">
+                <p>Your Answer: <span class="font-medium">${q.userAnswer || 'N/A'}</span></p>
+                <p>Correct Answer: <span class="font-medium">${q.correctAnswer}</span></p>
+                <p>Result: <span class="font-bold ${q.isCorrect ? 'text-green-500' : 'text-red-500'}">${q.isCorrect ? 'Correct ✔' : 'Incorrect ✘'}</span></p>
+            </div>
+        </div>
+    `).join('');
 
     const html = `
         <div class="bg-gray-50 dark:bg-gray-900 p-6 rounded-lg shadow-inner mb-4">
-             <h2 class="text-xl font-semibold mb-2 text-primary-600 dark:text-primary-400 flex items-center">
-                Exam Details: ${exam.examId}
-                 ${isPdfExam ? '<span class="ml-2 text-xs bg-purple-200 text-purple-800 dark:bg-purple-700 dark:text-purple-200 px-1.5 py-0.5 rounded">PDF</span>' : '<span class="ml-2 text-xs bg-blue-200 text-blue-800 dark:bg-blue-700 dark:text-blue-200 px-1.5 py-0.5 rounded">Online</span>'}
-             </h2>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">${date}${exam.durationMinutes ? ` - Duration: ${exam.durationMinutes} min` : ''}</p>
+            <h2 class="text-xl font-semibold mb-2 text-primary-600 dark:text-primary-400">Exam Details: ${exam.examId}</h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">${date} - Duration: ${exam.durationMinutes} min</p>
             <p class="text-lg font-bold mb-4">Overall Score: ${exam.score} / ${exam.totalQuestions} (${percentage}%)</p>
 
-            ${chapterSummaryHtml ? `
-                 <h3 class="text-md font-semibold mb-2 mt-5">Chapter Performance</h3>
-                 <ul class="space-y-1 mb-5">
-                     ${chapterSummaryHtml}
-                 </ul>
-            ` : ''}
-
-
-            <h3 class="text-md font-semibold mb-3 mt-5">Question Breakdown</h3>
-            <div class="max-h-96 overflow-y-auto pr-2 border dark:border-gray-700 rounded bg-gray-200 dark:bg-gray-800 p-2">
+            <h3 class="text-lg font-semibold mb-3 mt-5">Question Breakdown</h3>
+            <div class="max-h-96 overflow-y-auto pr-2">
                 ${questionsHtml}
             </div>
 
@@ -2215,17 +1908,17 @@ function showExamDetails(index) {
         </div>
     `;
     displayContent(html);
-
-    // Render LaTeX only if it's an online exam with questions
-    if (!isPdfExam && exam.questions) {
-        requestAnimationFrame(() => {
-            exam.questions.forEach((q, i) => {
-                const element = document.getElementById(`details-q-${i}-text`);
-                renderLatexInElement(element); // Use helper
-                 // Also render options if they exist in the details HTML (which they don't currently)
-            });
+     // Render LaTeX after displaying content
+     requestAnimationFrame(() => {
+        exam.questions.forEach((q, i) => {
+            const element = document.getElementById(`details-q-${i}-text`);
+            if (element && window.renderMathInElement) {
+                 try {
+                     window.renderMathInElement(element, { delimiters: [ { left: '$$', right: '$$', display: true }, { left: '$', right: '$', display: false } ]});
+                 } catch(e) { console.error("Katex error on details:", e)}
+            }
         });
-    }
+    });
 }
 
 function confirmDeletePendingExam(index) {
@@ -2808,59 +2501,6 @@ function exit() {
 }
 
 // --- Initialization ---
-
-async function generateAndDownloadPdf(htmlContent, baseFilename) {
-    showLoading(`Generating ${baseFilename}...`);
-
-    // Create a temporary, hidden element to render the HTML
-    const tempElement = document.createElement('div');
-    tempElement.style.position = 'fixed';
-    tempElement.style.left = '-9999px'; // Position off-screen
-    tempElement.style.width = '21cm'; // A4 width approx
-    tempElement.innerHTML = htmlContent;
-    document.body.appendChild(tempElement);
-
-    // Render KaTeX within the temporary element
-    try {
-        await renderMathInElement(tempElement, { // Use await if renderMathInElement is async or returns a promise
-             delimiters: [
-                { left: '$$', right: '$$', display: true },
-                { left: '$', right: '$', display: false },
-                { left: '\\(', right: '\\)', display: false },
-                { left: '\\[', right: '\\]', display: true }
-            ],
-            throwOnError: false
-        });
-         console.log("KaTeX rendered for PDF generation.");
-    } catch (error) {
-        console.error("KaTeX rendering error during PDF generation:", error);
-        // Continue anyway, math might just look bad
-    }
-
-     // Allow a short time for rendering to settle (especially images)
-     await new Promise(resolve => setTimeout(resolve, 500));
-
-
-    // Configure html2pdf
-    const options = { ...PDF_GENERATION_OPTIONS }; // Clone base options
-    options.filename = `${baseFilename}.pdf`;
-
-    // Generate PDF
-    try {
-        console.log(`Starting html2pdf generation for ${options.filename}`);
-        const pdfWorker = html2pdf().set(options).from(tempElement);
-        await pdfWorker.save(); // Triggers download
-        console.log(`PDF generation successful for ${options.filename}`);
-    } catch (error) {
-        console.error(`Error generating PDF ${options.filename}:`, error);
-        alert(`Failed to generate PDF: ${options.filename}. Error: ${error.message}. Please try downloading the .tex source instead.`);
-    } finally {
-        // Clean up the temporary element
-        document.body.removeChild(tempElement);
-        hideLoading();
-    }
-}
-
 
 async function initializeApp() {
      showLoading("Initializing and loading chapters...");
