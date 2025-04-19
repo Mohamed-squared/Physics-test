@@ -1362,14 +1362,9 @@ function displayCurrentQuestion() {
         return;
     }
 
-    // Optional: Uncomment to debug the exact data being used
-    // console.log("Rendering question data:", JSON.stringify(question, null, 2));
-
-    // Generate options HTML dynamically from the parsed options
+    // ... (keep the existing optionsHtml generation logic) ...
     let optionsHtml = (question.options || []).map(opt => {
-        // Replace markdown newlines with <br> for HTML display in options
         const optionTextHtml = opt.text.replace(/\n/g, '<br>');
-       // Added unique ID to option text container for potential future targeting
        return `
        <label class="flex items-start space-x-3 p-3 border dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
            <input type="radio" name="mcqOption" value="${opt.letter}" class="h-5 w-5 text-primary-600 focus:ring-primary-500 border-gray-300 dark:bg-gray-700 dark:border-gray-600 mt-1 shrink-0"
@@ -1377,95 +1372,62 @@ function displayCurrentQuestion() {
                   onchange="recordAnswer('${question.id}', this.value)">
             <div class="flex items-baseline">
                <span class="font-medium w-6 text-right mr-2">${opt.letter}.</span>
-                <div class="flex-1 option-text-container" id="option-text-${question.id}-${opt.letter}">${optionTextHtml}</div>
+                <div class="flex-1 option-text-container" id="option-text-${opt.letter}">${optionTextHtml}</div>
             </div>
        </label>
        `
    }).join('');
+   // ... (rest of optionsHtml logic) ...
 
-    if (!question.options || question.options.length === 0) {
-        optionsHtml = '<p class="text-sm text-yellow-600 dark:text-yellow-400">(No multiple choice options found for this question)</p>';
-    }
 
-   // Set the container's innerHTML - comments removed from inside the template literal
-   // Added unique IDs to key areas for better targeting
    container.innerHTML = `
-       <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg mb-4 animate-fade-in" id="current-question-card-${question.id}">
+       <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg mb-4 animate-fade-in">
            <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">Chapter ${question.chapter} - Question ${question.number}</p>
-           <div class="prose dark:prose-invert max-w-none mb-6" id="question-text-area-${question.id}">
-                ${question.text}
+           <div class="prose dark:prose-invert max-w-none mb-6" id="question-text-area">
+                ${question.text} {/* Assumes question.text contains the $...$ */}
                 ${question.image ? `<img src="${question.image}" alt="Question Image" class="max-w-full h-auto mx-auto my-4 border dark:border-gray-600 rounded">` : ''}
            </div>
-           <div class="space-y-3" id="question-options-area-${question.id}">
-               ${optionsHtml}
+           <div class="space-y-3">
+               ${optionsHtml} {/* Options text might also contain $...$ */}
            </div>
        </div>
    `;
 
-   // Use setTimeout to ensure DOM update before rendering KaTeX
-   setTimeout(() => {
+   // --- ADD THIS BLOCK ---
+   // Re-render KaTeX for the newly added content
+   requestAnimationFrame(() => { // Use rAF or setTimeout(0) for safety
        if (typeof renderMathInElement === 'function') {
-           // Find the specific question card element that was just added
-           const questionCard = document.getElementById(`current-question-card-${question.id}`);
-           if (questionCard) {
-                renderMathInElement(questionCard, { // Target the specific question card
-                   delimiters: [
-                       {left: '$$', right: '$$', display: true},
-                       {left: '$', right: '$', display: false},
-                       {left: '\\(', right: '\\)', display: false},
-                       {left: '\\[', right: '\\]', display: true}
-                   ],
-                   throwOnError: false // Prevent errors from stopping script execution
-                });
-                // Optional: console.log("KaTeX rendered via setTimeout for question card:", question.id);
-           } else {
-               console.error(`Question card element not found for KaTeX rendering: current-question-card-${question.id}`);
-           }
+           renderMathInElement(container, {
+               delimiters: [
+                   {left: '$$', right: '$$', display: true},
+                   {left: '$', right: '$', display: false},
+                   {left: '\\(', right: '\\)', display: false},
+                   {left: '\\[', right: '\\]', display: true}
+               ],
+               throwOnError: false
+           });
+           console.log("KaTeX rendered for question:", question.id);
        } else {
-           console.error("renderMathInElement is not defined when trying to render question (setTimeout). Check KaTeX script loading.");
+           console.error("renderMathInElement is not defined when trying to render question.");
        }
-   }, 50); // 50ms delay; adjust if needed (0 might work, 100 might be safer)
+   });
+   // --- END OF ADDED BLOCK ---
 
 
    // Update navigation buttons and counter
-   // Use the 'index' variable directly as it represents the current state for this display call
-   const prevBtn = document.getElementById('prev-btn');
-   const nextBtn = document.getElementById('next-btn');
-   const submitBtn = document.getElementById('submit-btn');
-   const questionCounter = document.getElementById('question-counter');
-
-   if (questionCounter) {
-        questionCounter.textContent = `Question ${index + 1} / ${totalQuestions}`;
-   }
-   if (prevBtn) {
-        prevBtn.disabled = (index === 0);
-   }
-
-   if (index === totalQuestions - 1) {
-       // Last question: hide Next, show Submit
-       if (nextBtn) nextBtn.classList.add('hidden');
-       if (submitBtn) submitBtn.classList.remove('hidden');
-   } else {
-       // Not the last question: show Next, hide Submit
-       if (nextBtn) nextBtn.classList.remove('hidden');
-       if (submitBtn) submitBtn.classList.add('hidden');
-   }
+   document.getElementById('question-counter').textContent = `Question ${index + 1} / ${totalQuestions}`;
+   // ... (rest of the function) ...
 }
 
 
 function navigateQuestion(direction) {
     if (!currentOnlineTestState) return;
-    console.log("Navigating. Direction:", direction, "Current Index:", currentOnlineTestState.currentQuestionIndex); // ADD LOG
     const newIndex = currentOnlineTestState.currentQuestionIndex + direction;
     const totalQuestions = currentOnlineTestState.questions.length;
-    console.log("Calculated New Index:", newIndex); // ADD LOG
 
     if (newIndex >= 0 && newIndex < totalQuestions) {
         currentOnlineTestState.currentQuestionIndex = newIndex;
-        console.log("Updated Index To:", currentOnlineTestState.currentQuestionIndex); // ADD LOG
         displayCurrentQuestion();
-    } else {
-         console.log("Navigation prevented: Index out of bounds."); // ADD LOG
     }
 }
 
@@ -1975,36 +1937,50 @@ function showCompletedExams() {
 }
 
 function showExamDetails(index) {
-    const exam = currentSubject.exam_history[index];
-    // ... (setup code, generate questionsHtml) ...
+    // ... (existing code to get exam data, setup basic HTML) ...
 
-    const html = `...`; // Your existing HTML structure
+    const html = `
+        <div class="bg-gray-50 dark:bg-gray-900 p-6 rounded-lg shadow-inner mb-4">
+             {/* ... other details ... */}
+
+            <h3 class="text-md font-semibold mb-3 mt-5">Question Breakdown</h3>
+            <div class="max-h-96 overflow-y-auto pr-2 border dark:border-gray-700 rounded bg-gray-200 dark:bg-gray-800 p-2">
+                ${questionsHtml} {/* This contains the individual question divs */}
+            </div>
+
+            <button onclick="showExamsDashboard()" class="mt-6 w-full btn-secondary">
+                {/* ... button content ... */}
+            </button>
+        </div>
+    `;
     displayContent(html);
 
+    // --- MODIFY THIS BLOCK ---
     // Render LaTeX only if it's an online exam with questions
     if (!isPdfExam && exam.questions) {
-        setTimeout(() => { // Use setTimeout here as well
-            if (typeof renderMathInElement === 'function') {
-                const detailContainer = document.querySelector('.max-h-96.overflow-y-auto'); // Target the main container for details
-                if (detailContainer) {
-                    renderMathInElement(detailContainer, { // Render math within this container
-                        delimiters: [
-                            {left: '$$', right: '$$', display: true},
-                            {left: '$', right: '$', display: false},
-                            {left: '\\(', right: '\\)', display: false},
-                            {left: '\\[', right: '\\]', display: true}
-                        ],
-                        throwOnError: false
-                    });
-                    // console.log("KaTeX rendered via setTimeout for exam details container.");
-                } else {
-                     console.error("Exam details container not found for KaTeX rendering.");
+        requestAnimationFrame(() => { // Use rAF or setTimeout(0)
+            exam.questions.forEach((q, i) => {
+                const element = document.getElementById(`details-q-${i}-text`);
+                // --- ADD THE CALL HERE ---
+                if (element && typeof renderMathInElement === 'function') {
+                     renderMathInElement(element.parentNode, { // Render parent div to catch text and image areas
+                         delimiters: [
+                             {left: '$$', right: '$$', display: true},
+                             {left: '$', right: '$', display: false},
+                             {left: '\\(', right: '\\)', display: false},
+                             {left: '\\[', right: '\\]', display: true}
+                         ],
+                         throwOnError: false
+                     });
+                } else if (!element){
+                     console.warn(`Element details-q-${i}-text not found for KaTeX rendering.`);
                 }
-            } else {
-                 console.error("renderMathInElement is not defined when trying to render exam details (setTimeout).");
-            }
-        }, 50); // Small delay
+                // --- END OF ADDED CALL ---
+            });
+            console.log("KaTeX rendered for exam details review.");
+        });
     }
+    // --- END OF MODIFIED BLOCK ---
 }
 
 function confirmDeletePendingExam(index) {
