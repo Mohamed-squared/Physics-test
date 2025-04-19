@@ -1362,9 +1362,8 @@ function displayCurrentQuestion() {
         return;
     }
 
-    // Generate options HTML dynamically from the parsed options
+    // ... (keep the existing optionsHtml generation logic) ...
     let optionsHtml = (question.options || []).map(opt => {
-        // Replace markdown newlines with <br> for HTML display in options
         const optionTextHtml = opt.text.replace(/\n/g, '<br>');
        return `
        <label class="flex items-start space-x-3 p-3 border dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
@@ -1378,35 +1377,46 @@ function displayCurrentQuestion() {
        </label>
        `
    }).join('');
+   // ... (rest of optionsHtml logic) ...
 
-    if (!question.options || question.options.length === 0) {
-        optionsHtml = '<p class="text-sm text-yellow-600 dark:text-yellow-400">(No multiple choice options found for this question)</p>';
-    }
 
    container.innerHTML = `
        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg mb-4 animate-fade-in">
            <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">Chapter ${question.chapter} - Question ${question.number}</p>
            <div class="prose dark:prose-invert max-w-none mb-6" id="question-text-area">
-                ${question.text}
+                ${question.text} {/* Assumes question.text contains the $...$ */}
                 ${question.image ? `<img src="${question.image}" alt="Question Image" class="max-w-full h-auto mx-auto my-4 border dark:border-gray-600 rounded">` : ''}
            </div>
            <div class="space-y-3">
-               ${optionsHtml}
+               ${optionsHtml} {/* Options text might also contain $...$ */}
            </div>
        </div>
    `;
 
+   // --- ADD THIS BLOCK ---
+   // Re-render KaTeX for the newly added content
+   requestAnimationFrame(() => { // Use rAF or setTimeout(0) for safety
+       if (typeof renderMathInElement === 'function') {
+           renderMathInElement(container, {
+               delimiters: [
+                   {left: '$$', right: '$$', display: true},
+                   {left: '$', right: '$', display: false},
+                   {left: '\\(', right: '\\)', display: false},
+                   {left: '\\[', right: '\\]', display: true}
+               ],
+               throwOnError: false
+           });
+           console.log("KaTeX rendered for question:", question.id);
+       } else {
+           console.error("renderMathInElement is not defined when trying to render question.");
+       }
+   });
+   // --- END OF ADDED BLOCK ---
+
+
    // Update navigation buttons and counter
    document.getElementById('question-counter').textContent = `Question ${index + 1} / ${totalQuestions}`;
-   document.getElementById('prev-btn').disabled = (index === 0);
-   if (index === totalQuestions - 1) {
-       document.getElementById('next-btn').classList.add('hidden');
-       document.getElementById('submit-btn').classList.remove('hidden');
-   } else {
-       document.getElementById('next-btn').classList.remove('hidden');
-       document.getElementById('submit-btn').classList.add('hidden');
-   }
-
+   // ... (rest of the function) ...
 }
 
 
@@ -1927,88 +1937,50 @@ function showCompletedExams() {
 }
 
 function showExamDetails(index) {
-    const exam = currentSubject.exam_history[index];
-    if (!exam) return;
-
-    const percentage = exam.totalQuestions > 0 ? ((exam.score / exam.totalQuestions) * 100).toFixed(1) : 0;
-    const date = new Date(exam.timestamp).toLocaleString();
-    const isPdfExam = exam.type === 'pdf' || !exam.questions || exam.questions.length === 0;
-
-    let questionsHtml = '';
-    if (isPdfExam) {
-        questionsHtml = '<p class="text-sm text-gray-600 dark:text-gray-400 italic p-4 text-center bg-gray-100 dark:bg-gray-700 rounded">Detailed question breakdown is not available for manually entered PDF exam results.</p>';
-    } else {
-        // Generate HTML for online test questions (as before)
-        questionsHtml = exam.questions.map((q, i) => `
-            <div class="p-4 border dark:border-gray-600 rounded-lg mb-3 bg-white dark:bg-gray-800 shadow-sm">
-                 <p class="font-semibold mb-2">Question ${i + 1} (Chapter ${q.chapter} - ${q.number})</p>
-                <div class="prose dark:prose-invert max-w-none text-sm mb-3" id="details-q-${i}-text">
-                    ${q.text}
-                    ${q.image ? `<img src="${q.image}" alt="Question Image" class="max-w-xs h-auto my-2 border dark:border-gray-600 rounded">` : ''}
-                 </div>
-                 <div class="text-sm space-y-1">
-                     <p>Your Answer: <span class="font-medium">${q.userAnswer || 'N/A'}</span></p>
-                     <p>Correct Answer: <span class="font-medium">${q.correctAnswer}</span></p>
-                     <p>Result: <span class="font-bold ${q.isCorrect ? 'text-green-500' : 'text-red-500'}">${q.isCorrect ? 'Correct ✔' : 'Incorrect ✘'}</span></p>
-                 </div>
-             </div>
-        `).join('');
-    }
-
-     // Display Chapter Summary (useful for both types)
-     let chapterSummaryHtml = '';
-     if (exam.resultsByChapter) {
-         chapterSummaryHtml = Object.entries(exam.resultsByChapter).map(([chapNum, chapRes]) => {
-             const chapPercentage = chapRes.attempted > 0 ? ((chapRes.correct / chapRes.attempted) * 100).toFixed(1) : 0;
-             return `
-                 <li class="flex justify-between items-center p-2 bg-gray-100 dark:bg-gray-700 rounded text-sm">
-                     <span>Chapter ${chapNum}</span>
-                     <span class="font-medium ${chapRes.wrong > 0 ? 'text-red-500' : 'text-green-500'}">
-                         ${chapRes.correct} / ${chapRes.attempted} (${chapPercentage}%)
-                     </span>
-                 </li>`;
-         }).join('');
-     }
-
+    // ... (existing code to get exam data, setup basic HTML) ...
 
     const html = `
         <div class="bg-gray-50 dark:bg-gray-900 p-6 rounded-lg shadow-inner mb-4">
-             <h2 class="text-xl font-semibold mb-2 text-primary-600 dark:text-primary-400 flex items-center">
-                Exam Details: ${exam.examId}
-                 ${isPdfExam ? '<span class="ml-2 text-xs bg-purple-200 text-purple-800 dark:bg-purple-700 dark:text-purple-200 px-1.5 py-0.5 rounded">PDF</span>' : '<span class="ml-2 text-xs bg-blue-200 text-blue-800 dark:bg-blue-700 dark:text-blue-200 px-1.5 py-0.5 rounded">Online</span>'}
-             </h2>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">${date}${exam.durationMinutes ? ` - Duration: ${exam.durationMinutes} min` : ''}</p>
-            <p class="text-lg font-bold mb-4">Overall Score: ${exam.score} / ${exam.totalQuestions} (${percentage}%)</p>
-
-            ${chapterSummaryHtml ? `
-                 <h3 class="text-md font-semibold mb-2 mt-5">Chapter Performance</h3>
-                 <ul class="space-y-1 mb-5">
-                     ${chapterSummaryHtml}
-                 </ul>
-            ` : ''}
-
+             {/* ... other details ... */}
 
             <h3 class="text-md font-semibold mb-3 mt-5">Question Breakdown</h3>
             <div class="max-h-96 overflow-y-auto pr-2 border dark:border-gray-700 rounded bg-gray-200 dark:bg-gray-800 p-2">
-                ${questionsHtml}
+                ${questionsHtml} {/* This contains the individual question divs */}
             </div>
 
             <button onclick="showExamsDashboard()" class="mt-6 w-full btn-secondary">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" /></svg>
-                 Back to Exams Dashboard
+                {/* ... button content ... */}
             </button>
         </div>
     `;
     displayContent(html);
 
+    // --- MODIFY THIS BLOCK ---
     // Render LaTeX only if it's an online exam with questions
     if (!isPdfExam && exam.questions) {
-        requestAnimationFrame(() => {
+        requestAnimationFrame(() => { // Use rAF or setTimeout(0)
             exam.questions.forEach((q, i) => {
                 const element = document.getElementById(`details-q-${i}-text`);
-                });
+                // --- ADD THE CALL HERE ---
+                if (element && typeof renderMathInElement === 'function') {
+                     renderMathInElement(element.parentNode, { // Render parent div to catch text and image areas
+                         delimiters: [
+                             {left: '$$', right: '$$', display: true},
+                             {left: '$', right: '$', display: false},
+                             {left: '\\(', right: '\\)', display: false},
+                             {left: '\\[', right: '\\]', display: true}
+                         ],
+                         throwOnError: false
+                     });
+                } else if (!element){
+                     console.warn(`Element details-q-${i}-text not found for KaTeX rendering.`);
+                }
+                // --- END OF ADDED CALL ---
+            });
+            console.log("KaTeX rendered for exam details review.");
         });
     }
+    // --- END OF MODIFIED BLOCK ---
 }
 
 function confirmDeletePendingExam(index) {
