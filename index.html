@@ -1,3 +1,5 @@
+--- START OF FILE index.html ---
+
 <!DOCTYPE html>
 <html lang="en" class="light">
 <head>
@@ -49,7 +51,7 @@
     <!-- KaTeX for LaTeX Rendering -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" integrity="sha384-Xi8rHCmBmhbuyyhbI88391ZKP2dmfnOl4rT9ZfRI7mLTdk1wblIUnrIq35nqwEvC" crossorigin="anonymous">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js" integrity="sha384-hIoBPJpTUs74ddyc4bFZSM1TVlQDA60VBbJS0oA934VSz82sBx1jxWCoaugHZT3S" crossorigin="anonymous"></script>
-    <!-- Optional: KaTeX auto-render extension (JS handles rendering now, but good to have) -->
+    <!-- KaTeX auto-render extension -->
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"></script>
 
     <!-- Chart.js for dashboard charts -->
@@ -166,5 +168,29 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <!-- Load the main script -->
     <script src="script.js"></script>
+
+    <!-- ADDED SCRIPT BLOCK FOR KATEX AUTO-RENDER INITIALIZATION -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+          // Check if renderMathInElement is available before calling it
+          if (typeof renderMathInElement === 'function') {
+              renderMathInElement(document.body, {
+                  // customised options
+                  delimiters: [
+                      {left: '$$', right: '$$', display: true},
+                      {left: '$', right: '$', display: false},
+                      {left: '\\(', right: '\\)', display: false},
+                      {left: '\\[', right: '\\]', display: true}
+                  ],
+                  // • rendering keys, e.g.:
+                  throwOnError : false
+              });
+          } else {
+              console.error("KaTeX auto-render function (renderMathInElement) not found. Ensure auto-render.min.js is loaded correctly.");
+          }
+      });
+    </script>
+    <!-- END OF ADDED SCRIPT BLOCK -->
+
 </body>
 </html>
