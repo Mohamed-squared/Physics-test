@@ -1396,7 +1396,6 @@ function displayCurrentQuestion() {
                   onchange="recordAnswer('${question.id}', this.value)">
             <div class="flex items-baseline">
                <span class="font-medium w-6 text-right mr-2">${opt.letter}.</span>
-               {/* Removed comment placeholder */}
                 <div class="flex-1 option-text-container" id="option-text-${opt.letter}">${optionTextHtml}</div>
             </div>
        </label>
@@ -1410,7 +1409,6 @@ function displayCurrentQuestion() {
    container.innerHTML = `
        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg mb-4 animate-fade-in">
            <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">Chapter ${question.chapter} - Question ${question.number}</p>
-           {/* Removed comment placeholder */}
            <div class="prose dark:prose-invert max-w-none mb-6" id="question-text-area">
                 ${question.text}
                 ${question.image ? `<img src="${question.image}" alt="Question Image" class="max-w-full h-auto mx-auto my-4 border dark:border-gray-600 rounded">` : ''}
